@@ -7,6 +7,13 @@ This repository contains the source code for:
 * [efivar](efivar) - A Rust crate to read and write EFI variables
 * [efiboot](efiboot) - A command-line tool to manage the UEFI boot manager
 
+The efiboot tool supports both Windows and Linux:
+
+* Windows: administrative rights are required to both *read* and *write* variables.
+* Linux: efivarfs should be mounted at /sys/firmware/efi/efivars on all major
+  distros. With the default settings, standard users should be able to read
+  variables, while writing to variables requires being root.
+
 ## Development status
 
 ***This project is still under heavy development. Its public interface should

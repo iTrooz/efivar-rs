@@ -4,6 +4,11 @@
 //! On Linux, it is assumed that efivarfs is mounted and available at /sys/firmware/efi/efivars,
 //! which should be the default nowadays on all major distros.
 //!
+//! On Windows, it uses the Get/SetFirmwareEnvironmentVariable family of functions, which require
+//! administrative rights. This also requires adjusting the security token for the current thread
+//! to include SeSystemEnvironmentPrivilege. This is done during the initialization of
+//! SystemManager (see  SystemManager::new() ).
+//!
 //! In-memory and filesystem storage are also provided for testing purposes, or as a way to dump
 //! system variables to an external file.
 
@@ -15,6 +20,9 @@ extern crate toml;
 #[macro_use]
 extern crate serde_derive;
 extern crate serde;
+
+#[cfg(windows)]
+extern crate winapi;
 
 /// EFI constants based on the [UEFI specification](http://www.uefi.org/sites/default/files/resources/UEFI_Spec_2_7.pdf)
 pub mod efi;
@@ -28,7 +36,7 @@ pub use reader::VarReader;
 pub use writer::VarWriter;
 
 /// Represents an EFI variable manager that can read, write and list variables
-pub trait VarManager: VarReader + VarWriter { }
+pub trait VarManager: VarReader + VarWriter {}
 
 use sys::SystemManager;
 /// Returns a `VarManager` that represents the firmware variables of the running system

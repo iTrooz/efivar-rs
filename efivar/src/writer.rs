@@ -15,4 +15,3 @@ pub trait VarWriter {
     /// * `value` - EFI variable contents
     fn write(&mut self, name: &str, attributes: VariableFlags, value: &[u8]) -> io::Result<()>;
 }
-

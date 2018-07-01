@@ -60,7 +60,10 @@ impl Drop for FileStore {
 }
 
 impl VariableStore for FileStore {
-    fn get_vendor_group(&self) -> &VendorGroup { &self.vendor_group }
-    fn get_vendor_group_mut(&mut self) -> &mut VendorGroup { &mut self.vendor_group }
+    fn get_vendor_group(&self) -> &VendorGroup {
+        &self.vendor_group
+    }
+    fn get_vendor_group_mut(&mut self) -> &mut VendorGroup {
+        &mut self.vendor_group
+    }
 }
-

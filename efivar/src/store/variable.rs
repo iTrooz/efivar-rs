@@ -1,5 +1,5 @@
-use ::efi::{VariableFlags, parse_name};
-use ::{VarManager, VarReader, VarWriter};
+use efi::{parse_name, VariableFlags};
+use {VarManager, VarReader, VarWriter};
 
 use super::VendorGroup;
 
@@ -13,8 +13,7 @@ pub trait VariableStore: VarManager {
 
 impl<T: VariableStore> VarReader for T {
     fn read(&self, name: &str) -> io::Result<(VariableFlags, Vec<u8>)> {
-        let (guid, variable_name) = parse_name(name)
-            .map_err(|e| Error::new(ErrorKind::Other, e))?;
+        let (guid, variable_name) = parse_name(name).map_err(|e| Error::new(ErrorKind::Other, e))?;
 
         self.get_vendor_group()
             .vendor(guid)
@@ -33,8 +32,7 @@ impl<T: VariableStore> VarReader for T {
 
 impl<T: VariableStore> VarWriter for T {
     fn write(&mut self, name: &str, attributes: VariableFlags, value: &[u8]) -> io::Result<()> {
-        let (guid, variable_name) = parse_name(name)
-            .map_err(|e| Error::new(ErrorKind::Other, e))?;
+        let (guid, variable_name) = parse_name(name).map_err(|e| Error::new(ErrorKind::Other, e))?;
 
         // Set variable
         self.get_vendor_group_mut()
@@ -46,5 +44,4 @@ impl<T: VariableStore> VarWriter for T {
     }
 }
 
-impl<T: VariableStore> VarManager for T {
-}
+impl<T: VariableStore> VarManager for T {}

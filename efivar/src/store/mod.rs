@@ -12,4 +12,3 @@ use self::vendor_group::VendorGroup;
 
 pub use self::file::FileStore;
 pub use self::memory::MemoryStore;
-

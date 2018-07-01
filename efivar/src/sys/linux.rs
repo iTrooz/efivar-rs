@@ -3,7 +3,7 @@ use std::io;
 use std::io::prelude::*;
 
 use efi::VariableFlags;
-use ::{VarManager, VarReader, VarWriter};
+use {VarManager, VarReader, VarWriter};
 
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
 
@@ -56,4 +56,4 @@ impl VarWriter for SystemManager {
     }
 }
 
-impl VarManager for SystemManager { }
+impl VarManager for SystemManager {}
