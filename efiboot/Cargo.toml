@@ -5,6 +5,6 @@ authors = ["Vincent Tavernier <vince.tavernier@gmail.com>"]
 description = "EFI boot manager variable editor written in Rust"
 
 [dependencies]
-clap = "2.32.0"
+clap = "2.32"
 efivar = { path = "../efivar" }
-itertools = "0.7.0"
+itertools = "0.7"
