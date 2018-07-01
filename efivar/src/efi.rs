@@ -97,6 +97,7 @@ pub fn parse_name<'b>(name: &'b str) -> Result<(&'b str, &'b str), String> {
 /// assert_eq!(to_fullname("BootOrder"), "BootOrder-8be4df61-93ca-11d2-aa0d-00e098032b8c");
 /// assert_eq!(to_fullname("BootOrder-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"),
 ///     "BootOrder-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx");
+/// ```
 pub fn to_fullname(name: &str) -> String {
     if name.find('-').is_some() {
         String::from(name)
