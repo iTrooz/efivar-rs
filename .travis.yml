@@ -1,14 +1,5 @@
 language: rust
 sudo: true
-addons:
-  apt:
-    packages:
-      - libcurl4-openssl-dev
-      - libelf-dev
-      - libdw-dev
-      - cmake
-      - gcc
-      - binutils-dev
 rust:
   - stable
   - beta
@@ -17,27 +8,10 @@ matrix:
   allow_failures:
     - rust: nightly
   fast_finish: true
-cache:
-  cargo: true
-  directories:
-    - ${HOME}/kcov
+cache: cargo
 env:
   global:
     - CARGO_MAKE_RUN_CODECOV="true"
-    - 'PATH=${PATH}:${HOME}/kcov/bin'
-install: |
-  if ! [ -x "${HOME}/kcov/bin/kcov" ]; then
-    wget https://github.com/SimonKagstrom/kcov/archive/v34.tar.gz
-    tar xzf v34.tar.gz
-    cd kcov-34
-    mkdir build
-    cd build
-    cmake -DCMAKE_INSTALL_PREFIX=${HOME}/kcov ..
-    make
-    make install
-    cd ../..
-    rm -rf kcov-34
-  fi
 script:
   - hash cargo-make || cargo install cargo-make
   - cargo make workspace-ci-flow --no-workspace

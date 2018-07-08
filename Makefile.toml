@@ -1,0 +1,10 @@
+[env]
+CARGO_MAKE_EXTEND_WORKSPACE_MAKEFILE = "true"
+
+[tasks.coverage]
+alias = "coverage-tarpaulin"
+
+[tasks.coverage-tarpaulin.linux]
+install_script = ["hash cargo-tarpaulin || RUSTFLAGS='--cfg procmacro2_semver_exempt' cargo install cargo-tarpaulin"]
+command = "cargo"
+args = ["tarpaulin", "--out", "Xml"]
