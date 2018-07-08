@@ -1,9 +1,11 @@
+use std::fs;
 use std::fs::{File, OpenOptions};
 use std::io;
 use std::io::prelude::*;
+use std::io::{Error, ErrorKind};
 
 use efi::VariableFlags;
-use {VarManager, VarReader, VarWriter};
+use {VarEnumerator, VarManager, VarReader, VarWriter};
 
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
 
@@ -19,7 +21,17 @@ impl SystemManager {
 
 impl VarEnumerator for SystemManager {
     fn get_var_names(&self) -> io::Result<Vec<String>> {
-        fs::read_dir(EFIVARFS_ROOT)
+        fs::read_dir(EFIVARFS_ROOT).map(|list| {
+            list.filter_map(|result| {
+                result
+                    .and_then(|entry| {
+                        entry.file_name().into_string().map_err(|_str| {
+                            Error::new(ErrorKind::Other, "Failed to decode filename as valid UTF-8")
+                        })
+                    })
+                    .ok()
+            }).collect()
+        })
     }
 }
 
