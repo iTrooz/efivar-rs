@@ -4,17 +4,9 @@ use std::ffi::OsStr;
 use std::iter::once;
 use std::mem;
 use std::os::windows::ffi::OsStrExt;
-use std::ptr::null_mut;
 use winapi::ctypes::c_void;
-use winapi::shared::minwindef::{BOOL, FALSE};
-use winapi::um::handleapi::CloseHandle;
-use winapi::um::processthreadsapi::{GetCurrentProcess, OpenProcessToken};
-use winapi::um::securitybaseapi::AdjustTokenPrivileges;
 use winapi::um::winbase::{
-    GetFirmwareEnvironmentVariableExW, LookupPrivilegeValueW, SetFirmwareEnvironmentVariableExW,
-};
-use winapi::um::winnt::{
-    HANDLE, PLUID, SE_PRIVILEGE_ENABLED, TOKEN_ADJUST_PRIVILEGES, TOKEN_PRIVILEGES,
+    GetFirmwareEnvironmentVariableExW, SetFirmwareEnvironmentVariableExW,
 };
 
 use std::io;
@@ -23,72 +15,12 @@ use std::io::{Error, ErrorKind};
 use efi::VariableFlags;
 use {VarManager, VarReader, VarWriter};
 
+mod security;
+
 impl SystemManager {
     pub fn new() -> SystemManager {
-        // We need SeSystemEnvironmentPrivilege to do anything NVRAM-related
-        // So we configure it for the current thread here
-        // This means SystemManager is not Send
-        let mut tp = TOKEN_PRIVILEGES {
-            PrivilegeCount: 1,
-            Privileges: unsafe { mem::uninitialized() },
-        };
-
-        // Lookup privilege value for SeSystemEnvironmentPrivilege
-        let se_system_environment_privilege: Vec<u16> = OsStr::new("SeSystemEnvironmentPrivilege")
-            .encode_wide()
-            .chain(once(0))
-            .collect();
-        let result = unsafe {
-            LookupPrivilegeValueW(
-                null_mut(),
-                se_system_environment_privilege.as_ptr(),
-                &mut tp.Privileges[0].Luid as PLUID,
-            )
-        };
-
-        // This should never happen
-        if result == 0 {
-            panic!("Failed to lookup privilege value");
-        }
-
-        // Set privilege to enabled
-        tp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
-
-        // Update current security token
-        let mut process_token: HANDLE = unsafe { mem::uninitialized() };
-        let result = unsafe {
-            OpenProcessToken(
-                GetCurrentProcess(),
-                TOKEN_ADJUST_PRIVILEGES,
-                &mut process_token as *mut HANDLE,
-            )
-        };
-
-        // This should never happen
-        if result == 0 {
-            panic!("Failed to open process token");
-        }
-
-        let result = unsafe {
-            AdjustTokenPrivileges(
-                process_token,
-                FALSE as BOOL,
-                &mut tp as *mut TOKEN_PRIVILEGES,
-                0,
-                null_mut(),
-                null_mut(),
-            )
-        };
-
-        if result == 0 {
-            panic!("Failed to adjust process privileges");
-        }
-
-        // Close handle
-        unsafe {
-            CloseHandle(process_token);
-        }
-
+        // Update current thread token with the right privileges
+        security::update_privileges().unwrap();
         SystemManager {}
     }
 
