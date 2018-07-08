@@ -1,5 +1,5 @@
 use efi::{parse_name, VariableFlags};
-use {VarManager, VarEnumerator, VarReader, VarWriter};
+use {VarEnumerator, VarManager, VarReader, VarWriter};
 
 use super::VendorGroup;
 

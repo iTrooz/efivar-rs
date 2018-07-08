@@ -1,9 +1,9 @@
 use std::ffi::OsStr;
-use std::os::windows::ffi::OsStrExt;
-use std::iter::once;
-use std::mem;
 use std::io;
 use std::io::Error;
+use std::iter::once;
+use std::mem;
+use std::os::windows::ffi::OsStrExt;
 
 use std::ptr::null_mut;
 use winapi::shared::minwindef::{BOOL, FALSE};
@@ -12,9 +12,8 @@ use winapi::um::handleapi::CloseHandle;
 use winapi::um::processthreadsapi::{GetCurrentProcess, OpenProcessToken};
 use winapi::um::securitybaseapi::AdjustTokenPrivileges;
 use winapi::um::winbase::LookupPrivilegeValueW;
-use winapi::um::winnt::{
-    HANDLE, PLUID, SE_PRIVILEGE_ENABLED, TOKEN_ADJUST_PRIVILEGES, TOKEN_PRIVILEGES
-};
+use winapi::um::winnt::{HANDLE, PLUID, SE_PRIVILEGE_ENABLED, TOKEN_ADJUST_PRIVILEGES,
+                        TOKEN_PRIVILEGES};
 
 /// Represents a process token. The associated `HANDLE` is closed when
 /// this object is dropped.
@@ -38,16 +37,12 @@ impl ProcessToken {
     /// * `desired_access` - Token access level
     pub fn open(process: HANDLE, desired_access: u32) -> io::Result<Self> {
         let mut process_token: HANDLE = NULL;
-        let result = unsafe {
-            OpenProcessToken(
-                process,
-                desired_access,
-                &mut process_token as *mut HANDLE)
-        };
+        let result =
+            unsafe { OpenProcessToken(process, desired_access, &mut process_token as *mut HANDLE) };
 
         match result {
             0 => Err(Error::last_os_error()),
-            _ => Ok(ProcessToken(process_token))
+            _ => Ok(ProcessToken(process_token)),
         }
     }
 }
@@ -111,6 +106,6 @@ pub fn update_privileges() -> io::Result<()> {
     // Check that the update is successful
     match result {
         0 => Err(Error::last_os_error()),
-        _ => Ok(())
+        _ => Ok(()),
     }
 }

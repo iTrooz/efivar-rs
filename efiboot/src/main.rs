@@ -37,10 +37,7 @@ fn main() {
                         .help("Print the value as a UTF-8 string"),
                 ),
         )
-        .subcommand(
-            SubCommand::with_name("list")
-                .about("List known EFI variables")
-            )
+        .subcommand(SubCommand::with_name("list").about("List known EFI variables"))
         .get_matches();
 
     let manager = if let Some(filename) = matches.value_of("file_store") {

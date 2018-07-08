@@ -5,9 +5,7 @@ use std::iter::once;
 use std::mem;
 use std::os::windows::ffi::OsStrExt;
 use winapi::ctypes::c_void;
-use winapi::um::winbase::{
-    GetFirmwareEnvironmentVariableExW, SetFirmwareEnvironmentVariableExW,
-};
+use winapi::um::winbase::{GetFirmwareEnvironmentVariableExW, SetFirmwareEnvironmentVariableExW};
 
 use std::io;
 use std::io::{Error, ErrorKind};
@@ -15,7 +13,7 @@ use std::io::{Error, ErrorKind};
 use byteorder::{LittleEndian, ReadBytesExt};
 
 use efi::VariableFlags;
-use {VarManager, VarEnumerator, VarReader, VarWriter};
+use {VarEnumerator, VarManager, VarReader, VarWriter};
 
 mod security;
 
@@ -61,13 +59,14 @@ impl VarEnumerator for SystemManager {
                 while let Ok(id) = bytes.read_u16::<LittleEndian>() {
                     known_vars.push(format!("Boot{}", id));
                 }
-            },
-            Err(e) => return Err(e)
+            }
+            Err(e) => return Err(e),
         }
 
-        Ok(known_vars.iter()
-           .map(|name| { format!("{}-{}", name, ::efi::EFI_GUID) })
-           .collect())
+        Ok(known_vars
+            .iter()
+            .map(|name| format!("{}-{}", name, ::efi::EFI_GUID))
+            .collect())
     }
 }
 
