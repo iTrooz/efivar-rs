@@ -17,6 +17,12 @@ impl SystemManager {
     }
 }
 
+impl VarEnumerator for SystemManager {
+    fn get_var_names(&self) -> io::Result<Vec<String>> {
+        fs::read_dir(EFIVARFS_ROOT)
+    }
+}
+
 impl VarReader for SystemManager {
     fn read(&self, name: &str) -> io::Result<(VariableFlags, Vec<u8>)> {
         // Filename to the matching efivarfs file for this variable

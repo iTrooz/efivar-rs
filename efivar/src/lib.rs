@@ -28,15 +28,17 @@ extern crate winapi;
 pub mod efi;
 pub mod store;
 
+mod enumerator;
 mod reader;
 mod sys;
 mod writer;
 
+pub use enumerator::VarEnumerator;
 pub use reader::VarReader;
 pub use writer::VarWriter;
 
 /// Represents an EFI variable manager that can read, write and list variables
-pub trait VarManager: VarReader + VarWriter {}
+pub trait VarManager: VarEnumerator + VarReader + VarWriter {}
 
 use sys::SystemManager;
 /// Returns a `VarManager` that represents the firmware variables of the running system

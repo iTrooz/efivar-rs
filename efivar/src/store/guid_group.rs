@@ -4,7 +4,7 @@ use super::StoreValue;
 
 #[derive(Serialize, Deserialize)]
 pub struct GuidGroup {
-    values: HashMap<String, StoreValue>,
+    pub values: HashMap<String, StoreValue>,
 }
 
 impl GuidGroup {

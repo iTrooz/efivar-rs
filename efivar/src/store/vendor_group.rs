@@ -4,7 +4,7 @@ use super::GuidGroup;
 
 #[derive(Serialize, Deserialize)]
 pub struct VendorGroup {
-    vendors: HashMap<String, GuidGroup>,
+    pub vendors: HashMap<String, GuidGroup>,
 }
 
 impl VendorGroup {

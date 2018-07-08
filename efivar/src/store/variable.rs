@@ -1,5 +1,5 @@
 use efi::{parse_name, VariableFlags};
-use {VarManager, VarReader, VarWriter};
+use {VarManager, VarEnumerator, VarReader, VarWriter};
 
 use super::VendorGroup;
 
@@ -9,6 +9,21 @@ use std::io::{Error, ErrorKind};
 pub trait VariableStore: VarManager {
     fn get_vendor_group(&self) -> &VendorGroup;
     fn get_vendor_group_mut(&mut self) -> &mut VendorGroup;
+}
+
+impl<T: VariableStore> VarEnumerator for T {
+    fn get_var_names(&self) -> io::Result<Vec<String>> {
+        Ok(self.get_vendor_group()
+            .vendors
+            .iter()
+            .flat_map(|(guid, group)| {
+                group
+                    .values
+                    .iter()
+                    .map(move |(name, _value)| format!("{}-{}", name, guid))
+            })
+            .collect())
+    }
 }
 
 impl<T: VariableStore> VarReader for T {

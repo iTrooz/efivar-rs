@@ -12,8 +12,10 @@ use winapi::um::winbase::{
 use std::io;
 use std::io::{Error, ErrorKind};
 
+use byteorder::{LittleEndian, ReadBytesExt};
+
 use efi::VariableFlags;
-use {VarManager, VarReader, VarWriter};
+use {VarManager, VarEnumerator, VarReader, VarWriter};
 
 mod security;
 
@@ -39,6 +41,33 @@ impl SystemManager {
         let name_wide: Vec<u16> = OsStr::new(name).encode_wide().chain(once(0)).collect();
 
         Ok((guid_wide, name_wide))
+    }
+}
+
+impl VarEnumerator for SystemManager {
+    fn get_var_names(&self) -> io::Result<Vec<String>> {
+        // Windows doesn't provide access to the variable enumeration service
+        // We default here to a static list of variables required by the spec
+        // as well as those we can discover by reading the BootOrder variable
+        let mut known_vars: Vec<_> = vec!["BootCurrent", "BootNext", "BootOrder", "Timeout"]
+            .iter()
+            .map(|&s| s.into())
+            .collect();
+
+        // Read BootOrder
+        match self.read(&format!("BootOrder-{}", ::efi::EFI_GUID)) {
+            Ok((_flags, boot_order)) => {
+                let mut bytes = &boot_order[..];
+                while let Ok(id) = bytes.read_u16::<LittleEndian>() {
+                    known_vars.push(format!("Boot{}", id));
+                }
+            },
+            Err(e) => return Err(e)
+        }
+
+        Ok(known_vars.iter()
+           .map(|name| { format!("{}-{}", name, ::efi::EFI_GUID) })
+           .collect())
     }
 }
 
