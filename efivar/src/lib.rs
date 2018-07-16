@@ -83,3 +83,33 @@ use store::FileStore;
 pub fn file_store(filename: &str) -> Box<VarManager> {
     Box::new(FileStore::new(filename))
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use ::efi::{VariableFlags, to_fullname};
+
+    #[test]
+    fn file_store_roundtrip() {
+        {
+            // Create a store from the file doc-test.toml
+            let mut store = file_store("doc-test.toml");
+            let value = vec![1, 2, 3, 4];
+            // Write the value of a variable
+            store.write(&to_fullname("BootOrder"), VariableFlags::NON_VOLATILE, &value)
+                .expect("Failed to write value in store");
+
+            // Check the value of the written variable
+            let (attributes, data) = store.read(&to_fullname("BootOrder")).unwrap();
+            assert_eq!(attributes, VariableFlags::NON_VOLATILE);
+            assert_eq!(data, value);
+            // At this point, store is dropped and doc-test.toml will be updated
+        }
+        std::fs::remove_file("doc-test.toml").expect("Failed to remove temporary file doc-test.toml");
+    }
+
+    #[test]
+    fn system_instantiate() {
+        system();
+    }
+}

@@ -15,6 +15,7 @@ use byteorder::{LittleEndian, ReadBytesExt};
 use efi::VariableFlags;
 use {VarEnumerator, VarManager, VarReader, VarWriter};
 
+#[cfg(target_os = "windows")]
 mod security;
 
 impl SystemManager {

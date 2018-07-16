@@ -105,3 +105,58 @@ pub fn to_fullname(name: &str) -> String {
         format!("{}-{}", String::from(name), EFI_GUID)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn variable_flags_to_string_empty() {
+        assert_eq!(VariableFlags::empty().to_string(), "");
+    }
+
+    #[test]
+    fn variable_flags_to_string_all() {
+        let s = (VariableFlags::NON_VOLATILE |
+                 VariableFlags::BOOTSERVICE_ACCESS |
+                 VariableFlags::RUNTIME_ACCESS |
+                 VariableFlags::HARDWARE_ERROR_RECORD |
+                 VariableFlags::AUTHENTICATED_WRITE_ACCESS |
+                 VariableFlags::TIME_BASED_AUTHENTICATED_WRITE_ACCESS |
+                 VariableFlags::APPEND_WRITE |
+                 VariableFlags::ENHANCED_AUTHENTICATED_ACCESS).to_string();
+
+        assert!(s.contains("NON_VOLATILE"));
+        assert!(s.contains("BOOTSERVICE_ACCESS"));
+        assert!(s.contains("RUNTIME_ACCESS"));
+        assert!(s.contains("HARDWARE_ERROR_RECORD"));
+        assert!(s.contains("AUTHENTICATED_WRITE_ACCESS"));
+        assert!(s.contains("TIME_BASED_AUTHENTICATED_WRITE_ACCESS"));
+        assert!(s.contains("APPEND_WRITE"));
+        assert!(s.contains("ENHANCED_AUTHENTICATED_ACCESS"));
+    }
+
+    #[test]
+    fn parse_name_valid() {
+        let (guid, name) = parse_name("BootOrder-8be4df61-93ca-11d2-aa0d-00e098032b8c").unwrap();
+
+        assert_eq!(guid, "8be4df61-93ca-11d2-aa0d-00e098032b8c");
+        assert_eq!(name, "BootOrder");
+    }
+
+    #[test]
+    fn parse_name_invalid() {
+        assert!(parse_name("BootOrder_Invalid").is_err());
+    }
+
+    #[test]
+    fn to_fullname_partial() {
+        assert_eq!(to_fullname("BootOrder"), "BootOrder-8be4df61-93ca-11d2-aa0d-00e098032b8c");
+    }
+
+    #[test]
+    fn to_fullname_full() {
+        assert_eq!(to_fullname("BootOrder-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"),
+                   "BootOrder-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx");
+    }
+}

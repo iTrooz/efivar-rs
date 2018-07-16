@@ -75,3 +75,25 @@ impl VarWriter for SystemManager {
 }
 
 impl VarManager for SystemManager {}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use ::efi::to_fullname;
+
+    #[test]
+    fn linux_get_var_names() {
+        let var_names = SystemManager::new().get_var_names().unwrap();
+        let name = to_fullname("BootOrder");
+        assert!(!var_names.is_empty());
+        assert!(var_names.contains(&name));
+    }
+
+    #[test]
+    fn linux_read_var() {
+        let manager = SystemManager::new();
+        let (_flags, data) = manager.read(&to_fullname("BootOrder")).expect("Failed to read variable");
+
+        assert!(!data.is_empty());
+    }
+}
