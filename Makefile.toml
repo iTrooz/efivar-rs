@@ -5,6 +5,6 @@ CARGO_MAKE_EXTEND_WORKSPACE_MAKEFILE = "true"
 alias = "coverage-tarpaulin"
 
 [tasks.coverage-tarpaulin.linux]
-install_script = ["hash cargo-tarpaulin || RUSTFLAGS='--cfg procmacro2_semver_exempt' cargo install cargo-tarpaulin"]
-command = "cargo"
-args = ["tarpaulin", "--out", "Xml"]
+install_script = ["hash cargo-tarpaulin || RUSTFLAGS='--cfg procmacro2_semver_exempt' cargo install --force cargo-tarpaulin"]
+command = "rustup"
+args = ["run", "cargo", "tarpaulin", "--out", "Xml"]
