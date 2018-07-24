@@ -7,4 +7,4 @@ alias = "coverage-tarpaulin"
 [tasks.coverage-tarpaulin.linux]
 install_script = ["hash cargo-tarpaulin || RUSTFLAGS='--cfg procmacro2_semver_exempt' cargo install --force cargo-tarpaulin"]
 command = "rustup"
-args = ["run", "cargo", "tarpaulin", "--out", "Xml"]
+args = ["run", "${CARGO_MAKE_RUST_CHANNEL}", "cargo", "tarpaulin", "--out", "Xml"]
