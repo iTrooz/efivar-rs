@@ -10,6 +10,6 @@ matrix:
   fast_finish: true
 cache: cargo
 script:
-  - '[[ "$TRAVIS_RUST_VERSION" == nightly ]] && export CARGO_MAKE_RUN_CODECOV=true'
+  - 'if [[ "$TRAVIS_RUST_VERSION" == nightly ]]; then export CARGO_MAKE_RUN_CODECOV=true; fi'
   - hash cargo-make || cargo install cargo-make
   - cargo make workspace-ci-flow --no-workspace
