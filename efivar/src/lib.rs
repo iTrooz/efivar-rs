@@ -16,6 +16,8 @@ extern crate base64;
 #[macro_use]
 extern crate bitflags;
 extern crate byteorder;
+#[macro_use]
+extern crate failure;
 extern crate toml;
 #[macro_use]
 extern crate serde_derive;

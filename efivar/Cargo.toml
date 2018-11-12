@@ -7,6 +7,7 @@ authors = ["Vincent Tavernier <vince.tavernier@gmail.com>"]
 base64 = "0.9"
 byteorder = "1.2"
 bitflags = "1.0"
+failure = "0.1"
 serde = "1.0"
 serde_derive = "1.0"
 toml = "0.4"

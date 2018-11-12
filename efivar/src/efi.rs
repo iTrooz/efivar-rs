@@ -1,3 +1,6 @@
+use std::str::FromStr;
+use std::io::{Error, ErrorKind};
+
 /// Vendor GUID of the EFI variables according to the specification
 pub const EFI_GUID: &'static str = "8be4df61-93ca-11d2-aa0d-00e098032b8c";
 
@@ -15,36 +18,72 @@ bitflags! {
     }
 }
 
+#[derive(Debug, Fail)]
+pub enum ParseVariableFlagsError {
+    #[fail(display = "Unknown EFI variable flag: '{}'", flag)]
+    UnknownFlag { flag: String },
+}
+
+impl From<ParseVariableFlagsError> for Error {
+    fn from(e: ParseVariableFlagsError) -> Error {
+        Error::new(ErrorKind::InvalidInput, e.to_string())
+    }
+}
+
+impl FromStr for VariableFlags {
+    type Err = ParseVariableFlagsError;
+
+    fn from_str(s: &str) -> Result<VariableFlags, Self::Err> {
+        match s {
+            "EFI_VARIABLE_NON_VOLATILE" => Ok(VariableFlags::NON_VOLATILE),
+            "EFI_VARIABLE_BOOTSERVICE_ACCESS" => Ok(VariableFlags::BOOTSERVICE_ACCESS),
+            "EFI_VARIABLE_RUNTIME_ACCESS" => Ok(VariableFlags::RUNTIME_ACCESS),
+            "EFI_VARIABLE_HARDWARE_ERROR_RECORD" => Ok(VariableFlags::HARDWARE_ERROR_RECORD),
+            "EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS" => {
+                Ok(VariableFlags::AUTHENTICATED_WRITE_ACCESS)
+            }
+            "EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS" => {
+                Ok(VariableFlags::TIME_BASED_AUTHENTICATED_WRITE_ACCESS)
+            }
+            "EFI_VARIABLE_APPEND_WRITE" => Ok(VariableFlags::APPEND_WRITE),
+            "EFI_VARIABLE_ENHANCED_AUTHENTICATED_ACCESS" => {
+                Ok(VariableFlags::ENHANCED_AUTHENTICATED_ACCESS)
+            }
+            _ => Err(ParseVariableFlagsError::UnknownFlag { flag: s.to_owned() }),
+        }
+    }
+}
+
 impl ToString for VariableFlags {
     fn to_string(&self) -> String {
         let mut flag_strings = Vec::new();
 
         if self.contains(VariableFlags::NON_VOLATILE) {
-            flag_strings.push("NON_VOLATILE (0x1)");
+            flag_strings.push("EFI_VARIABLE_NON_VOLATILE");
         }
         if self.contains(VariableFlags::BOOTSERVICE_ACCESS) {
-            flag_strings.push("BOOTSERVICE_ACCESS (0x2)");
+            flag_strings.push("EFI_VARIABLE_BOOTSERVICE_ACCESS");
         }
         if self.contains(VariableFlags::RUNTIME_ACCESS) {
-            flag_strings.push("RUNTIME_ACCESS (0x4)");
+            flag_strings.push("EFI_VARIABLE_RUNTIME_ACCESS");
         }
         if self.contains(VariableFlags::HARDWARE_ERROR_RECORD) {
-            flag_strings.push("HARDWARE_ERROR_RECORD (0x8)");
+            flag_strings.push("EFI_VARIABLE_HARDWARE_ERROR_RECORD");
         }
         if self.contains(VariableFlags::AUTHENTICATED_WRITE_ACCESS) {
-            flag_strings.push("AUTHENTICATED_WRITE_ACCESS (0x10)");
+            flag_strings.push("EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS");
         }
         if self.contains(VariableFlags::TIME_BASED_AUTHENTICATED_WRITE_ACCESS) {
-            flag_strings.push("TIME_BASED_AUTHENTICATED_WRITE_ACCESS (0x20)");
+            flag_strings.push("EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS");
         }
         if self.contains(VariableFlags::APPEND_WRITE) {
-            flag_strings.push("APPEND_WRITE (0x40)");
+            flag_strings.push("EFI_VARIABLE_APPEND_WRITE");
         }
         if self.contains(VariableFlags::ENHANCED_AUTHENTICATED_ACCESS) {
-            flag_strings.push("ENHANCED_AUTHENTICATED_ACCESS (0x80)");
+            flag_strings.push("EFI_VARIABLE_ENHANCED_AUTHENTICATED_ACCESS");
         }
 
-        return flag_strings.join(", ");
+        return flag_strings.join("\n");
     }
 }
 
