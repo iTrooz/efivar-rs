@@ -7,6 +7,7 @@ use std::str::FromStr;
 
 use efi::VariableFlags;
 use {VarEnumerator, VarManager, VarReader, VarWriter};
+use super::LinuxSystemManager;
 
 pub const EFIVARFS_ROOT: &'static str = "/sys/firmware/efi/vars";
 
@@ -16,7 +17,9 @@ impl SystemManager {
     pub fn new() -> SystemManager {
         SystemManager {}
     }
+}
 
+impl LinuxSystemManager for SystemManager {
     #[cfg(test)]
     fn supported(&self) -> bool {
         fs::metadata(EFIVARFS_ROOT).is_ok()
@@ -101,36 +104,3 @@ impl VarWriter for SystemManager {
 }
 
 impl VarManager for SystemManager {}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use efi::to_fullname;
-
-    #[test]
-    fn linux_get_var_names() {
-        let manager = SystemManager::new();
-        if !manager.supported() {
-            return;
-        }
-
-        let var_names = manager.get_var_names().unwrap();
-        let name = to_fullname("BootOrder");
-        assert!(!var_names.is_empty());
-        assert!(var_names.contains(&name));
-    }
-
-    #[test]
-    fn linux_read_var() {
-        let manager = SystemManager::new();
-        if !manager.supported() {
-            return;
-        }
-
-        let (_flags, data) = manager
-            .read(&to_fullname("BootOrder"))
-            .expect("Failed to read variable");
-
-        assert!(!data.is_empty());
-    }
-}
