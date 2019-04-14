@@ -12,8 +12,8 @@ use std::io::{Error, ErrorKind};
 
 use byteorder::{LittleEndian, ReadBytesExt};
 
-use efi::VariableFlags;
-use {VarEnumerator, VarManager, VarReader, VarWriter};
+use crate::efi::VariableFlags;
+use crate::{VarEnumerator, VarManager, VarReader, VarWriter};
 
 #[cfg(target_os = "windows")]
 mod security;
@@ -27,7 +27,7 @@ impl SystemManager {
 
     fn parse_name(name: &str) -> io::Result<(Vec<u16>, Vec<u16>)> {
         // Parse name, and split into LPCWSTR
-        let (guid, name) = ::efi::parse_name(name).map_err(|e| {
+        let (guid, name) = crate::efi::parse_name(name).map_err(|e| {
             Error::new(
                 ErrorKind::Other,
                 format!("Failed to parse variable name: {}", e),
@@ -54,7 +54,7 @@ impl VarEnumerator for SystemManager {
             .collect();
 
         // Read BootOrder
-        match self.read(&format!("BootOrder-{}", ::efi::EFI_GUID)) {
+        match self.read(&format!("BootOrder-{}", crate::efi::EFI_GUID)) {
             Ok((_flags, boot_order)) => {
                 let mut bytes = &boot_order[..];
                 while let Ok(id) = bytes.read_u16::<LittleEndian>() {
@@ -66,7 +66,7 @@ impl VarEnumerator for SystemManager {
 
         Ok(known_vars
             .iter()
-            .map(|name| format!("{}-{}", name, ::efi::EFI_GUID))
+            .map(|name| format!("{}-{}", name, crate::efi::EFI_GUID))
             .collect())
     }
 }
