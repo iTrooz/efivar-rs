@@ -1,8 +1,8 @@
-extern crate efiboot;
-extern crate efivar;
+
+use efivar;
 use efiboot::cli;
 
-extern crate clap;
+
 use clap::{App, Arg, SubCommand};
 
 fn main() {

@@ -4,8 +4,8 @@ use std::io;
 use std::io::prelude::*;
 use std::io::{Error, ErrorKind};
 
-use efi::VariableFlags;
-use {VarEnumerator, VarManager, VarReader, VarWriter};
+use crate::efi::VariableFlags;
+use crate::{VarEnumerator, VarManager, VarReader, VarWriter};
 use super::LinuxSystemManager;
 
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};

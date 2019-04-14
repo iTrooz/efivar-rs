@@ -1,5 +1,5 @@
-use efi::{parse_name, VariableFlags};
-use {VarEnumerator, VarManager, VarReader, VarWriter};
+use crate::efi::{parse_name, VariableFlags};
+use crate::{VarEnumerator, VarManager, VarReader, VarWriter};
 
 use super::VendorGroup;
 

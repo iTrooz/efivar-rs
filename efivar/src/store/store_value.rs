@@ -1,4 +1,4 @@
-use efi::VariableFlags;
+use crate::efi::VariableFlags;
 
 use base64;
 use std::error::Error as std_error;

@@ -2,7 +2,7 @@ use efivar::efi::parse_name;
 use efivar::efi::EFI_GUID;
 use efivar::VarManager;
 
-pub fn run(enumerator: Box<VarManager>) {
+pub fn run(enumerator: Box<dyn VarManager>) {
     for var in enumerator
         .get_var_names()
         .expect("Failed to list variable names")

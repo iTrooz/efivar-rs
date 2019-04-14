@@ -4,8 +4,8 @@ use std::io;
 mod efivarfs;
 mod efivars;
 
-use efi::VariableFlags;
-use {VarEnumerator, VarManager, VarReader, VarWriter};
+use crate::efi::VariableFlags;
+use crate::{VarEnumerator, VarManager, VarReader, VarWriter};
 
 trait LinuxSystemManager : VarManager {
     #[cfg(test)]
@@ -81,7 +81,7 @@ impl VarManager for SystemManager {}
 #[cfg(test)]
 mod tests {
     use super::*;
-    use efi::to_fullname;
+    use crate::efi::to_fullname;
 
     fn linux_get_var_names(manager: &SystemManager) {
         if !manager.supported() {

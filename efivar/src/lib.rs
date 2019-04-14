@@ -12,16 +12,12 @@
 //! In-memory and filesystem storage are also provided for testing purposes, or as a way to dump
 //! system variables to an external file.
 
-extern crate base64;
 #[macro_use]
 extern crate bitflags;
-extern crate byteorder;
 #[macro_use]
 extern crate failure;
-extern crate toml;
 #[macro_use]
 extern crate serde_derive;
-extern crate serde;
 
 #[cfg(windows)]
 extern crate winapi;
@@ -35,25 +31,25 @@ mod reader;
 mod sys;
 mod writer;
 
-pub use enumerator::VarEnumerator;
-pub use reader::VarReader;
-pub use writer::VarWriter;
+pub use crate::enumerator::VarEnumerator;
+pub use crate::reader::VarReader;
+pub use crate::writer::VarWriter;
 
 /// Represents an EFI variable manager that can read, write and list variables
 pub trait VarManager: VarEnumerator + VarReader + VarWriter {}
 
-use sys::SystemManager;
+use crate::sys::SystemManager;
 /// Returns a `VarManager` that represents the firmware variables of the running system
 ///
 /// Reading variables should not require extra permissions, but writing variables will.
 ///
 /// ***The returned object will change the values stored in the system's NVRAM. Please be cautious
 /// when using its methods.***
-pub fn system() -> Box<VarManager> {
+pub fn system() -> Box<dyn VarManager> {
     Box::new(SystemManager::new())
 }
 
-use store::FileStore;
+use crate::store::FileStore;
 /// Returns a `VarManager` which loads and stores variables to a TOML file. The variable file will
 /// be read when calling this method, and written to when the returned object is dropped.
 ///
@@ -82,14 +78,14 @@ use store::FileStore;
 /// # }
 /// # std::fs::remove_file("doc-test.toml");
 /// ```
-pub fn file_store(filename: &str) -> Box<VarManager> {
+pub fn file_store(filename: &str) -> Box<dyn VarManager> {
     Box::new(FileStore::new(filename))
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use ::efi::{VariableFlags, to_fullname};
+    use crate::efi::{VariableFlags, to_fullname};
 
     #[test]
     fn file_store_roundtrip() {

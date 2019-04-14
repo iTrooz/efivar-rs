@@ -1,9 +1,9 @@
 use efivar::VarManager;
 
-extern crate itertools;
+use itertools;
 use itertools::Itertools;
 
-pub fn run(reader: Box<VarManager>, name: &str, as_string: bool) {
+pub fn run(reader: Box<dyn VarManager>, name: &str, as_string: bool) {
     match reader.read(&name) {
         Ok((attr, buffer)) => {
             eprintln!("Attributes: {}", attr.to_string());

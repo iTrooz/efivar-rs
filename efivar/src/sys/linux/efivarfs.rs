@@ -5,8 +5,8 @@ use std::io::prelude::*;
 use std::io::{Error, ErrorKind, BufReader, BufWriter};
 use std::str::FromStr;
 
-use efi::VariableFlags;
-use {VarEnumerator, VarManager, VarReader, VarWriter};
+use crate::efi::VariableFlags;
+use crate::{VarEnumerator, VarManager, VarReader, VarWriter};
 use super::LinuxSystemManager;
 
 pub const EFIVARFS_ROOT: &'static str = "/sys/firmware/efi/vars";
