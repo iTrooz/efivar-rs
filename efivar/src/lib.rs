@@ -16,6 +16,7 @@
 extern crate bitflags;
 #[macro_use]
 extern crate failure;
+#[cfg(feature = "store")]
 #[macro_use]
 extern crate serde_derive;
 
@@ -24,6 +25,7 @@ extern crate winapi;
 
 /// EFI constants based on the [UEFI specification](http://www.uefi.org/sites/default/files/resources/UEFI_Spec_2_7.pdf)
 pub mod efi;
+#[cfg(feature = "store")]
 pub mod store;
 
 mod enumerator;
@@ -55,7 +57,6 @@ pub fn system() -> Box<dyn VarManager> {
     Box::new(SystemManager::new())
 }
 
-use crate::store::FileStore;
 /// Returns a `VarManager` which loads and stores variables to a TOML file. The variable file will
 /// be read when calling this method, and written to when the returned object is dropped.
 ///
@@ -84,8 +85,9 @@ use crate::store::FileStore;
 /// # }
 /// # std::fs::remove_file("doc-test.toml");
 /// ```
+#[cfg(feature = "store")]
 pub fn file_store(filename: &str) -> Box<dyn VarManager> {
-    Box::new(FileStore::new(filename))
+    Box::new(store::FileStore::new(filename))
 }
 
 #[cfg(test)]
