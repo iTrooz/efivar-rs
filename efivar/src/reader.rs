@@ -1,5 +1,3 @@
-use std::io;
-
 use super::efi::VariableFlags;
 
 /// Represents the capability of reading EFI variables
@@ -9,5 +7,5 @@ pub trait VarReader {
     /// # Arguments
     ///
     /// * `name` - Full name (including vendor GUID) of the variable to read
-    fn read(&self, name: &str) -> io::Result<(VariableFlags, Vec<u8>)>;
+    fn read(&self, name: &str) -> crate::Result<(VariableFlags, Vec<u8>)>;
 }

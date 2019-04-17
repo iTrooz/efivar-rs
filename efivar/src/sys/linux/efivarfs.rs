@@ -1,12 +1,11 @@
 use std::fs;
 use std::fs::{File, OpenOptions};
-use std::io;
 use std::io::prelude::*;
-use std::io::{Error, ErrorKind, BufReader, BufWriter};
+use std::io::{BufReader, BufWriter};
 use std::str::FromStr;
 
 use crate::efi::VariableFlags;
-use crate::{VarEnumerator, VarManager, VarReader, VarWriter};
+use crate::{Error, VarEnumerator, VarManager, VarReader, VarWriter};
 use super::LinuxSystemManager;
 
 pub const EFIVARFS_ROOT: &'static str = "/sys/firmware/efi/vars";
@@ -27,7 +26,7 @@ impl LinuxSystemManager for SystemManager {
 }
 
 impl VarEnumerator for SystemManager {
-    fn get_var_names(&self) -> io::Result<Vec<String>> {
+    fn get_var_names(&self) -> crate::Result<Vec<String>> {
         fs::read_dir(EFIVARFS_ROOT).map(|list| {
             list.filter_map(Result::ok)
                 .filter(|ref entry| match entry.file_type() {
@@ -38,28 +37,31 @@ impl VarEnumerator for SystemManager {
                     entry
                         .file_name()
                         .into_string()
-                        .map_err(|_str| {
-                            Error::new(ErrorKind::Other, "Failed to decode filename as valid UTF-8")
-                        })
+                        .map_err(|_str| Error::InvalidUTF8)
                         .ok()
                 })
                 .collect()
+        }).map_err(|error| {
+            // TODO: check for specific error types
+            Error::UnknownIoError { error }
         })
     }
 }
 
 impl VarReader for SystemManager {
-    fn read(&self, name: &str) -> io::Result<(VariableFlags, Vec<u8>)> {
+    fn read(&self, name: &str) -> crate::Result<(VariableFlags, Vec<u8>)> {
         // Path to the attributes file
         let attributes_filename = format!("{}/{}/attributes", EFIVARFS_ROOT, name);
 
         // Open attributes file
-        let f = File::open(attributes_filename)?;
+        let f = File::open(attributes_filename)
+            .map_err(|error| Error::for_variable(error, name.into()))?;
         let reader = BufReader::new(&f);
 
         let mut flags = VariableFlags::empty();
         for line in reader.lines() {
-            let line = line?;
+            let line = line
+                .map_err(|error| Error::for_variable(error, name.into()))?;
             let parsed = VariableFlags::from_str(&line)?;
             flags = flags | parsed;
         }
@@ -67,26 +69,31 @@ impl VarReader for SystemManager {
         // Filename to the matching efivarfs data for this variable
         let filename = format!("{}/{}/data", EFIVARFS_ROOT, name);
 
-        let mut f = File::open(filename)?;
+        let mut f = File::open(filename)
+            .map_err(|error| Error::for_variable(error, name.into()))?;
 
         // Read variable contents
         let mut buf = Vec::new();
-        f.read_to_end(&mut buf)?;
+        f.read_to_end(&mut buf)
+            .map_err(|error| Error::for_variable(error, name.into()))?;
 
         Ok((flags, buf))
     }
 }
 
 impl VarWriter for SystemManager {
-    fn write(&mut self, name: &str, attributes: VariableFlags, value: &[u8]) -> io::Result<()> {
+    fn write(&mut self, name: &str, attributes: VariableFlags, value: &[u8]) -> crate::Result<()> {
         // Path to the attributes file
         let attributes_filename = format!("{}/{}/attributes", EFIVARFS_ROOT, name);
         // Open attributes file
-        let mut f = File::open(attributes_filename)?;
+        let mut f = File::open(attributes_filename)
+            .map_err(|error| Error::for_variable(error, name.into()))?;
         let mut writer = BufWriter::new(&mut f);
 
         // Write attributes
-        writer.write_all(attributes.to_string().as_bytes())?;
+        writer.write_all(attributes.to_string().as_bytes())
+            .map_err(|error| Error::for_variable(error, name.into()))?;
+
 
         // Filename to the matching efivarfs file for this variable
         let filename = format!("{}/{}/data", EFIVARFS_ROOT, name);
@@ -94,10 +101,12 @@ impl VarWriter for SystemManager {
         let mut f = OpenOptions::new()
             .write(true)
             .truncate(true)
-            .open(filename)?;
+            .open(filename)
+            .map_err(|error| Error::for_variable(error, name.into()))?;
 
         // Write variable contents
-        f.write(value)?;
+        f.write(value)
+            .map_err(|error| Error::for_variable(error, name.into()))?;
 
         Ok(())
     }

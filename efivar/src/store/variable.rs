@@ -1,10 +1,7 @@
 use crate::efi::{parse_name, VariableFlags};
-use crate::{VarEnumerator, VarManager, VarReader, VarWriter};
+use crate::{Error, VarEnumerator, VarManager, VarReader, VarWriter};
 
-use super::VendorGroup;
-
-use std::io;
-use std::io::{Error, ErrorKind};
+use super::{StoreValue, VendorGroup};
 
 pub trait VariableStore: VarManager {
     fn get_vendor_group(&self) -> &VendorGroup;
@@ -12,7 +9,7 @@ pub trait VariableStore: VarManager {
 }
 
 impl<T: VariableStore> VarEnumerator for T {
-    fn get_var_names(&self) -> io::Result<Vec<String>> {
+    fn get_var_names(&self) -> crate::Result<Vec<String>> {
         Ok(self.get_vendor_group()
             .vendors
             .iter()
@@ -27,27 +24,20 @@ impl<T: VariableStore> VarEnumerator for T {
 }
 
 impl<T: VariableStore> VarReader for T {
-    fn read(&self, name: &str) -> io::Result<(VariableFlags, Vec<u8>)> {
-        let (guid, variable_name) = parse_name(name).map_err(|e| Error::new(ErrorKind::Other, e))?;
+    fn read(&self, name: &str) -> crate::Result<(VariableFlags, Vec<u8>)> {
+        let (guid, variable_name) = parse_name(name)?;
 
         self.get_vendor_group()
             .vendor(guid)
             .and_then(|guid_group| guid_group.variable(variable_name))
-            .ok_or_else(|| Error::new(ErrorKind::Other, format!("Variable {} not found", name)))
-            .and_then(|variable| {
-                variable.to_tuple().map_err(|e| {
-                    Error::new(
-                        ErrorKind::Other,
-                        format!("Failed to decode {}: {}", name, e),
-                    )
-                })
-            })
+            .ok_or_else(|| Error::VarNotFound { name: variable_name.into() })
+            .and_then(StoreValue::to_tuple)
     }
 }
 
 impl<T: VariableStore> VarWriter for T {
-    fn write(&mut self, name: &str, attributes: VariableFlags, value: &[u8]) -> io::Result<()> {
-        let (guid, variable_name) = parse_name(name).map_err(|e| Error::new(ErrorKind::Other, e))?;
+    fn write(&mut self, name: &str, attributes: VariableFlags, value: &[u8]) -> crate::Result<()> {
+        let (guid, variable_name) = parse_name(name)?;
 
         // Set variable
         self.get_vendor_group_mut()

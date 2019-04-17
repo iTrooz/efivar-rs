@@ -1,7 +1,6 @@
 use crate::efi::VariableFlags;
 
 use base64;
-use std::error::Error as std_error;
 
 #[derive(Serialize, Deserialize)]
 pub struct StoreValue {
@@ -22,14 +21,11 @@ impl StoreValue {
         self.data = base64::encode(&value.1);
     }
 
-    pub fn to_tuple(&self) -> Result<(VariableFlags, Vec<u8>), String> {
+    pub fn to_tuple(&self) -> crate::Result<(VariableFlags, Vec<u8>)> {
         let attr = VariableFlags::from_bits(self.attributes).unwrap_or(VariableFlags::empty());
-        let data = base64::decode(&self.data);
+        let data = base64::decode(&self.data)?;
 
-        match data {
-            Ok(buffer) => Ok((attr, buffer)),
-            Err(reason) => Err(String::from(reason.description())),
-        }
+        Ok((attr, data))
     }
 }
 

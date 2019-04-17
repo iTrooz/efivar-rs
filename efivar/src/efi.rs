@@ -1,5 +1,6 @@
 use std::str::FromStr;
-use std::io::{Error, ErrorKind};
+
+use crate::Error;
 
 /// Vendor GUID of the EFI variables according to the specification
 pub const EFI_GUID: &'static str = "8be4df61-93ca-11d2-aa0d-00e098032b8c";
@@ -18,20 +19,8 @@ bitflags! {
     }
 }
 
-#[derive(Debug, Fail)]
-pub enum ParseVariableFlagsError {
-    #[fail(display = "Unknown EFI variable flag: '{}'", flag)]
-    UnknownFlag { flag: String },
-}
-
-impl From<ParseVariableFlagsError> for Error {
-    fn from(e: ParseVariableFlagsError) -> Error {
-        Error::new(ErrorKind::InvalidInput, e.to_string())
-    }
-}
-
 impl FromStr for VariableFlags {
-    type Err = ParseVariableFlagsError;
+    type Err = Error;
 
     fn from_str(s: &str) -> Result<VariableFlags, Self::Err> {
         match s {
@@ -49,7 +38,7 @@ impl FromStr for VariableFlags {
             "EFI_VARIABLE_ENHANCED_AUTHENTICATED_ACCESS" => {
                 Ok(VariableFlags::ENHANCED_AUTHENTICATED_ACCESS)
             }
-            _ => Err(ParseVariableFlagsError::UnknownFlag { flag: s.to_owned() }),
+            _ => Err(Error::UnknownFlag { flag: s.to_owned() }),
         }
     }
 }
@@ -111,10 +100,10 @@ impl ToString for VariableFlags {
 /// let result = efivar::efi::parse_name("invalid name");
 /// assert!(result.is_err());
 /// ```
-pub fn parse_name<'b>(name: &'b str) -> Result<(&'b str, &'b str), String> {
+pub fn parse_name<'b>(name: &'b str) -> crate::Result<(&'b str, &'b str)> {
     let name_parts = name.splitn(2, '-').collect::<Vec<_>>();
     if name_parts.len() != 2 {
-        return Err(String::from("Name must be in name-vendor_guid format"));
+        return Err(Error::InvalidVarName { name: name.into() })
     }
 
     Ok((name_parts[1], name_parts[0]))

@@ -1,5 +1,4 @@
 use std::fs;
-use std::io;
 
 mod efivarfs;
 mod efivars;
@@ -59,19 +58,19 @@ impl SystemManager {
 }
 
 impl VarEnumerator for SystemManager {
-    fn get_var_names(&self) -> io::Result<Vec<String>> {
+    fn get_var_names(&self) -> crate::Result<Vec<String>> {
         self.sys_impl.get_var_names()
     }
 }
 
 impl VarReader for SystemManager {
-    fn read(&self, name: &str) -> io::Result<(VariableFlags, Vec<u8>)> {
+    fn read(&self, name: &str) -> crate::Result<(VariableFlags, Vec<u8>)> {
         self.sys_impl.read(name)
     }
 }
 
 impl VarWriter for SystemManager {
-    fn write(&mut self, name: &str, attributes: VariableFlags, value: &[u8]) -> io::Result<()> {
+    fn write(&mut self, name: &str, attributes: VariableFlags, value: &[u8]) -> crate::Result<()> {
         self.sys_impl.write(name, attributes, value)
     }
 }
