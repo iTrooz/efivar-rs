@@ -11,6 +11,7 @@ pub enum Error {
     #[fail(display = "unknown i/o error for variable: {}", name)]
     VarUnknownError { name: String, error: io::Error },
     #[fail(display = "base64 decoding error: {}", error)]
+    #[cfg(feature = "store")]
     Base64DecodeError { error: base64::DecodeError },
     #[fail(display = "unknown i/o error")]
     UnknownIoError { error: io::Error },
@@ -45,6 +46,7 @@ impl Error {
     }
 }
 
+#[cfg(feature = "store")]
 impl From<base64::DecodeError> for Error {
     fn from(error: base64::DecodeError) -> Self {
         Error::Base64DecodeError { error }
