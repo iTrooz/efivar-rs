@@ -64,19 +64,30 @@ impl VarReader for SystemManager {
 
 impl VarWriter for SystemManager {
     fn write(&mut self, name: &str, attributes: VariableFlags, value: &[u8]) -> io::Result<()> {
+        // Prepare attributes
+        let attribute_bits = attributes.bits();
+
+        // Prepare buffer (we must only write once)
+        let mut buf = Vec::with_capacity(std::mem::size_of_val(&attribute_bits));
+
+        // Write attributes
+        buf.write_u32::<LittleEndian>(attribute_bits)?;
+
+        // Write variable contents
+        buf.write(value)?;
+
         // Filename to the matching efivarfs file for this variable
         let filename = format!("{}/{}", EFIVARS_ROOT, name);
 
+        // Open file.
         let mut f = OpenOptions::new()
             .write(true)
             .truncate(true)
+            .create(true)
             .open(filename)?;
 
-        // Write attributes
-        f.write_u32::<LittleEndian>(attributes.bits())?;
-
-        // Write variable contents
-        f.write(value)?;
+        // Write the value using a single write.
+        f.write(&buf)?;
 
         Ok(())
     }
