@@ -27,6 +27,7 @@ pub mod efi;
 pub mod store;
 
 mod enumerator;
+mod error;
 mod reader;
 mod sys;
 mod writer;
@@ -34,6 +35,11 @@ mod writer;
 pub use crate::enumerator::VarEnumerator;
 pub use crate::reader::VarReader;
 pub use crate::writer::VarWriter;
+
+pub use crate::error::Error;
+
+/// Result type for this crate's API functions
+pub type Result<T> = std::result::Result<T, Error>;
 
 /// Represents an EFI variable manager that can read, write and list variables
 pub trait VarManager: VarEnumerator + VarReader + VarWriter {}

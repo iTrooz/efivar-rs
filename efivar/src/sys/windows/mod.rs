@@ -7,13 +7,10 @@ use std::os::windows::ffi::OsStrExt;
 use winapi::ctypes::c_void;
 use winapi::um::winbase::{GetFirmwareEnvironmentVariableExW, SetFirmwareEnvironmentVariableExW};
 
-use std::io;
-use std::io::{Error, ErrorKind};
-
 use byteorder::{LittleEndian, ReadBytesExt};
 
 use crate::efi::VariableFlags;
-use crate::{VarEnumerator, VarManager, VarReader, VarWriter};
+use crate::{Error, VarEnumerator, VarManager, VarReader, VarWriter};
 
 #[cfg(target_os = "windows")]
 mod security;
@@ -25,14 +22,10 @@ impl SystemManager {
         SystemManager {}
     }
 
-    fn parse_name(name: &str) -> io::Result<(Vec<u16>, Vec<u16>)> {
+    fn parse_name(name: &str) -> crate::Result<(Vec<u16>, Vec<u16>)> {
         // Parse name, and split into LPCWSTR
-        let (guid, name) = crate::efi::parse_name(name).map_err(|e| {
-            Error::new(
-                ErrorKind::Other,
-                format!("Failed to parse variable name: {}", e),
-            )
-        })?;
+        let (guid, name) = crate::efi::parse_name(name)?;
+
         let guid_wide: Vec<u16> = OsStr::new(&format!("{{{}}}", guid))
             .encode_wide()
             .chain(once(0))
@@ -44,7 +37,7 @@ impl SystemManager {
 }
 
 impl VarEnumerator for SystemManager {
-    fn get_var_names(&self) -> io::Result<Vec<String>> {
+    fn get_var_names(&self) -> crate::Result<Vec<String>> {
         // Windows doesn't provide access to the variable enumeration service
         // We default here to a static list of variables required by the spec
         // as well as those we can discover by reading the BootOrder variable
@@ -72,7 +65,7 @@ impl VarEnumerator for SystemManager {
 }
 
 impl VarReader for SystemManager {
-    fn read(&self, name: &str) -> io::Result<(VariableFlags, Vec<u8>)> {
+    fn read(&self, name: &str) -> crate::Result<(VariableFlags, Vec<u8>)> {
         // Parse name, and split into LPCWSTR
         let (guid_wide, name_wide) = SystemManager::parse_name(name)?;
 
@@ -94,7 +87,7 @@ impl VarReader for SystemManager {
         };
 
         match result {
-            0 => Err(Error::last_os_error()),
+            0 => Err(Error::for_variable_os(name.into())),
             len => Ok((
                 VariableFlags::from_bits(attributes).unwrap_or(VariableFlags::empty()),
                 Vec::from(&buffer[0..len as usize]),
@@ -104,7 +97,7 @@ impl VarReader for SystemManager {
 }
 
 impl VarWriter for SystemManager {
-    fn write(&mut self, name: &str, attributes: VariableFlags, value: &[u8]) -> io::Result<()> {
+    fn write(&mut self, name: &str, attributes: VariableFlags, value: &[u8]) -> crate::Result<()> {
         // Parse name, and split into LPCWSTR
         let (guid_wide, name_wide) = SystemManager::parse_name(name)?;
 
@@ -121,7 +114,7 @@ impl VarWriter for SystemManager {
         };
 
         match result {
-            0 => Err(Error::last_os_error()),
+            0 => Err(Error::for_variable_os(name.into())),
             _ => Ok(()),
         }
     }

@@ -1,5 +1,3 @@
-use std::io;
-
 use super::efi::VariableFlags;
 
 /// Represents the capability of writing EFI variables
@@ -13,5 +11,5 @@ pub trait VarWriter {
     /// * `name` - Full name (including vendor GUID) of the variable to read
     /// * `attributes` - EFI variable attributes
     /// * `value` - EFI variable contents
-    fn write(&mut self, name: &str, attributes: VariableFlags, value: &[u8]) -> io::Result<()>;
+    fn write(&mut self, name: &str, attributes: VariableFlags, value: &[u8]) -> crate::Result<()>;
 }

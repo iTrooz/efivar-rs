@@ -1,11 +1,9 @@
 use std::fs;
 use std::fs::{File, OpenOptions};
-use std::io;
 use std::io::prelude::*;
-use std::io::{Error, ErrorKind};
 
 use crate::efi::VariableFlags;
-use crate::{VarEnumerator, VarManager, VarReader, VarWriter};
+use crate::{Error, VarEnumerator, VarManager, VarReader, VarWriter};
 use super::LinuxSystemManager;
 
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
@@ -28,42 +26,50 @@ impl LinuxSystemManager for SystemManager {
 }
 
 impl VarEnumerator for SystemManager {
-    fn get_var_names(&self) -> io::Result<Vec<String>> {
+    fn get_var_names(&self) -> crate::Result<Vec<String>> {
         fs::read_dir(EFIVARS_ROOT).map(|list| {
             list.filter_map(|result| {
                 result
+                    .map_err(|error| Error::UnknownIoError { error })
                     .and_then(|entry| {
-                        entry.file_name().into_string().map_err(|_str| {
-                            Error::new(ErrorKind::Other, "Failed to decode filename as valid UTF-8")
-                        })
+                        entry
+                            .file_name()
+                            .into_string()
+                            .map_err(|_str| Error::InvalidUTF8)
                     })
                     .ok()
             }).collect()
+        }).map_err(|error| {
+            // TODO: check for specific error types
+            Error::UnknownIoError { error }
         })
     }
 }
 
 impl VarReader for SystemManager {
-    fn read(&self, name: &str) -> io::Result<(VariableFlags, Vec<u8>)> {
+    fn read(&self, name: &str) -> crate::Result<(VariableFlags, Vec<u8>)> {
         // Filename to the matching efivarfs file for this variable
         let filename = format!("{}/{}", EFIVARS_ROOT, name);
 
-        let mut f = File::open(filename)?;
+        let mut f = File::open(filename)
+            .map_err(|error| Error::for_variable(error, name.into()))?;
 
         // Read attributes
-        let attr = f.read_u32::<LittleEndian>()?;
+        let attr = f.read_u32::<LittleEndian>()
+            .map_err(|error| Error::for_variable(error, name.into()))?;
         let attr = VariableFlags::from_bits(attr).unwrap_or(VariableFlags::empty());
 
         // Read variable contents
         let mut buf = Vec::new();
-        f.read_to_end(&mut buf)?;
+        f.read_to_end(&mut buf)
+            .map_err(|error| Error::for_variable(error, name.into()))?;
 
         Ok((attr, buf))
     }
 }
 
 impl VarWriter for SystemManager {
-    fn write(&mut self, name: &str, attributes: VariableFlags, value: &[u8]) -> io::Result<()> {
+    fn write(&mut self, name: &str, attributes: VariableFlags, value: &[u8]) -> crate::Result<()> {
         // Prepare attributes
         let attribute_bits = attributes.bits();
 
@@ -71,10 +77,12 @@ impl VarWriter for SystemManager {
         let mut buf = Vec::with_capacity(std::mem::size_of_val(&attribute_bits));
 
         // Write attributes
-        buf.write_u32::<LittleEndian>(attribute_bits)?;
+        buf.write_u32::<LittleEndian>(attribute_bits)
+            .map_err(|error| Error::for_variable(error, name.into()))?;
 
         // Write variable contents
-        buf.write(value)?;
+        buf.write(value)
+            .map_err(|error| Error::for_variable(error, name.into()))?;
 
         // Filename to the matching efivarfs file for this variable
         let filename = format!("{}/{}", EFIVARS_ROOT, name);
@@ -84,10 +92,12 @@ impl VarWriter for SystemManager {
             .write(true)
             .truncate(true)
             .create(true)
-            .open(filename)?;
+            .open(filename)
+            .map_err(|error| Error::for_variable(error, name.into()))?;
 
         // Write the value using a single write.
-        f.write(&buf)?;
+        f.write(&buf)
+            .map_err(|error| Error::for_variable(error, name.into()))?;
 
         Ok(())
     }
