@@ -26,7 +26,7 @@ impl LinuxSystemManager for SystemManager {
 }
 
 impl VarEnumerator for SystemManager {
-    fn get_var_names(&self) -> crate::Result<Vec<String>> {
+    fn get_var_names<'a>(&'a self) -> crate::Result<Box<dyn Iterator<Item = String> + 'a>> {
         fs::read_dir(EFIVARFS_ROOT).map(|list| {
             list.filter_map(Result::ok)
                 .filter(|ref entry| match entry.file_type() {
@@ -40,8 +40,9 @@ impl VarEnumerator for SystemManager {
                         .map_err(|_str| Error::InvalidUTF8)
                         .ok()
                 })
-                .collect()
-        }).map_err(|error| {
+        })
+        .map(|it| -> Box<dyn Iterator<Item = String>> { Box::new(it) })
+        .map_err(|error| {
             // TODO: check for specific error types
             Error::UnknownIoError { error }
         })

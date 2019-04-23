@@ -1,5 +1,8 @@
 pub struct SystemManager;
 
+use std::iter;
+use std::io::Cursor;
+
 use std::ffi::OsStr;
 use std::iter::once;
 use std::mem;
@@ -36,31 +39,42 @@ impl SystemManager {
     }
 }
 
+struct BootOrderIterator {
+    cursor: Cursor<Vec<u8>>,
+}
+
+impl BootOrderIterator {
+    fn new(sm: &SystemManager) -> crate::Result<BootOrderIterator> {
+        let (_flags, boot_order) = sm.read(&format!("BootOrder-{}", crate::efi::EFI_GUID))?;
+        let cursor = Cursor::new(boot_order);
+
+        Ok(BootOrderIterator { cursor })
+    }
+}
+
+impl Iterator for BootOrderIterator {
+    type Item = String;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if let Ok(id) = self.cursor.read_u16::<LittleEndian>() {
+            return Some(format!("Boot{:04X}-{}", id, crate::efi::EFI_GUID).to_owned());
+        }
+
+        None
+    }
+}
+
 impl VarEnumerator for SystemManager {
-    fn get_var_names(&self) -> crate::Result<Vec<String>> {
+    fn get_var_names<'a>(&'a self) -> crate::Result<Box<dyn Iterator<Item = String> + 'a>> {
         // Windows doesn't provide access to the variable enumeration service
         // We default here to a static list of variables required by the spec
         // as well as those we can discover by reading the BootOrder variable
-        let mut known_vars: Vec<_> = vec!["BootCurrent", "BootNext", "BootOrder", "Timeout"]
-            .iter()
-            .map(|&s| s.into())
-            .collect();
-
-        // Read BootOrder
-        match self.read(&format!("BootOrder-{}", crate::efi::EFI_GUID)) {
-            Ok((_flags, boot_order)) => {
-                let mut bytes = &boot_order[..];
-                while let Ok(id) = bytes.read_u16::<LittleEndian>() {
-                    known_vars.push(format!("Boot{}", id));
-                }
-            }
-            Err(e) => return Err(e),
-        }
-
-        Ok(known_vars
-            .iter()
-            .map(|name| format!("{}-{}", name, crate::efi::EFI_GUID))
-            .collect())
+        Ok(Box::new(
+            iter::once(format!("BootCurrent-{}", crate::efi::EFI_GUID).to_owned())
+                .chain(iter::once(format!("BootNext-{}", crate::efi::EFI_GUID).to_owned()))
+                .chain(iter::once(format!("BootOrder-{}", crate::efi::EFI_GUID).to_owned()))
+                .chain(iter::once(format!("Timeout-{}", crate::efi::EFI_GUID).to_owned()))
+                .chain(BootOrderIterator::new(self)?)))
     }
 }
 

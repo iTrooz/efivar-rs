@@ -4,5 +4,5 @@ pub trait VarEnumerator {
     ///
     /// *Note that some implementations of `VarEnumerator` rely on a static list since the
     /// underlying OS is not capable of enumerating variables.*
-    fn get_var_names(&self) -> crate::Result<Vec<String>>;
+    fn get_var_names<'a>(&'a self) -> crate::Result<Box<dyn Iterator<Item = String> + 'a>>;
 }

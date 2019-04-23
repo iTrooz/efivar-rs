@@ -58,7 +58,7 @@ impl SystemManager {
 }
 
 impl VarEnumerator for SystemManager {
-    fn get_var_names(&self) -> crate::Result<Vec<String>> {
+    fn get_var_names<'a>(&'a self) -> crate::Result<Box<dyn Iterator<Item = String> + 'a>> {
         self.sys_impl.get_var_names()
     }
 }
@@ -87,10 +87,9 @@ mod tests {
             return;
         }
 
-        let var_names = manager.get_var_names().unwrap();
+        let mut var_names = manager.get_var_names().unwrap();
         let name = to_fullname("BootOrder");
-        assert!(!var_names.is_empty());
-        assert!(var_names.contains(&name));
+        assert!(var_names.find(|n| *n == name).is_some());
     }
 
     fn linux_read_var(manager: &SystemManager) {
