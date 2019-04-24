@@ -9,17 +9,15 @@ pub trait VariableStore: VarManager {
 }
 
 impl<T: VariableStore> VarEnumerator for T {
-    fn get_var_names(&self) -> crate::Result<Vec<String>> {
-        Ok(self.get_vendor_group()
-            .vendors
-            .iter()
-            .flat_map(|(guid, group)| {
+    fn get_var_names<'a>(&'a self) -> crate::Result<Box<dyn Iterator<Item = String> + 'a>> {
+        Ok(Box::new(self.get_vendor_group().vendors.iter().flat_map(
+            |(guid, group)| {
                 group
                     .values
                     .iter()
                     .map(move |(name, _value)| format!("{}-{}", name, guid))
-            })
-            .collect())
+            },
+        )))
     }
 }
 
