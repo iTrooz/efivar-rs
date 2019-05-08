@@ -2,7 +2,20 @@
 name = "efivar"
 version = "0.1.0"
 authors = ["Vincent Tavernier <vince.tavernier@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/vtavernier/efiboot-rs"
+homepage = "https://github.com/vtavernier/efiboot-rs"
+documentation = "https://vtavernier.github.io/efiboot-rs"
+keywords = ["efi"]
+categories = []
+description = """
+Rust crate for manipulating EFI variables using the OS interface.
+"""
 edition = "2018"
+
+[badges]
+travis-ci = { repository = "vtavernier/efiboot-rs" }
 
 [dependencies]
 byteorder = "1.3.1"
