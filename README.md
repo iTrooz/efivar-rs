@@ -1,10 +1,10 @@
 # efiboot-rs
 
-[![Build Status](https://travis-ci.org/vtavernier/efiboot-rs.svg?branch=master)](https://travis-ci.org/vtavernier/efiboot-rs) [![Build status](https://ci.appveyor.com/api/projects/status/m5yniiijvg92itpf/branch/master?svg=true)](https://ci.appveyor.com/project/vtavernier/efiboot-rs/branch/master) [![codecov](https://codecov.io/gh/vtavernier/efiboot-rs/branch/master/graph/badge.svg)](https://codecov.io/gh/vtavernier/efiboot-rs) [![libraries.io](https://img.shields.io/librariesio/github/vtavernier/efiboot-rs.svg)](https://libraries.io/github/vtavernier/efiboot-rs) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) [![Built with cargo-make](https://sagiegurari.github.io/cargo-make/assets/badges/cargo-make.svg)](https://sagiegurari.github.io/cargo-make)
+[![Build Status](https://travis-ci.org/vtavernier/efiboot-rs.svg?branch=master)](https://travis-ci.org/vtavernier/efiboot-rs) [![Build status](https://ci.appveyor.com/api/projects/status/m5yniiijvg92itpf/branch/master?svg=true)](https://ci.appveyor.com/project/vtavernier/efiboot-rs/branch/master) [![Documentation](https://img.shields.io/badge/docs-master-blue.svg)](https://vtavernier.github.io/efiboot-rs/) [![codecov](https://codecov.io/gh/vtavernier/efiboot-rs/branch/master/graph/badge.svg)](https://codecov.io/gh/vtavernier/efiboot-rs) [![libraries.io](https://img.shields.io/librariesio/github/vtavernier/efiboot-rs.svg)](https://libraries.io/github/vtavernier/efiboot-rs) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) [![Built with cargo-make](https://sagiegurari.github.io/cargo-make/assets/badges/cargo-make.svg)](https://sagiegurari.github.io/cargo-make)
 
 This repository contains the source code for:
 
-* [efivar](efivar) - A Rust crate to read and write EFI variables
+* [![crates.io](https://img.shields.io/crates/v/efivar.svg)](https://crates.io/crates/efivar) [efivar](efivar) - A Rust crate to read and write EFI variables
 * [efiboot](efiboot) - A command-line tool to manage the UEFI boot manager
 
 The efiboot tool supports both Windows and Linux:
