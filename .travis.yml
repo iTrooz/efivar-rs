@@ -13,14 +13,10 @@ rust:
 matrix:
   allow_failures:
     - rust: nightly
-      os: linux
-  # Exclude those as the builds seem to get stuck
-  # on early versions of Windows on Travis CI
   exclude:
+    # Added in include: with GH_TOKEN env var for GitHub pages
     - rust: stable
-      os: windows
-    - rust: beta
-      os: windows
+      os: linux
   include:
     - rust: stable
       os: linux
