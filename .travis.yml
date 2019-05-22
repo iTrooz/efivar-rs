@@ -21,6 +21,11 @@ matrix:
       os: windows
     - rust: beta
       os: windows
+  include:
+    - rust: stable
+      os: linux
+      env:
+        secure: C/gXHY8DzpHEGDO7QHYLkRRnorGBKw/eGOvO8ZVTOO/8WLbnmcTvAf/Endum35yKj85SM2QtYBinq/mdgseEyzDFRBH3XG2edp9wjhBi+ZL+p+N3SQjazJW9dizbztxZ71SMCQg0fBnNK3EormgpYz04XLW95AXPWTFjVIIiQ00IOWP7yQQrZR+BMh3vZTcjLkANu4usN9J746Uj8zWqbZ0vBga3zcGiA70YlwQCfRN0WJWaxK2evXet4qzv3xMPuHRfR7WaJza+oBunAvE1jJjhYjkNqkIbT28gKFrWca3VrIgrjzHBZ7I46qQBMFL5ZSLFKpB5Phd5pRA8CalfykF71TVhpK7d+g1dcC0bQWM69kE62GwabkQdeRebV5KJqBv5kyV6/MCATJC948o/gS3+wQATes1LvzUh0nEoqnCmGefD26frFVNh6kylVoPc8Y3K/TumNH4dg9La5WHI0q2Gf53EuNDxYcGfU5jf0/yElj569a07mZsJZcbKUfRb75GUELKXzMHCvZs3Vy6xCQbzW40Hxb5ZsMCe+ZcbbOrhlHqM8VTd1Yx0QafcbIllk7ZSjbrE3P80z0Q8NtirxhjLJgypQIL4wfsrE09Lla79RL53kX4wMbBeY0Vzg28GeSCo+cGpLli6YO89/acIwEYm/sNxP4zNZejsCac5/Ic=
   fast_finish: true
 
 cache: cargo
@@ -42,12 +47,9 @@ after_success: |
   [ $TRAVIS_BRANCH = master ] &&
   [ $TRAVIS_PULL_REQUEST = false ] &&
   [ $TRAVIS_OS_NAME = linux ] &&
+  [ $TRAVIS_RUST_VERSION = stable ] &&
   cargo doc &&
   echo '<meta http-equiv=refresh content=0;url="efivar/">' > target/doc/index.html &&
   pip install --user ghp-import &&
   ghp-import -n target/doc &&
   git push -fq https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git gh-pages
-
-env:
-  global:
-    secure: C/gXHY8DzpHEGDO7QHYLkRRnorGBKw/eGOvO8ZVTOO/8WLbnmcTvAf/Endum35yKj85SM2QtYBinq/mdgseEyzDFRBH3XG2edp9wjhBi+ZL+p+N3SQjazJW9dizbztxZ71SMCQg0fBnNK3EormgpYz04XLW95AXPWTFjVIIiQ00IOWP7yQQrZR+BMh3vZTcjLkANu4usN9J746Uj8zWqbZ0vBga3zcGiA70YlwQCfRN0WJWaxK2evXet4qzv3xMPuHRfR7WaJza+oBunAvE1jJjhYjkNqkIbT28gKFrWca3VrIgrjzHBZ7I46qQBMFL5ZSLFKpB5Phd5pRA8CalfykF71TVhpK7d+g1dcC0bQWM69kE62GwabkQdeRebV5KJqBv5kyV6/MCATJC948o/gS3+wQATes1LvzUh0nEoqnCmGefD26frFVNh6kylVoPc8Y3K/TumNH4dg9La5WHI0q2Gf53EuNDxYcGfU5jf0/yElj569a07mZsJZcbKUfRb75GUELKXzMHCvZs3Vy6xCQbzW40Hxb5ZsMCe+ZcbbOrhlHqM8VTd1Yx0QafcbIllk7ZSjbrE3P80z0Q8NtirxhjLJgypQIL4wfsrE09Lla79RL53kX4wMbBeY0Vzg28GeSCo+cGpLli6YO89/acIwEYm/sNxP4zNZejsCac5/Ic=
