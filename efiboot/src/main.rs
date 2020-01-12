@@ -1,7 +1,4 @@
-
-use efivar;
-use efiboot::cli;
-
+mod cli;
 
 use clap::{App, Arg, SubCommand};
 

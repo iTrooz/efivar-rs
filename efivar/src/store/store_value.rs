@@ -1,7 +1,5 @@
 use crate::efi::VariableFlags;
 
-use base64;
-
 #[derive(Serialize, Deserialize)]
 pub struct StoreValue {
     attributes: u32,

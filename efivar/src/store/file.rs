@@ -6,8 +6,6 @@ use std::fs::File;
 use std::io::prelude::*;
 use std::io::{Error, ErrorKind};
 
-use toml;
-
 /// Implements support for storing and loading EFI variables from a TOML file
 ///
 /// Implements `Drop` in order to save the updated variables once the object is no longer in use.
