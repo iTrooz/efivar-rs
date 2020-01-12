@@ -1,9 +1,9 @@
 use crate::efi::{parse_name, VariableFlags};
-use crate::{Error, VarEnumerator, VarManager, VarReader, VarWriter};
+use crate::{Error, VarEnumerator, VarManager, VarManagerEx, VarReader, VarReaderEx, VarWriter};
 
 use super::VendorGroup;
 
-pub trait VariableStore: VarManager {
+pub trait VariableStore: VarManagerEx {
     fn get_vendor_group(&self) -> &VendorGroup;
     fn get_vendor_group_mut(&mut self) -> &mut VendorGroup;
 }
@@ -35,6 +35,20 @@ impl<T: VariableStore> VarReader for T {
     }
 }
 
+impl<T: VariableStore> VarReaderEx for T {
+    fn read_buf(&self, name: &str) -> crate::Result<(Vec<u8>, VariableFlags)> {
+        let (guid, variable_name) = parse_name(name)?;
+
+        self.get_vendor_group()
+            .vendor(guid)
+            .and_then(|guid_group| guid_group.variable(variable_name))
+            .ok_or_else(|| Error::VarNotFound {
+                name: variable_name.into(),
+            })
+            .and_then(|val| val.to_tuple_buf())
+    }
+}
+
 impl<T: VariableStore> VarWriter for T {
     fn write(&mut self, name: &str, attributes: VariableFlags, value: &[u8]) -> crate::Result<()> {
         let (guid, variable_name) = parse_name(name)?;
@@ -50,3 +64,4 @@ impl<T: VariableStore> VarWriter for T {
 }
 
 impl<T: VariableStore> VarManager for T {}
+impl<T: VariableStore> VarManagerEx for T {}

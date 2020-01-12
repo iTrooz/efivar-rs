@@ -19,12 +19,20 @@ impl StoreValue {
         self.data = base64::encode(&value.1);
     }
 
+    pub fn to_tuple_buf(&self) -> crate::Result<(Vec<u8>, VariableFlags)> {
+        let attr = VariableFlags::from_bits(self.attributes).unwrap_or(VariableFlags::empty());
+
+        Ok((base64::decode(&self.data)?, attr))
+    }
+
     pub fn to_tuple(&self, name: &str, value: &mut [u8]) -> crate::Result<(usize, VariableFlags)> {
         let attr = VariableFlags::from_bits(self.attributes).unwrap_or(VariableFlags::empty());
 
         // base64::decode_config_slice panics if the target buffer is too small
         if value.len() < (self.data.len() + 3) / 4 * 3 {
-            return Err(crate::Error::BufferTooSmall { name: name.to_owned() });
+            return Err(crate::Error::BufferTooSmall {
+                name: name.to_owned(),
+            });
         }
 
         Ok((
@@ -46,8 +54,8 @@ mod tests {
         let mut value = StoreValue::new();
         value.set_from(&(attributes, &bytes));
 
-        let tuple = value.to_tuple().unwrap();
-        assert_eq!(attributes, tuple.0);
-        assert_eq!(bytes, tuple.1);
+        let tuple = value.to_tuple_buf().unwrap();
+        assert_eq!(bytes, tuple.0);
+        assert_eq!(attributes, tuple.1);
     }
 }

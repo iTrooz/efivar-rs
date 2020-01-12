@@ -51,7 +51,7 @@ impl BootOrderIterator {
         // Read BootOrder
         let (boot_order_size, _flags) =
             sm.read(&format!("BootOrder-{}", crate::efi::EFI_GUID), &mut buf[..])?;
-        
+
         // Resize to actual value size
         buf.resize(boot_order_size, 0);
 

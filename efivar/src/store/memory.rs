@@ -72,9 +72,9 @@ mod tests {
             .get_vendor_group()
             .vendor(crate::efi::EFI_GUID)
             .unwrap();
-        let variable = group.variable("BootOrder").unwrap().to_tuple().unwrap();
+        let variable = group.variable("BootOrder").unwrap().to_tuple_buf().unwrap();
 
-        assert_eq!(variable.0, VariableFlags::empty());
-        assert_eq!(variable.1, vec![]);
+        assert_eq!(variable.0, vec![]);
+        assert_eq!(variable.1, VariableFlags::empty());
     }
 }

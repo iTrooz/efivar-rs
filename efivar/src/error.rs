@@ -34,7 +34,7 @@ fn is_variable_not_found_error(err: &io::Error) -> bool {
 }
 
 #[cfg(not(target_os = "windows"))]
-fn is_buffer_too_small_error(err: &io::Error) -> bool {
+fn is_buffer_too_small_error(_err: &io::Error) -> bool {
     // TODO: Can this error actually be raised on Linux?
     false
 }
@@ -54,7 +54,7 @@ impl Error {
             return Error::BufferTooSmall { name };
         }
 
-       Error::VarUnknownError { name, error }
+        Error::VarUnknownError { name, error }
     }
 
     #[cfg(target_os = "windows")]

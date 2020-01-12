@@ -97,11 +97,12 @@ mod tests {
             return;
         }
 
-        let (_flags, data) = manager
-            .read(&to_fullname("BootOrder"))
+        let mut buf = vec![0u8; 512];
+        let (data_size, _flags) = manager
+            .read(&to_fullname("BootOrder"), &mut buf)
             .expect("Failed to read variable");
 
-        assert!(!data.is_empty());
+        assert!(data_size > 0);
     }
 
     #[test]

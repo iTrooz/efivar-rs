@@ -37,7 +37,7 @@ mod sys;
 mod writer;
 
 pub use crate::enumerator::VarEnumerator;
-pub use crate::reader::VarReader;
+pub use crate::reader::*;
 pub use crate::writer::VarWriter;
 
 pub use crate::error::Error;
@@ -47,6 +47,10 @@ pub type Result<T> = std::result::Result<T, Error>;
 
 /// Represents an EFI variable manager that can read, write and list variables
 pub trait VarManager: VarEnumerator + VarReader + VarWriter {}
+
+/// Represents an EFI variable manager that can read (both static and dynamic sized variables),
+/// write and list variables
+pub trait VarManagerEx: VarManager + VarReaderEx {}
 
 use crate::sys::SystemManager;
 /// Returns a `VarManager` that represents the firmware variables of the running system
@@ -80,15 +84,22 @@ pub fn system() -> Box<dyn VarManager> {
 /// store.write("BootOrder-8be4df61-93ca-11d2-aa0d-00e098032b8c", VariableFlags::NON_VOLATILE, &value);
 ///
 /// // Check the value of the written variable
-/// let (attributes, data) = store.read("BootOrder-8be4df61-93ca-11d2-aa0d-00e098032b8c").unwrap();
-/// assert_eq!(attributes, VariableFlags::NON_VOLATILE);
+/// let (data, attributes) = store.read_buf("BootOrder-8be4df61-93ca-11d2-aa0d-00e098032b8c").unwrap();
 /// assert_eq!(data, value);
+/// assert_eq!(attributes, VariableFlags::NON_VOLATILE);
 /// // At this point, store is dropped and doc-test.toml will be updated
 /// # }
 /// # std::fs::remove_file("doc-test.toml");
 /// ```
 #[cfg(feature = "store")]
-pub fn file_store(filename: &str) -> Box<dyn VarManager> {
+pub fn file_store(filename: &str) -> Box<dyn VarManagerEx> {
+    Box::new(store::FileStore::new(filename))
+}
+
+#[cfg(feature = "store")]
+#[doc(hidden)]
+pub fn file_store_std(filename: &str) -> Box<dyn VarManager> {
+    // TODO: Fix this knowing that VarManagerEx: VarManager
     Box::new(store::FileStore::new(filename))
 }
 
@@ -113,7 +124,7 @@ mod tests {
                 .expect("Failed to write value in store");
 
             // Check the value of the written variable
-            let (attributes, data) = store.read(&to_fullname("BootOrder")).unwrap();
+            let (data, attributes) = store.read_buf(&to_fullname("BootOrder")).unwrap();
             assert_eq!(attributes, VariableFlags::NON_VOLATILE);
             assert_eq!(data, value);
             // At this point, store is dropped and doc-test.toml will be updated

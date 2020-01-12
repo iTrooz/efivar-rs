@@ -72,11 +72,13 @@ impl VarReader for SystemManager {
         if read == value.len() {
             let mut b = [0u8];
             if let Ok(1) = f.read(&mut b) {
-                return Err(Error::BufferTooSmall { name: name.to_owned() });
+                return Err(Error::BufferTooSmall {
+                    name: name.to_owned(),
+                });
             }
         }
 
-        Ok((read, flags))
+        Ok((read, attr))
     }
 }
 

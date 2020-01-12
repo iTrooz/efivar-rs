@@ -38,7 +38,7 @@ fn main() {
         .get_matches();
 
     let manager = if let Some(filename) = matches.value_of("file_store") {
-        efivar::file_store(filename)
+        efivar::file_store_std(filename)
     } else {
         efivar::system()
     };
