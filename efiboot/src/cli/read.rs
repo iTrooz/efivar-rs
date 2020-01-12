@@ -3,7 +3,7 @@ use efivar::VarManager;
 use itertools::Itertools;
 
 pub fn run(reader: Box<dyn VarManager>, name: &str, as_string: bool) {
-    let mut buf = vec![0u8; 512];
+    let mut buf = vec![0u8; 2];
 
     match reader.read(&name, &mut buf[..]) {
         Ok((size, attr)) => {

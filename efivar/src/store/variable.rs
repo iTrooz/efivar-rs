@@ -31,7 +31,7 @@ impl<T: VariableStore> VarReader for T {
             .ok_or_else(|| Error::VarNotFound {
                 name: variable_name.into(),
             })
-            .and_then(|val| val.to_tuple(value))
+            .and_then(|val| val.to_tuple(name, value))
     }
 }
 
