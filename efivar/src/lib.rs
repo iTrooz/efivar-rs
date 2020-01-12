@@ -18,6 +18,8 @@
 extern crate bitflags;
 #[macro_use]
 extern crate failure;
+#[macro_use]
+extern crate lazy_static;
 #[cfg(feature = "store")]
 #[macro_use]
 extern crate serde_derive;
@@ -106,7 +108,7 @@ pub fn file_store_std<P: Into<std::path::PathBuf>>(filename: P) -> Box<dyn VarMa
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::efi::{to_fullname, VariableFlags};
+    use crate::efi::{VariableFlags, VariableName};
 
     #[test]
     fn file_store_roundtrip() {
@@ -117,14 +119,14 @@ mod tests {
             // Write the value of a variable
             store
                 .write(
-                    &to_fullname("BootOrder"),
+                    &VariableName::new("BootOrder"),
                     VariableFlags::NON_VOLATILE,
                     &value,
                 )
                 .expect("Failed to write value in store");
 
             // Check the value of the written variable
-            let (data, attributes) = store.read_buf(&to_fullname("BootOrder")).unwrap();
+            let (data, attributes) = store.read_buf(&VariableName::new("BootOrder")).unwrap();
             assert_eq!(attributes, VariableFlags::NON_VOLATILE);
             assert_eq!(data, value);
             // At this point, store is dropped and doc-test.toml will be updated

@@ -1,4 +1,4 @@
-use super::efi::VariableFlags;
+use super::efi::{VariableFlags, VariableName};
 
 /// Represents the capability of reading EFI variables
 pub trait VarReader {
@@ -10,13 +10,13 @@ pub trait VarReader {
     ///
     /// # Arguments
     ///
-    /// * `name`: full name (including vendor GUID) of the variable to read
+    /// * `name`: name of the variable to read
     /// * `value`: target buffer for returning the variable value
     ///
     /// # Return value
     ///
     /// On success, number of bytes read and associated EFI variable flags.
-    fn read(&self, name: &str, value: &mut [u8]) -> crate::Result<(usize, VariableFlags)>;
+    fn read(&self, name: &VariableName, value: &mut [u8]) -> crate::Result<(usize, VariableFlags)>;
 }
 
 /// Represents the capability of reading EFI variables of a dynamic size
@@ -28,10 +28,10 @@ pub trait VarReaderEx {
     ///
     /// # Arguments
     ///
-    /// * `name`: full name (including vendor GUID) of the variable to read
+    /// * `name`: name of the variable to read
     ///
     /// # Return value
     ///
     /// On success, read bytes and associated EFI variable flags.
-    fn read_buf(&self, name: &str) -> crate::Result<(Vec<u8>, VariableFlags)>;
+    fn read_buf(&self, name: &VariableName) -> crate::Result<(Vec<u8>, VariableFlags)>;
 }

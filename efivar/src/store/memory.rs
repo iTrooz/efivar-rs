@@ -26,7 +26,7 @@ impl VariableStore for MemoryStore {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::efi::VariableFlags;
+    use crate::efi::{VariableFlags, VariableName};
     use crate::VarWriter;
 
     #[test]
@@ -35,7 +35,7 @@ mod tests {
 
         assert!(store
             .get_vendor_group()
-            .vendor(crate::efi::EFI_GUID)
+            .vendor(&crate::efi::VariableVendor::Efi)
             .is_none());
     }
 
@@ -44,7 +44,7 @@ mod tests {
         let mut store = MemoryStore::new();
         store
             .write(
-                &format!("BootOrder-{}", crate::efi::EFI_GUID),
+                &VariableName::new("BootOrder"),
                 VariableFlags::empty(),
                 &vec![],
             )
@@ -52,7 +52,7 @@ mod tests {
 
         let group = store
             .get_vendor_group()
-            .vendor(crate::efi::EFI_GUID)
+            .vendor(&crate::efi::VariableVendor::Efi)
             .unwrap();
         assert!(group.variable("Boot0001").is_none());
     }
@@ -62,7 +62,7 @@ mod tests {
         let mut store = MemoryStore::new();
         store
             .write(
-                &format!("BootOrder-{}", crate::efi::EFI_GUID),
+                &VariableName::new("BootOrder"),
                 VariableFlags::empty(),
                 &vec![],
             )
@@ -70,7 +70,7 @@ mod tests {
 
         let group = store
             .get_vendor_group()
-            .vendor(crate::efi::EFI_GUID)
+            .vendor(&crate::efi::VariableVendor::Efi)
             .unwrap();
         let variable = group.variable("BootOrder").unwrap().to_tuple_buf().unwrap();
 

@@ -1,10 +1,11 @@
 use std::collections::HashMap;
 
 use super::GuidGroup;
+use crate::efi::VariableVendor;
 
 #[derive(Serialize, Deserialize)]
 pub struct VendorGroup {
-    pub vendors: HashMap<String, GuidGroup>,
+    pub vendors: HashMap<uuid::Uuid, GuidGroup>,
 }
 
 impl VendorGroup {
@@ -14,13 +15,13 @@ impl VendorGroup {
         }
     }
 
-    pub fn vendor(&self, guid: &str) -> Option<&GuidGroup> {
-        self.vendors.get(guid)
+    pub fn vendor(&self, vendor: &VariableVendor) -> Option<&GuidGroup> {
+        self.vendors.get(vendor.as_ref())
     }
 
-    pub fn vendor_mut(&mut self, guid: &str) -> &mut GuidGroup {
+    pub fn vendor_mut(&mut self, vendor: &VariableVendor) -> &mut GuidGroup {
         self.vendors
-            .entry(String::from(guid))
+            .entry(*vendor.as_ref())
             .or_insert_with(|| GuidGroup::new())
     }
 }

@@ -1,4 +1,4 @@
-use super::efi::VariableFlags;
+use super::efi::{VariableFlags, VariableName};
 
 /// Represents the capability of writing EFI variables
 pub trait VarWriter {
@@ -8,8 +8,13 @@ pub trait VarWriter {
     ///
     /// # Arguments
     ///
-    /// * `name`: Full name (including vendor GUID) of the variable to read
+    /// * `name`: name of the variable to write
     /// * `attributes`: EFI variable attributes
     /// * `value`: EFI variable contents
-    fn write(&mut self, name: &str, attributes: VariableFlags, value: &[u8]) -> crate::Result<()>;
+    fn write(
+        &mut self,
+        name: &VariableName,
+        attributes: VariableFlags,
+        value: &[u8],
+    ) -> crate::Result<()>;
 }

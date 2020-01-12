@@ -3,7 +3,7 @@ use std::fs;
 mod efivarfs;
 mod efivars;
 
-use crate::efi::VariableFlags;
+use crate::efi::{VariableFlags, VariableName};
 use crate::{VarEnumerator, VarManager, VarReader, VarWriter};
 
 trait LinuxSystemManager: VarManager {
@@ -58,19 +58,24 @@ impl SystemManager {
 }
 
 impl VarEnumerator for SystemManager {
-    fn get_var_names<'a>(&'a self) -> crate::Result<Box<dyn Iterator<Item = String> + 'a>> {
+    fn get_var_names<'a>(&'a self) -> crate::Result<Box<dyn Iterator<Item = VariableName> + 'a>> {
         self.sys_impl.get_var_names()
     }
 }
 
 impl VarReader for SystemManager {
-    fn read(&self, name: &str, value: &mut [u8]) -> crate::Result<(usize, VariableFlags)> {
+    fn read(&self, name: &VariableName, value: &mut [u8]) -> crate::Result<(usize, VariableFlags)> {
         self.sys_impl.read(name, value)
     }
 }
 
 impl VarWriter for SystemManager {
-    fn write(&mut self, name: &str, attributes: VariableFlags, value: &[u8]) -> crate::Result<()> {
+    fn write(
+        &mut self,
+        name: &VariableName,
+        attributes: VariableFlags,
+        value: &[u8],
+    ) -> crate::Result<()> {
         self.sys_impl.write(name, attributes, value)
     }
 }
@@ -80,7 +85,7 @@ impl VarManager for SystemManager {}
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::efi::to_fullname;
+    use crate::efi::VariableName;
 
     fn linux_get_var_names(manager: &SystemManager) {
         if !manager.supported() {
@@ -88,7 +93,7 @@ mod tests {
         }
 
         let mut var_names = manager.get_var_names().unwrap();
-        let name = to_fullname("BootOrder");
+        let name = VariableName::new("BootOrder");
         assert!(var_names.find(|n| *n == name).is_some());
     }
 
@@ -99,7 +104,7 @@ mod tests {
 
         let mut buf = vec![0u8; 512];
         let (data_size, _flags) = manager
-            .read(&to_fullname("BootOrder"), &mut buf)
+            .read(&VariableName::new("BootOrder"), &mut buf)
             .expect("Failed to read variable");
 
         assert!(data_size > 0);

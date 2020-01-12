@@ -1,5 +1,6 @@
-use std::convert::From;
 use std::io;
+
+use crate::efi::VariableName;
 
 /// Describes an error returned by EFI variable operations
 #[derive(Debug, Fail)]
@@ -7,9 +8,12 @@ pub enum Error {
     #[fail(display = "failed to parse variable name: {}", name)]
     InvalidVarName { name: String },
     #[fail(display = "variable not found: {}", name)]
-    VarNotFound { name: String },
+    VarNotFound { name: VariableName },
     #[fail(display = "unknown i/o error for variable: {}", name)]
-    VarUnknownError { name: String, error: io::Error },
+    VarUnknownError {
+        name: VariableName,
+        error: io::Error,
+    },
     #[fail(display = "base64 decoding error: {}", error)]
     #[cfg(feature = "store")]
     Base64DecodeError { error: base64::DecodeError },
@@ -20,7 +24,9 @@ pub enum Error {
     #[fail(display = "failed to decode name as valid UTF-8")]
     InvalidUTF8,
     #[fail(display = "buffer too small for variable: {}", name)]
-    BufferTooSmall { name: String },
+    BufferTooSmall { name: VariableName },
+    #[fail(display = "failed to decode uuid: {}", error)]
+    UuidError { error: uuid::Error },
 }
 
 #[cfg(not(target_os = "windows"))]
@@ -45,7 +51,9 @@ fn is_buffer_too_small_error(err: &io::Error) -> bool {
 }
 
 impl Error {
-    pub fn for_variable(error: io::Error, name: String) -> Self {
+    pub fn for_variable(error: io::Error, name: &VariableName) -> Self {
+        let name = name.clone();
+
         if is_variable_not_found_error(&error) {
             return Error::VarNotFound { name };
         }
@@ -58,7 +66,7 @@ impl Error {
     }
 
     #[cfg(target_os = "windows")]
-    pub fn for_variable_os(name: String) -> Self {
+    pub fn for_variable_os(name: &VariableName) -> Self {
         Error::for_variable(io::Error::last_os_error(), name)
     }
 }

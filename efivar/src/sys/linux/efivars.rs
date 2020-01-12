@@ -1,9 +1,10 @@
 use std::fs;
 use std::fs::{File, OpenOptions};
 use std::io::prelude::*;
+use std::str::FromStr;
 
 use super::LinuxSystemManager;
-use crate::efi::VariableFlags;
+use crate::efi::{VariableFlags, VariableName};
 use crate::{Error, VarEnumerator, VarManager, VarReader, VarWriter};
 
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
@@ -26,7 +27,7 @@ impl LinuxSystemManager for SystemManager {
 }
 
 impl VarEnumerator for SystemManager {
-    fn get_var_names<'a>(&'a self) -> crate::Result<Box<dyn Iterator<Item = String> + 'a>> {
+    fn get_var_names<'a>(&'a self) -> crate::Result<Box<dyn Iterator<Item = VariableName> + 'a>> {
         fs::read_dir(EFIVARS_ROOT)
             .map(|list| {
                 list.filter_map(|result| {
@@ -37,11 +38,12 @@ impl VarEnumerator for SystemManager {
                                 .file_name()
                                 .into_string()
                                 .map_err(|_str| Error::InvalidUTF8)
+                                .and_then(|s| VariableName::from_str(&s))
                         })
                         .ok()
                 })
             })
-            .map(|it| -> Box<dyn Iterator<Item = String>> { Box::new(it) })
+            .map(|it| -> Box<dyn Iterator<Item = VariableName>> { Box::new(it) })
             .map_err(|error| {
                 // TODO: check for specific error types
                 Error::UnknownIoError { error }
@@ -50,7 +52,7 @@ impl VarEnumerator for SystemManager {
 }
 
 impl VarReader for SystemManager {
-    fn read(&self, name: &str, value: &mut [u8]) -> crate::Result<(usize, VariableFlags)> {
+    fn read(&self, name: &VariableName, value: &mut [u8]) -> crate::Result<(usize, VariableFlags)> {
         // Filename to the matching efivarfs file for this variable
         let filename = format!("{}/{}", EFIVARS_ROOT, name);
 
@@ -83,7 +85,12 @@ impl VarReader for SystemManager {
 }
 
 impl VarWriter for SystemManager {
-    fn write(&mut self, name: &str, attributes: VariableFlags, value: &[u8]) -> crate::Result<()> {
+    fn write(
+        &mut self,
+        name: &VariableName,
+        attributes: VariableFlags,
+        value: &[u8],
+    ) -> crate::Result<()> {
         // Prepare attributes
         let attribute_bits = attributes.bits();
 

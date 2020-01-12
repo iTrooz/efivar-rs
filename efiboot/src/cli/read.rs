@@ -1,9 +1,12 @@
-use efivar::VarManager;
-
 use itertools::Itertools;
+use std::str::FromStr;
+
+use efivar::{efi::VariableName, VarManager};
 
 pub fn run(reader: Box<dyn VarManager>, name: &str, as_string: bool) {
     let mut buf = vec![0u8; 512];
+
+    let name = VariableName::from_str(name).expect("failed to parse variable name");
 
     match reader.read(&name, &mut buf[..]) {
         Ok((size, attr)) => {
