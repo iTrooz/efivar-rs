@@ -95,7 +95,7 @@ pub fn file_store(filename: &str) -> Box<dyn VarManager> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::efi::{VariableFlags, to_fullname};
+    use crate::efi::{to_fullname, VariableFlags};
 
     #[test]
     fn file_store_roundtrip() {
@@ -104,7 +104,12 @@ mod tests {
             let mut store = file_store("doc-test.toml");
             let value = vec![1, 2, 3, 4];
             // Write the value of a variable
-            store.write(&to_fullname("BootOrder"), VariableFlags::NON_VOLATILE, &value)
+            store
+                .write(
+                    &to_fullname("BootOrder"),
+                    VariableFlags::NON_VOLATILE,
+                    &value,
+                )
                 .expect("Failed to write value in store");
 
             // Check the value of the written variable
@@ -113,7 +118,8 @@ mod tests {
             assert_eq!(data, value);
             // At this point, store is dropped and doc-test.toml will be updated
         }
-        std::fs::remove_file("doc-test.toml").expect("Failed to remove temporary file doc-test.toml");
+        std::fs::remove_file("doc-test.toml")
+            .expect("Failed to remove temporary file doc-test.toml");
     }
 
     #[test]

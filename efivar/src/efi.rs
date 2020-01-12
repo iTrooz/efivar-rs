@@ -103,7 +103,7 @@ impl ToString for VariableFlags {
 pub fn parse_name<'b>(name: &'b str) -> crate::Result<(&'b str, &'b str)> {
     let name_parts = name.splitn(2, '-').collect::<Vec<_>>();
     if name_parts.len() != 2 {
-        return Err(Error::InvalidVarName { name: name.into() })
+        return Err(Error::InvalidVarName { name: name.into() });
     }
 
     Ok((name_parts[1], name_parts[0]))
@@ -145,14 +145,15 @@ mod tests {
 
     #[test]
     fn variable_flags_to_string_all() {
-        let s = (VariableFlags::NON_VOLATILE |
-                 VariableFlags::BOOTSERVICE_ACCESS |
-                 VariableFlags::RUNTIME_ACCESS |
-                 VariableFlags::HARDWARE_ERROR_RECORD |
-                 VariableFlags::AUTHENTICATED_WRITE_ACCESS |
-                 VariableFlags::TIME_BASED_AUTHENTICATED_WRITE_ACCESS |
-                 VariableFlags::APPEND_WRITE |
-                 VariableFlags::ENHANCED_AUTHENTICATED_ACCESS).to_string();
+        let s = (VariableFlags::NON_VOLATILE
+            | VariableFlags::BOOTSERVICE_ACCESS
+            | VariableFlags::RUNTIME_ACCESS
+            | VariableFlags::HARDWARE_ERROR_RECORD
+            | VariableFlags::AUTHENTICATED_WRITE_ACCESS
+            | VariableFlags::TIME_BASED_AUTHENTICATED_WRITE_ACCESS
+            | VariableFlags::APPEND_WRITE
+            | VariableFlags::ENHANCED_AUTHENTICATED_ACCESS)
+            .to_string();
 
         assert!(s.contains("NON_VOLATILE"));
         assert!(s.contains("BOOTSERVICE_ACCESS"));
@@ -179,12 +180,17 @@ mod tests {
 
     #[test]
     fn to_fullname_partial() {
-        assert_eq!(to_fullname("BootOrder"), "BootOrder-8be4df61-93ca-11d2-aa0d-00e098032b8c");
+        assert_eq!(
+            to_fullname("BootOrder"),
+            "BootOrder-8be4df61-93ca-11d2-aa0d-00e098032b8c"
+        );
     }
 
     #[test]
     fn to_fullname_full() {
-        assert_eq!(to_fullname("BootOrder-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"),
-                   "BootOrder-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx");
+        assert_eq!(
+            to_fullname("BootOrder-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"),
+            "BootOrder-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+        );
     }
 }

@@ -34,7 +34,7 @@ fn is_variable_not_found_error(err: &io::Error) -> bool {
 impl Error {
     pub fn for_variable(error: io::Error, name: String) -> Self {
         if is_variable_not_found_error(&error) {
-            return Error::VarNotFound { name }
+            return Error::VarNotFound { name };
         }
 
         Error::VarUnknownError { name, error }

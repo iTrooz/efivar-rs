@@ -12,8 +12,9 @@ use winapi::um::handleapi::CloseHandle;
 use winapi::um::processthreadsapi::{GetCurrentProcess, OpenProcessToken};
 use winapi::um::securitybaseapi::AdjustTokenPrivileges;
 use winapi::um::winbase::LookupPrivilegeValueW;
-use winapi::um::winnt::{HANDLE, PLUID, SE_PRIVILEGE_ENABLED, TOKEN_ADJUST_PRIVILEGES,
-                        TOKEN_PRIVILEGES};
+use winapi::um::winnt::{
+    HANDLE, PLUID, SE_PRIVILEGE_ENABLED, TOKEN_ADJUST_PRIVILEGES, TOKEN_PRIVILEGES,
+};
 
 /// Represents a process token. The associated `HANDLE` is closed when
 /// this object is dropped.

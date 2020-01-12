@@ -1,6 +1,5 @@
 use efivar::VarManager;
 
-
 use itertools::Itertools;
 
 pub fn run(reader: Box<dyn VarManager>, name: &str, as_string: bool) {

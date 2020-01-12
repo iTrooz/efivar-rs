@@ -2,9 +2,9 @@ use std::fs;
 use std::fs::{File, OpenOptions};
 use std::io::prelude::*;
 
+use super::LinuxSystemManager;
 use crate::efi::VariableFlags;
 use crate::{Error, VarEnumerator, VarManager, VarReader, VarWriter};
-use super::LinuxSystemManager;
 
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
 
@@ -27,24 +27,25 @@ impl LinuxSystemManager for SystemManager {
 
 impl VarEnumerator for SystemManager {
     fn get_var_names<'a>(&'a self) -> crate::Result<Box<dyn Iterator<Item = String> + 'a>> {
-        fs::read_dir(EFIVARS_ROOT).map(|list| {
-            list.filter_map(|result| {
-                result
-                    .map_err(|error| Error::UnknownIoError { error })
-                    .and_then(|entry| {
-                        entry
-                            .file_name()
-                            .into_string()
-                            .map_err(|_str| Error::InvalidUTF8)
-                    })
-                    .ok()
+        fs::read_dir(EFIVARS_ROOT)
+            .map(|list| {
+                list.filter_map(|result| {
+                    result
+                        .map_err(|error| Error::UnknownIoError { error })
+                        .and_then(|entry| {
+                            entry
+                                .file_name()
+                                .into_string()
+                                .map_err(|_str| Error::InvalidUTF8)
+                        })
+                        .ok()
+                })
             })
-        })
-        .map(|it| -> Box<dyn Iterator<Item = String>> { Box::new(it) })
-        .map_err(|error| {
-            // TODO: check for specific error types
-            Error::UnknownIoError { error }
-        })
+            .map(|it| -> Box<dyn Iterator<Item = String>> { Box::new(it) })
+            .map_err(|error| {
+                // TODO: check for specific error types
+                Error::UnknownIoError { error }
+            })
     }
 }
 
@@ -53,11 +54,12 @@ impl VarReader for SystemManager {
         // Filename to the matching efivarfs file for this variable
         let filename = format!("{}/{}", EFIVARS_ROOT, name);
 
-        let mut f = File::open(filename)
-            .map_err(|error| Error::for_variable(error, name.into()))?;
+        let mut f =
+            File::open(filename).map_err(|error| Error::for_variable(error, name.into()))?;
 
         // Read attributes
-        let attr = f.read_u32::<LittleEndian>()
+        let attr = f
+            .read_u32::<LittleEndian>()
             .map_err(|error| Error::for_variable(error, name.into()))?;
         let attr = VariableFlags::from_bits(attr).unwrap_or(VariableFlags::empty());
 

@@ -33,7 +33,10 @@ mod tests {
     fn missing_vendor() {
         let store = MemoryStore::new();
 
-        assert!(store.get_vendor_group().vendor(crate::efi::EFI_GUID).is_none());
+        assert!(store
+            .get_vendor_group()
+            .vendor(crate::efi::EFI_GUID)
+            .is_none());
     }
 
     #[test]
@@ -47,7 +50,10 @@ mod tests {
             )
             .unwrap();
 
-        let group = store.get_vendor_group().vendor(crate::efi::EFI_GUID).unwrap();
+        let group = store
+            .get_vendor_group()
+            .vendor(crate::efi::EFI_GUID)
+            .unwrap();
         assert!(group.variable("Boot0001").is_none());
     }
 
@@ -62,7 +68,10 @@ mod tests {
             )
             .unwrap();
 
-        let group = store.get_vendor_group().vendor(crate::efi::EFI_GUID).unwrap();
+        let group = store
+            .get_vendor_group()
+            .vendor(crate::efi::EFI_GUID)
+            .unwrap();
         let variable = group.variable("BootOrder").unwrap().to_tuple().unwrap();
 
         assert_eq!(variable.0, VariableFlags::empty());

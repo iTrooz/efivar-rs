@@ -6,7 +6,7 @@ mod efivars;
 use crate::efi::VariableFlags;
 use crate::{VarEnumerator, VarManager, VarReader, VarWriter};
 
-trait LinuxSystemManager : VarManager {
+trait LinuxSystemManager: VarManager {
     #[cfg(test)]
     fn supported(&self) -> bool;
 }

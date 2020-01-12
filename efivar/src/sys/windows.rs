@@ -1,7 +1,7 @@
 pub struct SystemManager;
 
-use std::iter;
 use std::io::Cursor;
+use std::iter;
 
 use std::ffi::OsStr;
 use std::iter::once;
@@ -71,10 +71,17 @@ impl VarEnumerator for SystemManager {
         // as well as those we can discover by reading the BootOrder variable
         Ok(Box::new(
             iter::once(format!("BootCurrent-{}", crate::efi::EFI_GUID).to_owned())
-                .chain(iter::once(format!("BootNext-{}", crate::efi::EFI_GUID).to_owned()))
-                .chain(iter::once(format!("BootOrder-{}", crate::efi::EFI_GUID).to_owned()))
-                .chain(iter::once(format!("Timeout-{}", crate::efi::EFI_GUID).to_owned()))
-                .chain(BootOrderIterator::new(self)?)))
+                .chain(iter::once(
+                    format!("BootNext-{}", crate::efi::EFI_GUID).to_owned(),
+                ))
+                .chain(iter::once(
+                    format!("BootOrder-{}", crate::efi::EFI_GUID).to_owned(),
+                ))
+                .chain(iter::once(
+                    format!("Timeout-{}", crate::efi::EFI_GUID).to_owned(),
+                ))
+                .chain(BootOrderIterator::new(self)?),
+        ))
     }
 }
 

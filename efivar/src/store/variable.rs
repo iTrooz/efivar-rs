@@ -28,7 +28,9 @@ impl<T: VariableStore> VarReader for T {
         self.get_vendor_group()
             .vendor(guid)
             .and_then(|guid_group| guid_group.variable(variable_name))
-            .ok_or_else(|| Error::VarNotFound { name: variable_name.into() })
+            .ok_or_else(|| Error::VarNotFound {
+                name: variable_name.into(),
+            })
             .and_then(StoreValue::to_tuple)
     }
 }
