@@ -8,4 +8,4 @@ edition = "2018"
 [dependencies]
 clap = "2.33.0"
 efivar = { path = "../efivar", features = ["store"] }
-itertools = "0.8.0"
+itertools = "0.8.2"
