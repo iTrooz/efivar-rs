@@ -8,8 +8,8 @@ pub trait VarWriter {
     ///
     /// # Arguments
     ///
-    /// * `name` - Full name (including vendor GUID) of the variable to read
-    /// * `attributes` - EFI variable attributes
-    /// * `value` - EFI variable contents
+    /// * `name`: Full name (including vendor GUID) of the variable to read
+    /// * `attributes`: EFI variable attributes
+    /// * `value`: EFI variable contents
     fn write(&mut self, name: &str, attributes: VariableFlags, value: &[u8]) -> crate::Result<()>;
 }

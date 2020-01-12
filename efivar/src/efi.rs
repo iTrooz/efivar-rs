@@ -80,7 +80,7 @@ impl ToString for VariableFlags {
 ///
 /// # Arguments
 ///
-/// * `name` - Name of an EFI variable in the standard `name`-`guid` format
+/// * `name`: Name of an EFI variable in the standard `name`-`guid` format
 ///
 /// # Examples
 ///
@@ -116,7 +116,7 @@ pub fn parse_name<'b>(name: &'b str) -> crate::Result<(&'b str, &'b str)> {
 ///
 /// # Arguments
 ///
-/// * `name` - Partial or full EFI variable name
+/// * `name`: Partial or full EFI variable name
 ///
 /// # Examples
 ///

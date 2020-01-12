@@ -25,7 +25,7 @@ impl ProcessToken {
     ///
     /// # Arguments
     ///
-    /// * `desired_access` - Token access level
+    /// * `desired_access`: Token access level
     pub fn open_current(desired_access: u32) -> io::Result<Self> {
         Self::open(unsafe { GetCurrentProcess() }, desired_access)
     }
@@ -34,8 +34,8 @@ impl ProcessToken {
     ///
     /// # Arguments
     ///
-    /// * `process` - Process to get the token for
-    /// * `desired_access` - Token access level
+    /// * `process`: Process to get the token for
+    /// * `desired_access`: Token access level
     pub fn open(process: HANDLE, desired_access: u32) -> io::Result<Self> {
         let mut process_token: HANDLE = NULL;
         let result =

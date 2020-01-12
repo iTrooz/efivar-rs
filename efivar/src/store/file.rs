@@ -42,7 +42,7 @@ impl FileStore {
     ///
     /// # Arguments
     ///
-    /// * `filename` - Path to the file to use for storing the variables
+    /// * `filename`: Path to the file to use for storing the variables
     pub fn new(filename: PathBuf) -> Self {
         let vendor_group = load_vendors(&filename).unwrap_or(VendorGroup::new());
 

@@ -68,7 +68,7 @@ pub fn system() -> Box<dyn VarManager> {
 ///
 /// # Arguments
 ///
-/// * `filename` - Path to the TOML file for this variable storage. If the file doesn't exist, it
+/// * `filename`: Path to the TOML file for this variable storage. If the file doesn't exist, it
 /// will be created.
 ///
 /// # Examples
