@@ -79,9 +79,9 @@ dependencies = [
 
 [[package]]
 name = "efiboot"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
- "efivar 0.1.0",
+ "efivar 0.2.0",
  "itertools 0.8.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "paw 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "structopt 0.3.7 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -89,7 +89,7 @@ dependencies = [
 
 [[package]]
 name = "efivar"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "base64 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "bitflags 1.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
