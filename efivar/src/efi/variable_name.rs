@@ -78,14 +78,18 @@ impl fmt::Display for VariableVendor {
 /// Parsing a valid name into succeeds:
 ///
 /// ```
+/// # use std::str::FromStr;
+/// # use efivar::efi::VariableName;
 /// let name = VariableName::from_str("BootOrder-8be4df61-93ca-11d2-aa0d-00e098032b8c").unwrap();
-/// assert_eq!(name.vendor(), uuid::Uuid::from_str("8be4df61-93ca-11d2-aa0d-00e098032b8c"));
+/// assert_eq!(*name.vendor().as_ref(), uuid::Uuid::from_str("8be4df61-93ca-11d2-aa0d-00e098032b8c").unwrap());
 /// assert_eq!(name.variable(), "BootOrder");
 /// ```
 ///
 /// Parsing an invalid name fails:
 ///
 /// ```
+/// # use std::str::FromStr;
+/// # use efivar::efi::VariableName;
 /// let result = VariableName::from_str("invalid name");
 /// assert!(result.is_err());
 /// ```
@@ -93,6 +97,7 @@ impl fmt::Display for VariableVendor {
 /// Turning the structure back into a string:
 ///
 /// ```
+/// # use efivar::efi::VariableName;
 /// let name = VariableName::new("BootOrder");
 /// assert_eq!(name.to_string(), "BootOrder-8be4df61-93ca-11d2-aa0d-00e098032b8c");
 /// ```

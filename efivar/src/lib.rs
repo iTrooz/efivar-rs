@@ -77,16 +77,19 @@ pub fn system() -> Box<dyn VarManager> {
 ///
 /// ```
 /// # use efivar::file_store;
-/// use efivar::efi::VariableFlags;
+/// use efivar::efi::{VariableFlags, VariableName};
 /// # {
+/// // Name of the BootOrder variable
+/// let boot_order = VariableName::new("BootOrder");
+///
 /// // Create a store from the file doc-test.toml
 /// let mut store = file_store("doc-test.toml");
 /// let value = vec![1, 2, 3, 4];
 /// // Write the value of a variable
-/// store.write("BootOrder-8be4df61-93ca-11d2-aa0d-00e098032b8c", VariableFlags::NON_VOLATILE, &value);
+/// store.write(&boot_order, VariableFlags::NON_VOLATILE, &value);
 ///
 /// // Check the value of the written variable
-/// let (data, attributes) = store.read_buf("BootOrder-8be4df61-93ca-11d2-aa0d-00e098032b8c").unwrap();
+/// let (data, attributes) = store.read_buf(&boot_order).unwrap();
 /// assert_eq!(data, value);
 /// assert_eq!(attributes, VariableFlags::NON_VOLATILE);
 /// // At this point, store is dropped and doc-test.toml will be updated
