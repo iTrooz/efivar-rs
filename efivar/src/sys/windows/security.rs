@@ -63,22 +63,23 @@ pub fn update_privileges() -> io::Result<()> {
     // We need SeSystemEnvironmentPrivilege to do anything NVRAM-related
     // So we configure it for the current thread here
     // This means SystemManager is not Send
-    let mut tp = TOKEN_PRIVILEGES {
-        PrivilegeCount: 1,
-        Privileges: unsafe { mem::uninitialized() },
-    };
+    let mut tp = mem::MaybeUninit::<TOKEN_PRIVILEGES>::uninit();
 
     // Lookup privilege value for SeSystemEnvironmentPrivilege
     let se_system_environment_privilege: Vec<u16> = OsStr::new("SeSystemEnvironmentPrivilege")
         .encode_wide()
         .chain(once(0))
         .collect();
-    let result = unsafe {
-        LookupPrivilegeValueW(
+    let (mut tp, result) = unsafe {
+        (*tp.as_mut_ptr()).PrivilegeCount = 1;
+
+        let result = LookupPrivilegeValueW(
             null_mut(),
             se_system_environment_privilege.as_ptr(),
-            &mut tp.Privileges[0].Luid as PLUID,
-        )
+            &mut (*tp.as_mut_ptr()).Privileges[0].Luid as PLUID,
+        );
+
+        (tp.assume_init(), result)
     };
 
     if result == 0 {

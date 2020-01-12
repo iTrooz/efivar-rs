@@ -84,28 +84,29 @@ impl VarReader for SystemManager {
         let (guid_wide, name_wide) = SystemManager::parse_name(name)?;
 
         // Allocate buffer
-        let mut buffer: [u8; 1024] = unsafe { mem::uninitialized() };
+        let mut buffer = mem::MaybeUninit::<[u8; 1024]>::uninit();
         let size = 1024;
 
         // Attribute return value
         let mut attributes: u32 = 0;
 
-        let result = unsafe {
-            GetFirmwareEnvironmentVariableExW(
+        unsafe {
+            let result = GetFirmwareEnvironmentVariableExW(
                 name_wide.as_ptr(),
                 guid_wide.as_ptr(),
                 buffer.as_mut_ptr() as *mut c_void,
                 size,
                 &mut attributes as *mut u32,
-            )
-        };
+            );
 
-        match result {
-            0 => Err(Error::for_variable_os(name.into())),
-            len => Ok((
-                VariableFlags::from_bits(attributes).unwrap_or(VariableFlags::empty()),
-                Vec::from(&buffer[0..len as usize]),
-            )),
+            match result {
+                0 => Err(Error::for_variable_os(name.into())),
+                len => Ok((
+                    VariableFlags::from_bits(attributes).unwrap_or(VariableFlags::empty()),
+                    // TODO: Only part of the vector is initialized
+                    Vec::from(&buffer.assume_init()[0..len as usize]),
+                )),
+            }
         }
     }
 }
