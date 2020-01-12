@@ -92,15 +92,15 @@ pub fn system() -> Box<dyn VarManager> {
 /// # std::fs::remove_file("doc-test.toml");
 /// ```
 #[cfg(feature = "store")]
-pub fn file_store(filename: &str) -> Box<dyn VarManagerEx> {
-    Box::new(store::FileStore::new(filename))
+pub fn file_store<P: Into<std::path::PathBuf>>(filename: P) -> Box<dyn VarManagerEx> {
+    Box::new(store::FileStore::new(filename.into()))
 }
 
 #[cfg(feature = "store")]
 #[doc(hidden)]
-pub fn file_store_std(filename: &str) -> Box<dyn VarManager> {
+pub fn file_store_std<P: Into<std::path::PathBuf>>(filename: P) -> Box<dyn VarManager> {
     // TODO: Fix this knowing that VarManagerEx: VarManager
-    Box::new(store::FileStore::new(filename))
+    Box::new(store::FileStore::new(filename.into()))
 }
 
 #[cfg(test)]

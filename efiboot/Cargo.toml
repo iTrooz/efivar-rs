@@ -6,6 +6,7 @@ description = "EFI boot manager variable editor written in Rust"
 edition = "2018"
 
 [dependencies]
-clap = "2.33.0"
 efivar = { path = "../efivar", features = ["store"] }
 itertools = "0.8.2"
+paw = "1.0.0"
+structopt = { version = "0.3.7", features = ["paw"] }
