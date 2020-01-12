@@ -64,8 +64,8 @@ impl VarEnumerator for SystemManager {
 }
 
 impl VarReader for SystemManager {
-    fn read(&self, name: &str) -> crate::Result<(VariableFlags, Vec<u8>)> {
-        self.sys_impl.read(name)
+    fn read(&self, name: &str, value: &mut [u8]) -> crate::Result<(usize, VariableFlags)> {
+        self.sys_impl.read(name, value)
     }
 }
 

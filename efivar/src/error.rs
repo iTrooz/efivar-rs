@@ -19,6 +19,8 @@ pub enum Error {
     UnknownFlag { flag: String },
     #[fail(display = "failed to decode name as valid UTF-8")]
     InvalidUTF8,
+    #[fail(display = "buffer too small for return value")]
+    BufferTooSmall,
 }
 
 #[cfg(not(target_os = "windows"))]

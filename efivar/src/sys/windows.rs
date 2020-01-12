@@ -45,10 +45,19 @@ struct BootOrderIterator {
 
 impl BootOrderIterator {
     fn new(sm: &SystemManager) -> crate::Result<BootOrderIterator> {
-        let (_flags, boot_order) = sm.read(&format!("BootOrder-{}", crate::efi::EFI_GUID))?;
-        let cursor = Cursor::new(boot_order);
+        // Buffer for BootOrder
+        let mut buf = vec![0u8; 512];
 
-        Ok(BootOrderIterator { cursor })
+        // Read BootOrder
+        let (boot_order_size, _flags) =
+            sm.read(&format!("BootOrder-{}", crate::efi::EFI_GUID), &mut buf[..])?;
+        
+        // Resize to actual value size
+        buf.resize(boot_order_size, 0);
+
+        Ok(BootOrderIterator {
+            cursor: Cursor::new(buf),
+        })
     }
 }
 
@@ -86,34 +95,29 @@ impl VarEnumerator for SystemManager {
 }
 
 impl VarReader for SystemManager {
-    fn read(&self, name: &str) -> crate::Result<(VariableFlags, Vec<u8>)> {
+    fn read(&self, name: &str, value: &mut [u8]) -> crate::Result<(usize, VariableFlags)> {
         // Parse name, and split into LPCWSTR
         let (guid_wide, name_wide) = SystemManager::parse_name(name)?;
-
-        // Allocate buffer
-        let mut buffer = mem::MaybeUninit::<[u8; 1024]>::uninit();
-        let size = 1024;
 
         // Attribute return value
         let mut attributes: u32 = 0;
 
-        unsafe {
-            let result = GetFirmwareEnvironmentVariableExW(
+        let result = unsafe {
+            GetFirmwareEnvironmentVariableExW(
                 name_wide.as_ptr(),
                 guid_wide.as_ptr(),
-                buffer.as_mut_ptr() as *mut c_void,
-                size,
+                value.as_mut_ptr() as *mut c_void,
+                value.len() as u32,
                 &mut attributes as *mut u32,
-            );
+            )
+        };
 
-            match result {
-                0 => Err(Error::for_variable_os(name.into())),
-                len => Ok((
-                    VariableFlags::from_bits(attributes).unwrap_or(VariableFlags::empty()),
-                    // TODO: Only part of the vector is initialized
-                    Vec::from(&buffer.assume_init()[0..len as usize]),
-                )),
-            }
+        match result {
+            0 => Err(Error::for_variable_os(name.into())),
+            len => Ok((
+                len as usize,
+                VariableFlags::from_bits(attributes).unwrap_or(VariableFlags::empty()),
+            )),
         }
     }
 }

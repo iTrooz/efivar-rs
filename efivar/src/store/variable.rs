@@ -1,7 +1,7 @@
 use crate::efi::{parse_name, VariableFlags};
 use crate::{Error, VarEnumerator, VarManager, VarReader, VarWriter};
 
-use super::{StoreValue, VendorGroup};
+use super::VendorGroup;
 
 pub trait VariableStore: VarManager {
     fn get_vendor_group(&self) -> &VendorGroup;
@@ -22,7 +22,7 @@ impl<T: VariableStore> VarEnumerator for T {
 }
 
 impl<T: VariableStore> VarReader for T {
-    fn read(&self, name: &str) -> crate::Result<(VariableFlags, Vec<u8>)> {
+    fn read(&self, name: &str, value: &mut [u8]) -> crate::Result<(usize, VariableFlags)> {
         let (guid, variable_name) = parse_name(name)?;
 
         self.get_vendor_group()
@@ -31,7 +31,7 @@ impl<T: VariableStore> VarReader for T {
             .ok_or_else(|| Error::VarNotFound {
                 name: variable_name.into(),
             })
-            .and_then(StoreValue::to_tuple)
+            .and_then(|val| val.to_tuple(value))
     }
 }
 

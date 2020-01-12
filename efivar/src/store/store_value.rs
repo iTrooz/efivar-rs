@@ -19,11 +19,18 @@ impl StoreValue {
         self.data = base64::encode(&value.1);
     }
 
-    pub fn to_tuple(&self) -> crate::Result<(VariableFlags, Vec<u8>)> {
+    pub fn to_tuple(&self, value: &mut [u8]) -> crate::Result<(usize, VariableFlags)> {
         let attr = VariableFlags::from_bits(self.attributes).unwrap_or(VariableFlags::empty());
-        let data = base64::decode(&self.data)?;
 
-        Ok((attr, data))
+        // base64::decode_config_slice panics if the target buffer is too small
+        if value.len() < (self.data.len() + 3) / 4 * 3 {
+            return Err(crate::Error::BufferTooSmall);
+        }
+
+        Ok((
+            base64::decode_config_slice(&self.data, base64::STANDARD, value)?,
+            attr,
+        ))
     }
 }
 

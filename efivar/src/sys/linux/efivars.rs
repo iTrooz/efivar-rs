@@ -50,7 +50,7 @@ impl VarEnumerator for SystemManager {
 }
 
 impl VarReader for SystemManager {
-    fn read(&self, name: &str) -> crate::Result<(VariableFlags, Vec<u8>)> {
+    fn read(&self, name: &str, value: &mut [u8]) -> crate::Result<(usize, VariableFlags)> {
         // Filename to the matching efivarfs file for this variable
         let filename = format!("{}/{}", EFIVARS_ROOT, name);
 
@@ -64,11 +64,19 @@ impl VarReader for SystemManager {
         let attr = VariableFlags::from_bits(attr).unwrap_or(VariableFlags::empty());
 
         // Read variable contents
-        let mut buf = Vec::new();
-        f.read_to_end(&mut buf)
+        let read = f
+            .read(value)
             .map_err(|error| Error::for_variable(error, name.into()))?;
 
-        Ok((attr, buf))
+        // Check that there's nothing left
+        if read == value.len() {
+            let mut b = [0u8];
+            if let Ok(1) = f.read(&mut b) {
+                return Err(Error::BufferTooSmall);
+            }
+        }
+
+        Ok((read, flags))
     }
 }
 
