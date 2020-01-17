@@ -44,7 +44,7 @@ after_success: |
   [ $TRAVIS_PULL_REQUEST = false ] &&
   [ $TRAVIS_OS_NAME = linux ] &&
   [ $TRAVIS_RUST_VERSION = stable ] &&
-  cargo doc &&
+  cargo doc --no-deps -p efivar &&
   echo '<meta http-equiv=refresh content=0;url="efivar/">' > target/doc/index.html &&
   pip install --user ghp-import &&
   ghp-import -n target/doc &&
