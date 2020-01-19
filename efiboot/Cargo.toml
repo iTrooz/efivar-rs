@@ -1,6 +1,6 @@
 [package]
 name = "efiboot"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["Vincent Tavernier <vince.tavernier@gmail.com>"]
 description = "EFI boot manager variable editor written in Rust"
 edition = "2018"
