@@ -35,3 +35,6 @@ store = ["base64", "serde", "serde_derive", "toml"]
 [target.'cfg(windows)'.dependencies.winapi]
 version = "0.3.8"
 features = ["winbase", "winnt", "processthreadsapi", "securitybaseapi", "handleapi"]
+
+[dev-dependencies]
+version-sync = "0.8.1"

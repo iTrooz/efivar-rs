@@ -12,7 +12,7 @@
 //! In-memory and filesystem storage are also provided for testing purposes, or as a way to dump
 //! system variables to an external file.
 
-#![doc(html_root_url = "https://vtavernier.github.io/efiboot-rs/")]
+#![doc(html_root_url = "https://docs.rs/efivar/0.2.0")]
 
 #[macro_use]
 extern crate bitflags;
