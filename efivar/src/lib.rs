@@ -111,10 +111,11 @@ pub fn file_store_std<P: Into<std::path::PathBuf>>(filename: P) -> Box<dyn VarMa
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::efi::{VariableFlags, VariableName};
-
     #[test]
+    #[cfg(feature = "store")]
     fn file_store_roundtrip() {
+        use crate::efi::{VariableFlags, VariableName};
+
         {
             // Create a store from the file doc-test.toml
             let mut store = file_store("doc-test.toml");
