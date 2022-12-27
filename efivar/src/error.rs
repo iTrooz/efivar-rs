@@ -38,7 +38,7 @@ fn is_variable_not_found_error(err: &io::Error) -> bool {
 
 #[cfg(target_os = "windows")]
 fn is_variable_not_found_error(err: &io::Error) -> bool {
-    err.kind() == io::ErrorKind::Other && err.raw_os_error() == Some(203)
+    err.raw_os_error() == Some(203)
 }
 
 #[cfg(not(target_os = "windows"))]
@@ -49,7 +49,7 @@ fn is_buffer_too_small_error(_err: &io::Error) -> bool {
 
 #[cfg(target_os = "windows")]
 fn is_buffer_too_small_error(err: &io::Error) -> bool {
-    err.kind() == io::ErrorKind::Other && err.raw_os_error() == Some(122)
+    err.raw_os_error() == Some(122)
 }
 
 #[cfg(not(target_os = "windows"))]
@@ -59,7 +59,7 @@ fn is_permission_denied_error(err: &io::Error) -> bool {
 
 #[cfg(target_os = "windows")]
 fn is_permission_denied_error(err: &io::Error) -> bool {
-    err.kind() == io::ErrorKind::Other && err.raw_os_error() == Some(1314)
+    err.raw_os_error() == Some(1314)
 }
 
 impl Error {
