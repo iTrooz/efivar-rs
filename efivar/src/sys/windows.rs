@@ -107,7 +107,7 @@ impl VarReader for SystemManager {
         };
 
         match result {
-            0 => Err(Error::for_variable_os(name.into())),
+            0 => Err(Error::for_variable_os(name)),
             len => Ok((
                 len as usize,
                 VariableFlags::from_bits(attributes).unwrap_or(VariableFlags::empty()),

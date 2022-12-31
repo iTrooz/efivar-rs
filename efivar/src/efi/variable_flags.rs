@@ -71,7 +71,7 @@ impl ToString for VariableFlags {
             flag_strings.push("EFI_VARIABLE_ENHANCED_AUTHENTICATED_ACCESS");
         }
 
-        return flag_strings.join("\n");
+        flag_strings.join("\n")
     }
 }
 

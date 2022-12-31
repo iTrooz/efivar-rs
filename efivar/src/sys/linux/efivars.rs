@@ -9,7 +9,7 @@ use crate::{Error, VarEnumerator, VarManager, VarReader, VarWriter};
 
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
 
-pub const EFIVARS_ROOT: &'static str = "/sys/firmware/efi/efivars";
+pub const EFIVARS_ROOT: &str = "/sys/firmware/efi/efivars";
 
 pub struct SystemManager;
 
@@ -56,19 +56,18 @@ impl VarReader for SystemManager {
         // Filename to the matching efivarfs file for this variable
         let filename = format!("{}/{}", EFIVARS_ROOT, name);
 
-        let mut f =
-            File::open(filename).map_err(|error| Error::for_variable(error, name.into()))?;
+        let mut f = File::open(filename).map_err(|error| Error::for_variable(error, name))?;
 
         // Read attributes
         let attr = f
             .read_u32::<LittleEndian>()
-            .map_err(|error| Error::for_variable(error, name.into()))?;
+            .map_err(|error| Error::for_variable(error, name))?;
         let attr = VariableFlags::from_bits(attr).unwrap_or(VariableFlags::empty());
 
         // Read variable contents
         let read = f
             .read(value)
-            .map_err(|error| Error::for_variable(error, name.into()))?;
+            .map_err(|error| Error::for_variable(error, name))?;
 
         // Check that there's nothing left
         if read == value.len() {
@@ -99,11 +98,11 @@ impl VarWriter for SystemManager {
 
         // Write attributes
         buf.write_u32::<LittleEndian>(attribute_bits)
-            .map_err(|error| Error::for_variable(error, name.into()))?;
+            .map_err(|error| Error::for_variable(error, name))?;
 
         // Write variable contents
         buf.write(value)
-            .map_err(|error| Error::for_variable(error, name.into()))?;
+            .map_err(|error| Error::for_variable(error, name))?;
 
         // Filename to the matching efivarfs file for this variable
         let filename = format!("{}/{}", EFIVARS_ROOT, name);
@@ -114,11 +113,11 @@ impl VarWriter for SystemManager {
             .truncate(true)
             .create(true)
             .open(filename)
-            .map_err(|error| Error::for_variable(error, name.into()))?;
+            .map_err(|error| Error::for_variable(error, name))?;
 
         // Write the value using a single write.
         f.write(&buf)
-            .map_err(|error| Error::for_variable(error, name.into()))?;
+            .map_err(|error| Error::for_variable(error, name))?;
 
         Ok(())
     }

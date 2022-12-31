@@ -1,6 +1,7 @@
 use super::{VariableStore, VendorGroup};
 
 /// Represents an in-memory EFI variable store
+#[derive(Default)]
 pub struct MemoryStore {
     vendor_group: VendorGroup,
 }
@@ -8,9 +9,7 @@ pub struct MemoryStore {
 impl MemoryStore {
     /// Create a new empty memory store
     pub fn new() -> Self {
-        MemoryStore {
-            vendor_group: VendorGroup::new(),
-        }
+        Self::default()
     }
 }
 

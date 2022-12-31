@@ -18,10 +18,7 @@ pub enum VariableVendor {
 impl VariableVendor {
     /// Return true if this vendor is the EFI vendor
     fn is_efi(&self) -> bool {
-        match self {
-            VariableVendor::Efi => true,
-            _ => false,
-        }
+        matches!(self, VariableVendor::Efi)
     }
 }
 
@@ -54,7 +51,7 @@ impl AsRef<uuid::Uuid> for VariableVendor {
     fn as_ref(&self) -> &uuid::Uuid {
         match self {
             VariableVendor::Efi => &EFI_GUID,
-            VariableVendor::Custom(uuid) => &uuid,
+            VariableVendor::Custom(uuid) => uuid,
         }
     }
 }

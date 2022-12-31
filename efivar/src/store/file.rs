@@ -33,7 +33,7 @@ fn load_vendors(filename: &Path) -> io::Result<VendorGroup> {
 fn save_vendors(filename: &Path, vendor_group: &VendorGroup) -> io::Result<()> {
     let mut file = File::create(filename)?;
     let data = toml::to_vec(vendor_group).map_err(|e| Error::new(ErrorKind::Other, e))?;
-    file.write(&data)?;
+    file.write_all(&data)?;
     Ok(())
 }
 
@@ -44,7 +44,7 @@ impl FileStore {
     ///
     /// * `filename`: Path to the file to use for storing the variables
     pub fn new(filename: PathBuf) -> Self {
-        let vendor_group = load_vendors(&filename).unwrap_or(VendorGroup::new());
+        let vendor_group = load_vendors(&filename).unwrap_or_else(|_| VendorGroup::new());
 
         Self {
             filename,
@@ -55,10 +55,8 @@ impl FileStore {
 
 impl Drop for FileStore {
     fn drop(&mut self) {
-        save_vendors(&self.filename, &self.vendor_group).expect(&format!(
-            "Failed to write store to {}",
-            self.filename.display()
-        ));
+        save_vendors(&self.filename, &self.vendor_group)
+            .unwrap_or_else(|_| panic!("Failed to write store to {}", self.filename.display()));
     }
 }
 
