@@ -75,7 +75,7 @@ impl Error {
         }
 
         if is_permission_denied_error(&error) {
-            return Error::PermissionDenied { name }
+            return Error::PermissionDenied { name };
         }
 
         Error::VarUnknownError { name, error }

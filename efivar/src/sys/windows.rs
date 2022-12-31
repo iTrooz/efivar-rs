@@ -31,7 +31,10 @@ impl SystemManager {
             .encode_wide()
             .chain(once(0))
             .collect();
-        let name_wide: Vec<u16> = OsStr::new(name.variable()).encode_wide().chain(once(0)).collect();
+        let name_wide: Vec<u16> = OsStr::new(name.variable())
+            .encode_wide()
+            .chain(once(0))
+            .collect();
 
         Ok((guid_wide, name_wide))
     }
@@ -47,8 +50,7 @@ impl BootOrderIterator {
         let mut buf = vec![0u8; 512];
 
         // Read BootOrder
-        let (boot_order_size, _flags) =
-            sm.read(&VariableName::new("BootOrder"), &mut buf[..])?;
+        let (boot_order_size, _flags) = sm.read(&VariableName::new("BootOrder"), &mut buf[..])?;
 
         // Resize to actual value size
         buf.resize(boot_order_size, 0);
@@ -115,7 +117,12 @@ impl VarReader for SystemManager {
 }
 
 impl VarWriter for SystemManager {
-    fn write(&mut self, name: &VariableName, attributes: VariableFlags, value: &[u8]) -> crate::Result<()> {
+    fn write(
+        &mut self,
+        name: &VariableName,
+        attributes: VariableFlags,
+        value: &[u8],
+    ) -> crate::Result<()> {
         // Parse name, and split into LPCWSTR
         let (guid_wide, name_wide) = SystemManager::parse_name(name)?;
 
