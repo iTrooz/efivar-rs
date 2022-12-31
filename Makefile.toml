@@ -8,3 +8,38 @@ alias = "coverage-tarpaulin"
 install_script = ["(hash cargo-tarpaulin && rustup run ${CARGO_MAKE_RUST_CHANNEL} cargo tarpaulin --help) || RUSTFLAGS='--cfg procmacro2_semver_exempt' cargo install --force cargo-tarpaulin"]
 command = "rustup"
 args = ["run", "${CARGO_MAKE_RUST_CHANNEL}", "cargo", "tarpaulin", "--out", "Xml"]
+
+[tasks.ci-bump-version]
+command = "./ci/setversion.sh"
+args = ["${@}"]
+
+[tasks.ci-build-release]
+dependencies = [
+  "build-release",
+  "move-artifacts",
+]
+
+[tasks.move-artifacts]
+script = '''
+#!@duckscript
+
+output_dir = set ../dist
+suffix = set ""
+
+if is_windows
+    suffix = set ".exe" 
+end
+
+target_binary_name = set efiboot
+target_binary = set "target/${CARGO_BUILD_TARGET}/release/${target_binary_name}${suffix}"
+
+mkdir ${output_dir}
+cp ../${target_binary} ${output_dir}/${target_binary_name}_${CARGO_BUILD_TARGET}${suffix}
+'''
+
+[tasks.ci-pre-check]
+dependencies = []
+
+[tasks.ci-test]
+command = "cargo"
+args = ["test"]

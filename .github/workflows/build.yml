@@ -1,0 +1,31 @@
+name: build
+
+on:
+  pull_request: {}
+  push:
+    branches:
+      - master
+    tags-ignore:
+      - "**"
+
+jobs:
+  build:
+    uses: vtavernier/github-workflows/.github/workflows/build-rust-bin.yml@feat/rust-bin
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        include:
+          - runs-on: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - runs-on: windows-latest
+            target: x86_64-pc-windows-msvc
+
+    with:
+      runs-on: ${{ matrix.runs-on }}
+      rust-target: ${{ matrix.target }}
+
+    secrets:
+      GH_TOKEN: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
+
