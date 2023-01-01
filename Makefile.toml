@@ -42,4 +42,4 @@ dependencies = []
 
 [tasks.ci-test]
 command = "cargo"
-args = ["test"]
+args = ["test", "--release"]
