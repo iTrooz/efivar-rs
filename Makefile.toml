@@ -39,5 +39,6 @@ cp ${target_binary} ${output_dir}/${target_binary_name}_${CARGO_BUILD_TARGET}${s
 '''
 
 [tasks.ci-test]
+workspace = false
 command = "cargo"
 args = ["test", "--release"]
