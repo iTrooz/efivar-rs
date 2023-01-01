@@ -1,0 +1,12 @@
+name: pullrequest
+
+on:
+  pull_request_target:
+    types:
+      - opened
+      - edited
+      - synchronize
+
+jobs:
+  pullrequest:
+    uses: vtavernier/github-workflows/.github/workflows/pullrequest-semantic.yml@feat/rust-bin
