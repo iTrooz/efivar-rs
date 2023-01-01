@@ -3,3 +3,6 @@ members = [
     "efiboot",
     "efivar"
 ]
+
+[profile.release]
+strip = "debuginfo"
