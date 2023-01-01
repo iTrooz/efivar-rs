@@ -10,6 +10,7 @@ command = "rustup"
 args = ["run", "${CARGO_MAKE_RUST_CHANNEL}", "cargo", "tarpaulin", "--out", "Xml"]
 
 [tasks.ci-bump-version]
+workspace = false
 command = "./ci/setversion.sh"
 args = ["${@}"]
 
