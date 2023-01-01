@@ -4,6 +4,12 @@
         "@semantic-release/release-notes-generator",
         "@semantic-release/changelog",
         [
+            "@semantic-release/exec",
+            {
+                "prepareCmd": "./ci/setversion.sh ${nextRelease.version}"
+            }
+        ],
+        [
             "@semantic-release/git",
             {
                 "assets": [
