@@ -13,7 +13,8 @@ args = ["run", "${CARGO_MAKE_RUST_CHANNEL}", "cargo", "tarpaulin", "--out", "Xml
 command = "./ci/setversion.sh"
 args = ["${@}"]
 
-[tasks.ci-build-release]
+[tasks.ci-build]
+workspace = false
 dependencies = [
   "build-release",
   "move-artifacts",
@@ -23,7 +24,7 @@ dependencies = [
 script = '''
 #!@duckscript
 
-output_dir = set ../dist
+output_dir = set dist
 suffix = set ""
 
 if is_windows
@@ -34,11 +35,8 @@ target_binary_name = set efiboot
 target_binary = set "target/${CARGO_BUILD_TARGET}/release/${target_binary_name}${suffix}"
 
 mkdir ${output_dir}
-cp ../${target_binary} ${output_dir}/${target_binary_name}_${CARGO_BUILD_TARGET}${suffix}
+cp ${target_binary} ${output_dir}/${target_binary_name}_${CARGO_BUILD_TARGET}${suffix}
 '''
-
-[tasks.ci-pre-check]
-dependencies = []
 
 [tasks.ci-test]
 command = "cargo"
