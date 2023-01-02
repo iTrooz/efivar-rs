@@ -13,6 +13,8 @@ on:
     tags-ignore:
       - "**"
 
+concurrency: ci-${{ github.ref }}
+
 jobs:
   check:
     uses: vtavernier/github-workflows/.github/workflows/check-rust.yml@v1.0.0-alpha.9
