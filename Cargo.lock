@@ -100,7 +100,7 @@ dependencies = [
 
 [[package]]
 name = "efiboot"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "efivar",
  "itertools",
@@ -110,7 +110,7 @@ dependencies = [
 
 [[package]]
 name = "efivar"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "base64",
  "bitflags",

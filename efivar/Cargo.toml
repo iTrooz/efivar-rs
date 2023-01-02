@@ -1,6 +1,6 @@
 [package]
 name = "efivar"
-version = "1.0.0"
+version = "1.0.1"
 authors = ["Vincent Tavernier <v.tavernier@pm.me>"]
 license = "MIT"
 readme = "README.md"
