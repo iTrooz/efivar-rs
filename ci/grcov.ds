@@ -9,13 +9,13 @@ if is_windows
     cwd = map_get ${env} CARGO_MAKE_WORKSPACE_WORKING_DIRECTORY
     parts = split ${cwd} :
     drive = array_get ${parts} 0
-    ignore_root = set "${drive}:/*"
+    ignore_root = set "--ignore ${drive}:/* --ignore C:/*"
 else
-    ignore_root = set "/*"
+    ignore_root = set "--ignore /*"
 end
 
 grcov_bin = set ./coverage/grcov
-grcov_args = set "--binary-path ${binary_path} -s . -t ${grcov_format} --branch --ignore ${ignore_root} --ignore-not-existing ."
+grcov_args = set "--binary-path ${binary_path} -s . -t ${grcov_format} --branch ${ignore_root} --ignore-not-existing ."
 
 echo ${grcov_bin} %{grcov_args}
 if equals ${grcov_format} markdown
