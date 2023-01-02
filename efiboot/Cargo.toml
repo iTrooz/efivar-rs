@@ -1,7 +1,14 @@
 [package]
 name = "efiboot"
 version = "0.2.2"
-authors = ["Vincent Tavernier <vince.tavernier@gmail.com>"]
+authors = ["Vincent Tavernier <v.tavernier@pm.me>"]
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/vtavernier/efiboot-rs"
+homepage = "https://github.com/vtavernier/efiboot-rs/tree/master/efiboot"
+documentation = "https://docs.rs/efiboot"
+keywords = ["efi"]
+categories = []
 description = "EFI boot manager variable editor written in Rust"
 edition = "2018"
 

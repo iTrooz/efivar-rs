@@ -45,4 +45,4 @@ tool.**
 
 ## Author
 
-Vincent Tavernier <vince.tavernier@gmail.com>
+Vincent Tavernier <v.tavernier@pm.me>

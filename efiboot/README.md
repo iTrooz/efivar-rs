@@ -5,4 +5,4 @@ to manage EFI variables related to UEFI boot manager operation.
 
 ## Author
 
-Vincent Tavernier <vince.tavernier@gmail.com>
+Vincent Tavernier <v.tavernier@pm.me>
