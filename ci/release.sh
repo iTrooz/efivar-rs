@@ -22,12 +22,14 @@ publish_crate () {
 
         if cargo publish -p "$crate_name"; then
             echo "Succeeded, moving on."
-            break
+            return 0
         else
             echo "Failed, waiting 10s."
             sleep 10
         fi
     done
+
+    return 1
 }
 
 publish () {
