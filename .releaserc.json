@@ -16,7 +16,8 @@
                     "CHANGELOG.md",
                     "Cargo.lock",
                     "efiboot/Cargo.toml",
-                    "efivar/Cargo.toml"
+                    "efivar/Cargo.toml",
+                    "efivar/src/lib.rs"
                 ],
                 "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
             }
