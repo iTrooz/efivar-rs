@@ -34,7 +34,6 @@ jobs:
       runs-on: ${{ matrix.runs-on }}
       rust-target: ${{ matrix.target }}
       artifact-name: artifact
-      run-release: false
       upload-coverage-to: codecov
 
     secrets:
