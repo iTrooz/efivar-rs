@@ -12,10 +12,10 @@ on:
 
 jobs:
   check:
-    uses: vtavernier/github-workflows/.github/workflows/check-rust.yml@feat/rust-bin
+    uses: vtavernier/github-workflows/.github/workflows/check-rust.yml@v1.0.0-alpha.9
 
   build:
-    uses: vtavernier/github-workflows/.github/workflows/build-rust-bin.yml@feat/rust-bin
+    uses: vtavernier/github-workflows/.github/workflows/build-rust-bin.yml@v1.0.0-alpha.9
 
     needs:
       - check
@@ -40,7 +40,7 @@ jobs:
       GH_TOKEN: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
 
   release:
-    uses: vtavernier/github-workflows/.github/workflows/release-semantic.yml@feat/rust-bin
+    uses: vtavernier/github-workflows/.github/workflows/release-semantic.yml@v1.0.0-alpha.9
 
     needs:
       - build
