@@ -1,12 +1,15 @@
 name: build
 
 on:
-  pull_request: {}
+  pull_request:
+    branches-ignore:
+      - renovate/*
   push:
     branches:
       - master
       - alpha
       - beta
+      - renovate/*
     tags-ignore:
       - "**"
 
