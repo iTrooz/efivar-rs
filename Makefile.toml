@@ -1,7 +1,7 @@
 [tasks.ci-bump-version]
 workspace = false
-command = "./ci/release.sh"
-args = ["set-version", "${@}"]
+command = "bash"
+args = ["./ci/release.sh", "set-version", "${@}"]
 
 [tasks.ci-build]
 workspace = false
