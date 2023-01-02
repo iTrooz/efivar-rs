@@ -6,7 +6,7 @@
         [
             "@semantic-release/exec",
             {
-                "prepareCmd": "./ci/setversion.sh ${nextRelease.version}"
+                "prepareCmd": "./ci/release.sh set-version ${nextRelease.version}"
             }
         ],
         [
@@ -25,6 +25,12 @@
             "@semantic-release/github",
             {
                 "assets": "dist/*"
+            }
+        ],
+        [
+            "@semantic-release/exec",
+            {
+                "publishCmd": "./ci/release.sh publish"
             }
         ]
     ]
