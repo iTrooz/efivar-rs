@@ -1,0 +1,18 @@
+if is_empty ${CARGO_BUILD_TARGET}
+    binary_path = set ./target/debug/deps
+else
+    binary_path = set ./target/${CARGO_BUILD_TARGET}/debug/deps
+end
+
+grcov_args = set "--binary-path ${binary_path} -s . -t ${grcov_format} --branch --ignore /* --ignore-not-existing ."
+
+exec echo %{grcov_args}
+if equals ${grcov_format} markdown
+    if is_empty ${GITHUB_STEP_SUMMARY}
+        exec ./coverage/grcov %{grcov_args}
+    else
+        exec ./coverage/grcov %{grcov_args} -o ${GITHUB_STEP_SUMMARY}
+    end
+else
+    exec ./coverage/grcov %{grcov_args} -o ${grcov_output}
+end

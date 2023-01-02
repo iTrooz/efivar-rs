@@ -33,8 +33,9 @@ jobs:
     with:
       runs-on: ${{ matrix.runs-on }}
       rust-target: ${{ matrix.target }}
-      run-release: false
       artifact-name: artifact
+      run-release: false
+      upload-coverage-to: codecov
 
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
