@@ -14,8 +14,8 @@ impl<T: VariableStore> VarEnumerator for T {
             |(guid, group)| {
                 group
                     .values
-                    .iter()
-                    .map(move |(name, _value)| VariableName::new_with_vendor(name, *guid))
+                    .keys()
+                    .map(move |name| VariableName::new_with_vendor(name, *guid))
             },
         )))
     }

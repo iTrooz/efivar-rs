@@ -8,7 +8,7 @@ use super::LinuxSystemManager;
 use crate::efi::{VariableFlags, VariableName};
 use crate::{Error, VarEnumerator, VarManager, VarReader, VarWriter};
 
-pub const EFIVARFS_ROOT: &'static str = "/sys/firmware/efi/vars";
+pub const EFIVARFS_ROOT: &str = "/sys/firmware/efi/vars";
 
 pub struct SystemManager;
 
@@ -30,7 +30,7 @@ impl VarEnumerator for SystemManager {
         fs::read_dir(EFIVARFS_ROOT)
             .map(|list| {
                 list.filter_map(Result::ok)
-                    .filter(|ref entry| match entry.file_type() {
+                    .filter(|entry| match entry.file_type() {
                         Ok(file_type) => file_type.is_dir(),
                         _ => false,
                     })
@@ -65,7 +65,7 @@ impl VarReader for SystemManager {
         for line in reader.lines() {
             let line = line.map_err(|error| Error::for_variable(error, name))?;
             let parsed = VariableFlags::from_str(&line)?;
-            flags = flags | parsed;
+            flags |= parsed;
         }
 
         // Filename to the matching efivarfs data for this variable

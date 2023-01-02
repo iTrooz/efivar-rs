@@ -1,0 +1,53 @@
+name: build
+
+on:
+  pull_request: {}
+  push:
+    branches:
+      - master
+      - alpha
+      - beta
+    tags-ignore:
+      - "**"
+
+jobs:
+  check:
+    uses: vtavernier/github-workflows/.github/workflows/check-rust.yml@v1.0.0-alpha.9
+
+  build:
+    uses: vtavernier/github-workflows/.github/workflows/build-rust-bin.yml@v1.0.0-alpha.9
+
+    needs:
+      - check
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        include:
+          - runs-on: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - runs-on: windows-latest
+            target: x86_64-pc-windows-msvc
+
+    with:
+      runs-on: ${{ matrix.runs-on }}
+      rust-target: ${{ matrix.target }}
+      artifact-name: artifact
+      upload-coverage-to: codecov
+
+    secrets:
+      GH_TOKEN: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
+
+  release:
+    uses: vtavernier/github-workflows/.github/workflows/release-semantic.yml@v1.0.0-alpha.9
+
+    needs:
+      - build
+
+    with:
+      artifact-name: artifact
+
+    secrets:
+      GH_TOKEN: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
+      CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}

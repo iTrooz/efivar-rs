@@ -1,10 +1,92 @@
-[env]
-CARGO_MAKE_EXTEND_WORKSPACE_MAKEFILE = "true"
+[tasks.ci-bump-version]
+workspace = false
+command = "./ci/setversion.sh"
+args = ["${@}"]
 
-[tasks.coverage]
-alias = "coverage-tarpaulin"
+[tasks.ci-build]
+workspace = false
+dependencies = [
+  "build-release",
+  "move-artifacts",
+]
 
-[tasks.coverage-tarpaulin.linux]
-install_script = ["(hash cargo-tarpaulin && rustup run ${CARGO_MAKE_RUST_CHANNEL} cargo tarpaulin --help) || RUSTFLAGS='--cfg procmacro2_semver_exempt' cargo install --force cargo-tarpaulin"]
-command = "rustup"
-args = ["run", "${CARGO_MAKE_RUST_CHANNEL}", "cargo", "tarpaulin", "--out", "Xml"]
+[tasks.move-artifacts]
+script = '''
+#!@duckscript
+
+output_dir = set dist
+suffix = set ""
+
+if is_windows
+    suffix = set ".exe"
+end
+
+target_binary_name = set efiboot
+target_binary = set "target/${CARGO_BUILD_TARGET}/release/${target_binary_name}${suffix}"
+
+mkdir ${output_dir}
+cp ${target_binary} ${output_dir}/${target_binary_name}_${CARGO_BUILD_TARGET}${suffix}
+'''
+
+[tasks.install-grcov]
+workspace = false
+
+[tasks.install-grcov.linux]
+script = '''
+mkdir -p coverage
+curl -sL https://github.com/mozilla/grcov/releases/download/v0.8.13/grcov-x86_64-unknown-linux-gnu.tar.bz2 | tar jxf - -C coverage
+'''
+
+[tasks.install-grcov.windows]
+script = '''
+md coverage
+curl -sL -o coverage/grcov-x86_64-pc-windows-msvc.zip https://github.com/mozilla/grcov/releases/download/v0.8.13/grcov-x86_64-pc-windows-msvc.zip
+cd coverage
+7z -y x grcov-x86_64-pc-windows-msvc.zip
+'''
+
+[tasks.run-cargo-test]
+workspace = false
+command = "cargo"
+args = ["test", "--all-features"]
+
+[tasks.run-cargo-test.env]
+CARGO_INCREMENTAL = "0"
+RUSTFLAGS = "-Cinstrument-coverage -Ccodegen-units=1 -Cinline-threshold=0 -Coverflow-checks=off"
+LLVM_PROFILE_FILE = "cargo-test-%p-%m.profraw"
+
+[tasks.grcov-test-lcov]
+workspace = false
+script_runner = '@duckscript'
+script = { file = 'ci/grcov.ds' }
+env = { grcov_format = "lcov", grcov_output = "coverage/info.lcov" }
+
+[tasks.grcov-test-html]
+workspace = false
+script_runner = '@duckscript'
+script = { file = 'ci/grcov.ds' }
+env = { grcov_format = "html", grcov_output = "coverage/html" }
+
+[tasks.grcov-test-markdown]
+workspace = false
+script_runner = '@duckscript'
+script = { file = 'ci/grcov.ds' }
+env = { grcov_format = "markdown" }
+
+[tasks.local-coverage]
+workspace = false
+dependencies = [
+  "install-grcov",
+  "run-cargo-test",
+  "grcov-test-html",
+  "grcov-test-markdown",
+]
+
+[tasks.ci-test]
+workspace = false
+dependencies = [
+  "install-grcov",
+  "run-cargo-test",
+  "grcov-test-lcov",
+  "grcov-test-markdown",
+]

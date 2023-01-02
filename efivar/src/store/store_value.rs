@@ -1,6 +1,6 @@
 use crate::efi::{VariableFlags, VariableName};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Default, Serialize, Deserialize)]
 pub struct StoreValue {
     attributes: u32,
     data: String,
@@ -8,10 +8,7 @@ pub struct StoreValue {
 
 impl StoreValue {
     pub fn new() -> Self {
-        StoreValue {
-            attributes: 0u32,
-            data: String::new(),
-        }
+        Self::default()
     }
 
     pub fn set_from(&mut self, value: &(VariableFlags, &[u8])) {
