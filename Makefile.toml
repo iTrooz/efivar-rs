@@ -48,7 +48,7 @@ cd coverage
 [tasks.run-cargo-test]
 workspace = false
 command = "cargo"
-args = ["test"]
+args = ["test", "--all-features"]
 
 [tasks.run-cargo-test.env]
 CARGO_INCREMENTAL = "0"
