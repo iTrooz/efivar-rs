@@ -1,6 +1,12 @@
 [tasks.ci-bump-version]
 workspace = false
-command = "bash"
+
+[tasks.ci-bump-version.linux]
+command = "./ci/release.sh"
+args = ["set-version", "${@}"]
+
+[tasks.ci-bump-version.windows]
+command = "C:/Program Files/Git/bin/bash.exe"
 args = ["./ci/release.sh", "set-version", "${@}"]
 
 [tasks.ci-build]
