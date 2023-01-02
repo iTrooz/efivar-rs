@@ -42,7 +42,7 @@ script = '''
 md coverage
 curl -sL -o coverage/grcov-x86_64-pc-windows-msvc.zip https://github.com/mozilla/grcov/releases/download/v0.8.13/grcov-x86_64-pc-windows-msvc.zip
 cd coverage
-7z x grcov-x86_64-pc-windows-msvc.zip
+7z -y x grcov-x86_64-pc-windows-msvc.zip
 '''
 
 [tasks.run-cargo-test]
@@ -52,7 +52,7 @@ args = ["test", "--all-features"]
 
 [tasks.run-cargo-test.env]
 CARGO_INCREMENTAL = "0"
-RUSTFLAGS = "-Cinstrument-coverage -Ccodegen-units=1 -Cinline-threshold=0 -Clink-dead-code -Coverflow-checks=off"
+RUSTFLAGS = "-Cinstrument-coverage -Ccodegen-units=1 -Cinline-threshold=0 -Coverflow-checks=off"
 LLVM_PROFILE_FILE = "cargo-test-%p-%m.profraw"
 
 [tasks.grcov-test-lcov]
