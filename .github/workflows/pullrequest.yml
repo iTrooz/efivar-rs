@@ -9,4 +9,4 @@ on:
 
 jobs:
   pullrequest:
-    uses: vtavernier/github-workflows/.github/workflows/pullrequest-semantic.yml@v1.0.0-alpha.9
+    uses: vtavernier/github-workflows/.github/workflows/pullrequest-semantic.yml@v1
