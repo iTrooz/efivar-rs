@@ -22,7 +22,7 @@ fn load_vendors(filename: &Path) -> io::Result<VendorGroup> {
     file.read_to_end(&mut buffer)?;
 
     // Deserialize document
-    let doc = toml::from_slice(&buffer);
+    let doc = toml::from_str(&String::from_utf8(buffer).map_err(|_| io::ErrorKind::Other)?);
 
     match doc {
         Ok(vendor_group) => Ok(vendor_group),
@@ -32,8 +32,8 @@ fn load_vendors(filename: &Path) -> io::Result<VendorGroup> {
 
 fn save_vendors(filename: &Path, vendor_group: &VendorGroup) -> io::Result<()> {
     let mut file = File::create(filename)?;
-    let data = toml::to_vec(vendor_group).map_err(|e| Error::new(ErrorKind::Other, e))?;
-    file.write_all(&data)?;
+    let data = toml::to_string(vendor_group).map_err(|e| Error::new(ErrorKind::Other, e))?;
+    file.write_all(data.as_bytes())?;
     Ok(())
 }
 

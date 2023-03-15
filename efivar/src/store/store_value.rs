@@ -1,3 +1,5 @@
+use base64::{engine::general_purpose::STANDARD, Engine};
+
 use crate::efi::{VariableFlags, VariableName};
 
 #[derive(Default, Serialize, Deserialize)]
@@ -13,13 +15,13 @@ impl StoreValue {
 
     pub fn set_from(&mut self, value: &(VariableFlags, &[u8])) {
         self.attributes = value.0.bits();
-        self.data = base64::encode(&value.1);
+        self.data = STANDARD.encode(value.1);
     }
 
     pub fn to_tuple_buf(&self) -> crate::Result<(Vec<u8>, VariableFlags)> {
         let attr = VariableFlags::from_bits(self.attributes).unwrap_or(VariableFlags::empty());
 
-        Ok((base64::decode(&self.data)?, attr))
+        Ok((STANDARD.decode(&self.data)?, attr))
     }
 
     pub fn to_tuple(
@@ -34,10 +36,7 @@ impl StoreValue {
             return Err(crate::Error::BufferTooSmall { name: name.clone() });
         }
 
-        Ok((
-            base64::decode_config_slice(&self.data, base64::STANDARD, value)?,
-            attr,
-        ))
+        Ok((STANDARD.decode_slice(&self.data, value)?, attr))
     }
 }
 
