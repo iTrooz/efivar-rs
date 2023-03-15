@@ -19,6 +19,9 @@ pub enum Error {
     #[fail(display = "base64 decoding error: {}", error)]
     #[cfg(feature = "store")]
     Base64DecodeError { error: base64::DecodeError },
+    #[fail(display = "base64 decoding error: {}", error)]
+    #[cfg(feature = "store")]
+    Base64DecodeSliceError { error: base64::DecodeSliceError },
     #[fail(display = "unknown i/o error")]
     UnknownIoError { error: io::Error },
     #[fail(display = "unknown EFI variable flag: '{}'", flag)]
@@ -91,5 +94,12 @@ impl Error {
 impl From<base64::DecodeError> for Error {
     fn from(error: base64::DecodeError) -> Self {
         Error::Base64DecodeError { error }
+    }
+}
+
+#[cfg(feature = "store")]
+impl From<base64::DecodeSliceError> for Error {
+    fn from(error: base64::DecodeSliceError) -> Self {
+        Error::Base64DecodeSliceError { error }
     }
 }
