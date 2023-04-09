@@ -12,7 +12,7 @@
 //! In-memory and filesystem storage are also provided for testing purposes, or as a way to dump
 //! system variables to an external file.
 
-#![doc(html_root_url = "https://docs.rs/efivar/1.0.3")]
+#![doc(html_root_url = "https://docs.rs/efivar/1.0.4")]
 
 #[macro_use]
 extern crate bitflags;

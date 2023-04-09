@@ -1,3 +1,10 @@
+## [1.0.4](https://github.com/vtavernier/efiboot-rs/compare/v1.0.3...v1.0.4) (2023-04-09)
+
+
+### Bug Fixes
+
+* **deps:** update all non-major dependencies ([f152564](https://github.com/vtavernier/efiboot-rs/commit/f1525643a9b1a1b375f33db6051e276296a34cae))
+
 ## [1.0.3](https://github.com/vtavernier/efiboot-rs/compare/v1.0.2...v1.0.3) (2023-03-20)
 
 
