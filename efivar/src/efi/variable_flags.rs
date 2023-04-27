@@ -6,6 +6,7 @@ use crate::Error;
 
 bitflags! {
     /// Possible attributes of EFI variables as a bitfield
+    #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     pub struct VariableFlags : u32 {
         const NON_VOLATILE = 0x1;
         const BOOTSERVICE_ACCESS = 0x2;
