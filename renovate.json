@@ -1,10 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:base", "schedule:weekly", "group:allNonMajor"],
-  "packageRules": [
-    {
-      "matchUpdateTypes": ["minor", "patch"],
-      "extends": [":automergeAll", ":automergeBranch"]
-    }
+  "extends": [
+    "github>vtavernier/renovate-presets"
   ]
 }
