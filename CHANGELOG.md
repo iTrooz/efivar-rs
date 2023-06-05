@@ -1,3 +1,10 @@
+## [1.0.7](https://github.com/vtavernier/efiboot-rs/compare/v1.0.6...v1.0.7) (2023-06-05)
+
+
+### Bug Fixes
+
+* **deps:** update rust crate base64 to 0.21.2 ([e7913b7](https://github.com/vtavernier/efiboot-rs/commit/e7913b7247c187c03199e3a4244d938df13ff31d))
+
 ## [1.0.6](https://github.com/vtavernier/efiboot-rs/compare/v1.0.5...v1.0.6) (2023-05-15)
 
 
