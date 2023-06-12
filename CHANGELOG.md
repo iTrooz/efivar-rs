@@ -1,3 +1,10 @@
+## [1.0.9](https://github.com/vtavernier/efiboot-rs/compare/v1.0.8...v1.0.9) (2023-06-12)
+
+
+### Bug Fixes
+
+* **deps:** update rust crate serde to 1.0.164 ([2b10707](https://github.com/vtavernier/efiboot-rs/commit/2b10707835afec3791449ece10e5b3c6929f21c8))
+
 ## [1.0.8](https://github.com/vtavernier/efiboot-rs/compare/v1.0.7...v1.0.8) (2023-06-12)
 
 
