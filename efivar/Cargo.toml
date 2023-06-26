@@ -22,7 +22,7 @@ failure = "0.1.8"
 base64 = { version = "0.21.2", optional = true }
 serde = { version = "1.0.164", optional = true }
 serde_derive = { version = "1.0.164", optional = true }
-toml = { version = "0.7.4", optional = true }
+toml = { version = "0.7.5", optional = true }
 uuid = { version = "1.3.4", features = ["serde"] }
 lazy_static = "1.4.0"
 
