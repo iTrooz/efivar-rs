@@ -1,3 +1,10 @@
+## [1.0.12](https://github.com/vtavernier/efiboot-rs/compare/v1.0.11...v1.0.12) (2023-07-03)
+
+
+### Bug Fixes
+
+* **deps:** update rust crate toml to 0.7.5 ([21ee995](https://github.com/vtavernier/efiboot-rs/commit/21ee995596490afe24364cd04df994715bcf3a81))
+
 ## [1.0.11](https://github.com/vtavernier/efiboot-rs/compare/v1.0.10...v1.0.11) (2023-06-26)
 
 
