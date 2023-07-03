@@ -16,7 +16,7 @@ edition = "2018"
 
 [dependencies]
 byteorder = "1.4.3"
-bitflags = "2.2.1"
+bitflags = "2.3.3"
 failure = "0.1.8"
 
 base64 = { version = "0.21.2", optional = true }
