@@ -1,3 +1,10 @@
+## [1.0.13](https://github.com/vtavernier/efiboot-rs/compare/v1.0.12...v1.0.13) (2023-07-10)
+
+
+### Bug Fixes
+
+* **deps:** update rust crate bitflags to 2.3.3 ([eb1aa50](https://github.com/vtavernier/efiboot-rs/commit/eb1aa50c0c27bc92ee0256903707c69a259ddcc7))
+
 ## [1.0.12](https://github.com/vtavernier/efiboot-rs/compare/v1.0.11...v1.0.12) (2023-07-03)
 
 

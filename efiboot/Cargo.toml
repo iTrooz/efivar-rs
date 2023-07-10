@@ -1,6 +1,6 @@
 [package]
 name = "efiboot"
-version = "1.0.12"
+version = "1.0.13"
 authors = ["Vincent Tavernier <v.tavernier@pm.me>"]
 license = "MIT"
 readme = "README.md"
@@ -13,7 +13,7 @@ description = "EFI boot manager variable editor written in Rust"
 edition = "2018"
 
 [dependencies]
-efivar = { version = "1.0.12", path = "../efivar", features = ["store"] }
+efivar = { version = "1.0.13", path = "../efivar", features = ["store"] }
 itertools = "0.10.5"
 paw = "1.0.0"
 structopt = { version = "0.3.26", features = ["paw"] }
