@@ -42,11 +42,7 @@ mod tests {
     fn missing_variable() {
         let mut store = MemoryStore::new();
         store
-            .write(
-                &VariableName::new("BootOrder"),
-                VariableFlags::empty(),
-                &vec![],
-            )
+            .write(&VariableName::new("BootOrder"), VariableFlags::empty(), &[])
             .unwrap();
 
         let group = store
@@ -60,11 +56,7 @@ mod tests {
     fn existing_variable() {
         let mut store = MemoryStore::new();
         store
-            .write(
-                &VariableName::new("BootOrder"),
-                VariableFlags::empty(),
-                &vec![],
-            )
+            .write(&VariableName::new("BootOrder"), VariableFlags::empty(), &[])
             .unwrap();
 
         let group = store

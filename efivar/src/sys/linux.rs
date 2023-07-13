@@ -92,7 +92,7 @@ mod tests {
 
         let mut var_names = manager.get_var_names().unwrap();
         let name = VariableName::new("BootOrder");
-        assert!(var_names.find(|n| *n == name).is_some());
+        assert!(var_names.any(|n| n == name));
     }
 
     fn linux_read_var(manager: &SystemManager) {
