@@ -32,6 +32,8 @@ pub enum Error {
     BufferTooSmall { name: VariableName },
     #[fail(display = "failed to decode uuid: {}", error)]
     UuidError { error: uuid::Error },
+    #[fail(display = "failed to parse variable content (invalid content)")]
+    VarParseError,
 }
 
 #[cfg(not(target_os = "windows"))]
