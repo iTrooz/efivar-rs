@@ -103,6 +103,7 @@ dependencies = [
  "itertools",
  "paw",
  "structopt",
+ "uuid",
 ]
 
 [[package]]

@@ -1,10 +1,34 @@
-use efivar::VarManager;
+use efivar::{efi::VariableVendor, VarManager};
 
-pub fn run(enumerator: Box<dyn VarManager>) {
+fn list_all(enumerator: Box<dyn VarManager>) {
+    println!("{: >36} Variable", "Namespace");
     for var in enumerator
         .get_var_names()
         .expect("Failed to list variable names")
     {
-        println!("{}", var.short_name());
+        println!("{} {}", var.vendor(), var.variable());
+    }
+}
+
+fn list_namespace(enumerator: Box<dyn VarManager>, vendor: VariableVendor) {
+    println!("Variables in namespace {} :", vendor);
+    for var in enumerator
+        .get_var_names()
+        .expect("Failed to list variable names")
+    {
+        if var.vendor() == &vendor {
+            println!("{}", var.variable());
+        }
+    }
+}
+
+pub fn run(enumerator: Box<dyn VarManager>, namespace: Option<uuid::Uuid>, all: bool) {
+    if all {
+        list_all(enumerator);
+    } else {
+        list_namespace(
+            enumerator,
+            namespace.map_or(VariableVendor::Efi, VariableVendor::Custom),
+        );
     }
 }

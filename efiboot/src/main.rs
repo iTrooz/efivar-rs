@@ -16,7 +16,14 @@ enum Command {
         string: bool,
     },
     /// List known EFI variables
-    List,
+    List {
+        /// GUID of the namespace. Default: EFI standard namespace
+        #[structopt(value_name = "GUID")]
+        namespace: Option<uuid::Uuid>,
+        /// ignore --namespace and show all namespaces
+        #[structopt(short, long)]
+        all: bool,
+    },
 }
 
 #[derive(StructOpt)]
@@ -48,8 +55,8 @@ fn main(opts: Opt) {
         Command::Read { name, string } => {
             cli::read(manager, &name, string);
         }
-        Command::List => {
-            cli::list(manager);
+        Command::List { namespace, all } => {
+            cli::list(manager, namespace, all);
         }
     }
 }
