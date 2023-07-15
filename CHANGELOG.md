@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/vtavernier/efiboot-rs/compare/v1.0.14...v1.1.0) (2023-07-15)
+
+
+### Features
+
+* **efiboot/list:** allow to show a single namespace ([#44](https://github.com/vtavernier/efiboot-rs/issues/44)) ([9741953](https://github.com/vtavernier/efiboot-rs/commit/97419536bc313972a4b10a1be5780167b587de46))
+
 ## [1.0.14](https://github.com/vtavernier/efiboot-rs/compare/v1.0.13...v1.0.14) (2023-07-10)
 
 
