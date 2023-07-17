@@ -10,7 +10,7 @@ pub struct BootOrderIterator {
 
 /// Loop over boot order IDs. The corresponding entries are not queried
 impl BootOrderIterator {
-    fn new(sm: &impl VarReader) -> crate::Result<BootOrderIterator> {
+    pub(in super::super) fn new(sm: &dyn VarReader) -> crate::Result<BootOrderIterator> {
         // Buffer for BootOrder
         let mut buf = vec![0u8; 512];
 
@@ -34,15 +34,5 @@ impl Iterator for BootOrderIterator {
             .read_u16::<LittleEndian>()
             .map(|id| VariableName::new(&format!("Boot{:04X}", id)))
             .ok()
-    }
-}
-
-pub trait BootVarReader {
-    fn get_boot_order(&self) -> crate::Result<BootOrderIterator>;
-}
-
-impl<T: VarReader> BootVarReader for T {
-    fn get_boot_order(&self) -> crate::Result<BootOrderIterator> {
-        BootOrderIterator::new(self)
     }
 }

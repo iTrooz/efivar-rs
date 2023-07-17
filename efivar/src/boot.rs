@@ -1,3 +1,6 @@
-mod boot_reader;
+mod boot_entries_reader;
+mod boot_entry_parser;
+mod boot_order_reader;
+mod boot_var_reader;
 
-pub use boot_reader::BootVarReader;
+pub use boot_var_reader::BootVarReader;
