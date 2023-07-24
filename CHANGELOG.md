@@ -1,3 +1,10 @@
+## [1.1.2](https://github.com/vtavernier/efiboot-rs/compare/v1.1.1...v1.1.2) (2023-07-24)
+
+
+### Bug Fixes
+
+* **deps:** update rust crate itertools to 0.11.0 ([52bf93c](https://github.com/vtavernier/efiboot-rs/commit/52bf93c997155e6f34c3e48f880ac015606839f1))
+
 ## [1.1.1](https://github.com/vtavernier/efiboot-rs/compare/v1.1.0...v1.1.1) (2023-07-24)
 
 
