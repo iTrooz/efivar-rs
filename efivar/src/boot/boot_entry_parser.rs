@@ -1,4 +1,4 @@
-use std::io::Read;
+use std::{fmt::Display, io::Read};
 
 use byteorder::{LittleEndian, ReadBytesExt};
 
@@ -14,6 +14,12 @@ bitflags! {
         const LOAD_OPTION_FORCE_RECONNECT = 0x2;
         const LOAD_OPTION_HIDDEN = 0x8;
         const LOAD_OPTION_CATEGORY_APP = 0x100;
+    }
+}
+
+impl Display for BootEntryAttributes {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        Display::fmt(&self.0, f)
     }
 }
 
