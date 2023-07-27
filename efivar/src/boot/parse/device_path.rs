@@ -70,33 +70,27 @@ impl DevicePath {
 
         #[allow(clippy::single_match)]
         match r#type {
-            consts::DEVICE_PATH_TYPE::MEDIA_DEVICE_PATH => {
-                match subtype {
-                    consts::MEDIA_DEVICE_PATH_SUBTYPE::FILE_PATH => {
-                        return Some(DevicePath::FilePath(
-                            read_nt_utf16_string(&mut device_path_data).into(),
-                        ));
-                    }
-                    consts::MEDIA_DEVICE_PATH_SUBTYPE::HARD_DRIVE => {
-                        return Some(DevicePath::HardDrive(EFIHardDrive {
-                            partition_number: device_path_data.read_u32::<LittleEndian>().unwrap(),
-                            partition_start: device_path_data.read_u64::<LittleEndian>().unwrap(),
-                            partition_size: device_path_data.read_u64::<LittleEndian>().unwrap(),
-                            partition_sig: Uuid::from_u128(
-                                device_path_data.read_u128::<LittleEndian>().unwrap(),
-                            ),
-                            format: device_path_data.read_u8().unwrap(),
-                            sig_type: EFIHardDriveType::parse(device_path_data.read_u8().unwrap()),
-                        }));
-                    }
-                    _ => {
-                        // panic!("Invalid media file path type");
-                    }
+            consts::DEVICE_PATH_TYPE::MEDIA_DEVICE_PATH => match subtype {
+                consts::MEDIA_DEVICE_PATH_SUBTYPE::FILE_PATH => {
+                    return Some(DevicePath::FilePath(
+                        read_nt_utf16_string(&mut device_path_data).into(),
+                    ));
                 }
-            }
-            _ => {
-                // panic!("Invalid file path type");
-            }
+                consts::MEDIA_DEVICE_PATH_SUBTYPE::HARD_DRIVE => {
+                    return Some(DevicePath::HardDrive(EFIHardDrive {
+                        partition_number: device_path_data.read_u32::<LittleEndian>().unwrap(),
+                        partition_start: device_path_data.read_u64::<LittleEndian>().unwrap(),
+                        partition_size: device_path_data.read_u64::<LittleEndian>().unwrap(),
+                        partition_sig: Uuid::from_u128(
+                            device_path_data.read_u128::<LittleEndian>().unwrap(),
+                        ),
+                        format: device_path_data.read_u8().unwrap(),
+                        sig_type: EFIHardDriveType::parse(device_path_data.read_u8().unwrap()),
+                    }));
+                }
+                _ => {}
+            },
+            _ => {}
         };
 
         None
