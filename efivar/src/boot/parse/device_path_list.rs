@@ -17,7 +17,7 @@ pub struct FilePathList {
 
 impl Display for FilePathList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}\\File({})", self.hard_drive, self.file_path.display())
+        write!(f, "{}/File({})", self.hard_drive, self.file_path.display())
     }
 }
 
