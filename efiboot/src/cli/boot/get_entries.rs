@@ -21,11 +21,14 @@ pub fn get_entries(manager: Box<dyn VarManager>, verbose: bool) {
                 .contains(BootEntryAttributes::LOAD_OPTION_ACTIVE)
         );
 
-        if let Some(file_path_list) = entry.file_path_list {
-            println!("Boot file: {}", file_path_list);
-        } else {
-            println!("No valid boot file location");
-        }
+        println!(
+            "Boot file: {}",
+            entry
+                .file_path_list
+                .map(|fpl| fpl.to_string())
+                .unwrap_or_else(|| "None/Invalid".to_owned())
+        );
+
         if verbose {
             if !entry.optional_data.is_empty() {
                 println!(
