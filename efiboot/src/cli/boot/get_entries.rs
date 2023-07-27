@@ -14,9 +14,9 @@ pub fn get_entries(manager: Box<dyn VarManager>, verbose: bool) {
     for entry in entries {
         println!();
 
-        println!("Description: {:?}", entry.description);
+        println!("Description: {}", entry.description);
         println!(
-            "Enabled: {:?}",
+            "Enabled: {}",
             entry
                 .attributes
                 .contains(BootEntryAttributes::LOAD_OPTION_ACTIVE)
