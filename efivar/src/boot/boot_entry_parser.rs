@@ -35,6 +35,7 @@ pub struct BootEntry {
     pub attributes: BootEntryAttributes,
     pub description: String,
     pub file_path_list: Option<FilePathList>,
+    pub optional_data: Vec<u8>,
 }
 
 impl BootEntry {
@@ -63,6 +64,7 @@ impl BootEntry {
             attributes: BootEntryAttributes::from_bits(attributes).unwrap(),
             description,
             file_path_list,
+            optional_data: buf.to_vec(),
         }
     }
 }

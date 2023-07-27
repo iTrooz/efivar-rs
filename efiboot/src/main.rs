@@ -7,7 +7,11 @@ use structopt::StructOpt;
 enum BootCommand {
     /// Get current boot order IDs. See get-entries to get boot entries information
     GetOrder,
-    GetEntries,
+    GetEntries {
+        /// Show more information, such as optional data
+        #[structopt(short, long)]
+        verbose: bool,
+    },
 }
 
 #[derive(StructOpt)]
@@ -85,8 +89,8 @@ fn main(opts: Opt) {
             BootCommand::GetOrder => {
                 cli::get_boot_order(manager);
             }
-            BootCommand::GetEntries => {
-                cli::get_boot_entries(manager);
+            BootCommand::GetEntries { verbose } => {
+                cli::get_boot_entries(manager, verbose);
             }
         },
     }
