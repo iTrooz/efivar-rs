@@ -12,13 +12,39 @@ pub enum DevicePath {
     HardDrive(EFIHardDrive),
 }
 
+pub enum EFIHardDriveType {
+    Mbr,
+    Gpt,
+    Unknown,
+}
+
+impl EFIHardDriveType {
+    pub fn parse(sig_type: u8) -> EFIHardDriveType {
+        match sig_type {
+            0x01 => Self::Mbr,
+            0x02 => Self::Gpt,
+            _ => Self::Unknown,
+        }
+    }
+}
+
+impl Display for EFIHardDriveType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            EFIHardDriveType::Mbr => f.write_str("MBR"),
+            EFIHardDriveType::Gpt => f.write_str("GPT"),
+            EFIHardDriveType::Unknown => f.write_str("Unknown"),
+        }
+    }
+}
+
 pub struct EFIHardDrive {
     pub partition_number: u32,
     pub partition_start: u64,
     pub partition_size: u64,
     pub partition_sig: Uuid,
     pub format: u8,
-    pub sig_type: u8,
+    pub sig_type: EFIHardDriveType,
 }
 
 impl Display for EFIHardDrive {
@@ -60,7 +86,7 @@ impl DevicePath {
                                 device_path_data.read_u128::<LittleEndian>().unwrap(),
                             ),
                             format: device_path_data.read_u8().unwrap(),
-                            sig_type: device_path_data.read_u8().unwrap(),
+                            sig_type: EFIHardDriveType::parse(device_path_data.read_u8().unwrap()),
                         }));
                     }
                     _ => {
