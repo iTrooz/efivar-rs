@@ -40,39 +40,6 @@ impl SystemManager {
     }
 }
 
-struct BootOrderIterator {
-    cursor: Cursor<Vec<u8>>,
-}
-
-impl BootOrderIterator {
-    fn new(sm: &SystemManager) -> crate::Result<BootOrderIterator> {
-        // Buffer for BootOrder
-        let mut buf = vec![0u8; 512];
-
-        // Read BootOrder
-        let (boot_order_size, _flags) = sm.read(&VariableName::new("BootOrder"), &mut buf[..])?;
-
-        // Resize to actual value size
-        buf.resize(boot_order_size, 0);
-
-        Ok(BootOrderIterator {
-            cursor: Cursor::new(buf),
-        })
-    }
-}
-
-impl Iterator for BootOrderIterator {
-    type Item = VariableName;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        if let Ok(id) = self.cursor.read_u16::<LittleEndian>() {
-            Some(VariableName::new(&format!("Boot{:04X}", id)))
-        } else {
-            None
-        }
-    }
-}
-
 impl VarEnumerator for SystemManager {
     fn get_var_names<'a>(&'a self) -> crate::Result<Box<dyn Iterator<Item = VariableName> + 'a>> {
         // Windows doesn't provide access to the variable enumeration service
