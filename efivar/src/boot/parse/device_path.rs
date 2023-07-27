@@ -52,7 +52,7 @@ impl Display for EFIHardDrive {
         write!(
             f,
             "HD({},{},{})",
-            self.partition_number, self.partition_sig, self.sig_type
+            self.partition_number, self.sig_type, self.partition_sig
         )
     }
 }
