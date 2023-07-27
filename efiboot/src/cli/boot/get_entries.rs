@@ -12,7 +12,8 @@ pub fn get_entries(manager: Box<dyn VarManager>, verbose: bool) {
     println!("Boot entries (in boot order):");
 
     for entry in entries {
-        println!("--");
+        println!();
+
         println!("Description: {:?}", entry.description);
         println!(
             "Enabled: {:?}",
