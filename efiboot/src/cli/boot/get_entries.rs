@@ -11,7 +11,14 @@ pub fn get_entries(manager: Box<dyn VarManager>) {
 
     println!("Boot entries (in boot order):");
 
-    for _entry in entries {
-        println!("Some entry");
+    for entry in entries {
+        println!("--");
+        println!("Attributes: {:?}", entry.attributes);
+        println!("Description: {:?}", entry.description);
+        if let Some(file_path_list) = entry.file_path_list {
+            println!("Boot file: {}", file_path_list);
+        } else {
+            println!("No valid boot file location");
+        }
     }
 }
