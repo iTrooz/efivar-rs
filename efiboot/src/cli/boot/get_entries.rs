@@ -30,21 +30,28 @@ pub fn get_entries(manager: Box<dyn VarManager>, verbose: bool) {
         );
 
         if verbose {
-            if !entry.optional_data.is_empty() {
-                println!(
-                    "Optional data: {}",
+            println!(
+                "Optional data: {}",
+                if entry.optional_data.is_empty() {
+                    "None".to_owned()
+                } else {
                     entry
                         .optional_data
                         .iter()
                         .map(|b| format!("{:02x}", b))
                         .collect::<Vec<String>>()
                         .join(" ")
-                );
-            }
+                }
+            );
 
-            if !entry.attributes.is_empty() {
-                println!("Attributes: {}", entry.attributes);
-            }
+            println!(
+                "Attributes: {}",
+                if entry.attributes.is_empty() {
+                    "None".to_owned()
+                } else {
+                    entry.attributes.to_string()
+                }
+            );
         }
     }
 }
