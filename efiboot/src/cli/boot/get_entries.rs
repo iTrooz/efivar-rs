@@ -13,7 +13,7 @@ pub fn get_entries(manager: Box<dyn VarManager>, verbose: bool) {
 
     for entry in entries {
         println!("--");
-        println!("Attributes: {:?}", entry.attributes);
+        println!("Attributes: {}", entry.attributes);
         println!("Description: {:?}", entry.description);
         if let Some(file_path_list) = entry.file_path_list {
             println!("Boot file: {}", file_path_list);
