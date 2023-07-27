@@ -7,7 +7,7 @@ pub struct BootEntriesIterator<'a> {
     var_reader: &'a dyn VarReader,
 }
 
-/// Loop over boot order IDs. The corresponding entries are not queried
+/// Loop over boot entries. On each iteration, a variable data will be queried from the OS
 impl<'a> BootEntriesIterator<'a> {
     pub(in super::super) fn new(
         var_reader: &'a dyn VarReader,
