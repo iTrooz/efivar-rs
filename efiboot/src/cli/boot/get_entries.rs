@@ -1,4 +1,4 @@
-use efivar::VarManager;
+use efivar::{boot::BootEntryAttributes, VarManager};
 
 pub fn get_entries(manager: Box<dyn VarManager>, verbose: bool) {
     let entries = match manager.get_boot_entries() {
@@ -14,6 +14,13 @@ pub fn get_entries(manager: Box<dyn VarManager>, verbose: bool) {
     for entry in entries {
         println!("--");
         println!("Description: {:?}", entry.description);
+        println!(
+            "Enabled: {:?}",
+            entry
+                .attributes
+                .contains(BootEntryAttributes::LOAD_OPTION_ACTIVE)
+        );
+
         if let Some(file_path_list) = entry.file_path_list {
             println!("Boot file: {}", file_path_list);
         } else {
