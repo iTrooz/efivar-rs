@@ -2,12 +2,12 @@ use crate::VarReader;
 
 use super::{boot_entry_parser::BootEntry, boot_order_reader::BootOrderIterator};
 
+/// Loop over boot entries. On each iteration, a variable data will be queried from the OS
 pub struct BootEntriesIterator<'a> {
     order_iter: BootOrderIterator,
     var_reader: &'a dyn VarReader,
 }
 
-/// Loop over boot entries. On each iteration, a variable data will be queried from the OS
 impl<'a> BootEntriesIterator<'a> {
     pub(in super::super) fn new(
         var_reader: &'a dyn VarReader,

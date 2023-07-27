@@ -4,11 +4,11 @@ use byteorder::{LittleEndian, ReadBytesExt};
 
 use crate::{efi::VariableName, VarReader};
 
+/// Loop over boot order IDs. The corresponding entries are not queried
 pub struct BootOrderIterator {
     cursor: Cursor<Vec<u8>>,
 }
 
-/// Loop over boot order IDs. The corresponding entries are not queried
 impl BootOrderIterator {
     pub(in super::super) fn new(sm: &dyn VarReader) -> crate::Result<BootOrderIterator> {
         // Buffer for BootOrder
