@@ -10,7 +10,7 @@ pub fn run(reader: Box<dyn VarManager>, name: &str, as_string: bool) {
 
     match reader.read(&name, &mut buf[..]) {
         Ok((size, attr)) => {
-            eprintln!("Attributes: {}", attr.to_string());
+            println!("Attributes: {}", attr.to_string());
             if as_string {
                 println!("{}", String::from_utf8_lossy(&buf[..size]));
             } else {
