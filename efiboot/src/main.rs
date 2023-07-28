@@ -38,6 +38,20 @@ enum Command {
         #[structopt(value_name = "OUTPUT_FILE")]
         output_file: PathBuf,
     },
+    /// Import a variable from a file
+    Import {
+        /// Input file
+        #[structopt(value_name = "OUTPUT_FILE")]
+        input_file: PathBuf,
+
+        /// Name of the variable to create
+        #[structopt(value_name = "VARIABLE")]
+        name: String,
+
+        /// GUID of the namespace. Default: EFI standard namespace
+        #[structopt(short, long, value_name = "NAMESPACE")]
+        namespace: Option<uuid::Uuid>,
+    },
 }
 
 #[derive(StructOpt)]
@@ -78,6 +92,13 @@ fn main(opts: Opt) {
             output_file,
         } => {
             cli::dump(manager, &name, namespace, &output_file);
+        }
+        Command::Import {
+            input_file,
+            name,
+            namespace,
+        } => {
+            cli::import(manager, &input_file, &name, namespace);
         }
     }
 }
