@@ -99,6 +99,7 @@ dependencies = [
 name = "efiboot"
 version = "1.2.0"
 dependencies = [
+ "byteorder",
  "efivar",
  "itertools",
  "paw",
