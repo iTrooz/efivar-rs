@@ -19,7 +19,7 @@ enum Command {
     /// Read the value of a variable
     Read {
         /// Name of the variable to read
-        #[structopt(short, long, value_name = "VARIABLE")]
+        #[structopt(value_name = "VARIABLE")]
         name: String,
 
         /// Print the value as an UTF-8 string
