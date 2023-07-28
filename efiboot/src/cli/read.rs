@@ -22,10 +22,13 @@ pub fn run(
         Ok((size, attr)) => {
             println!("Attributes: {}", attr.to_string());
             if as_string {
-                println!("{}", String::from_utf8_lossy(&buf[..size]));
+                println!(
+                    "Value (as UTF8 string): {}",
+                    String::from_utf8_lossy(&buf[..size])
+                );
             } else {
                 println!(
-                    "{}",
+                    "Value: {}",
                     buf[..size]
                         .iter()
                         .tuples()
