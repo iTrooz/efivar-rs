@@ -2,7 +2,7 @@ use std::{fmt::Display, io::Read};
 
 use byteorder::{LittleEndian, ReadBytesExt};
 
-use crate::{efi::VariableName, VarReader};
+use crate::{efi::VariableName, Error, VarReader};
 
 use super::FilePathList;
 
@@ -23,12 +23,15 @@ impl Display for BootEntryAttributes {
     }
 }
 
-pub fn read_nt_utf16_string(cursor: &mut &[u8]) -> String {
+pub fn read_nt_utf16_string(cursor: &mut &[u8]) -> crate::Result<String> {
     let mut vec: Vec<u16> = vec![];
     loop {
-        match cursor.read_u16::<LittleEndian>().unwrap() {
+        match cursor
+            .read_u16::<LittleEndian>()
+            .map_err(|_| Error::VarParseError)?
+        {
             0 => {
-                return String::from_utf16(&vec).unwrap();
+                return String::from_utf16(&vec).map_err(|_| Error::VarParseError);
             }
             chr => {
                 vec.push(chr);
@@ -45,32 +48,40 @@ pub struct BootEntry {
 }
 
 impl BootEntry {
-    pub fn parse(manager: &(impl ?Sized + VarReader), variable: &VariableName) -> Self {
+    pub fn parse(
+        manager: &(impl ?Sized + VarReader),
+        variable: &VariableName,
+    ) -> crate::Result<Self> {
         let mut conrete_buf = vec![0u8; 512];
 
-        let (written_size, _flags) = manager.read(variable, &mut conrete_buf).unwrap();
+        let (written_size, _flags) = manager.read(variable, &mut conrete_buf)?;
 
         conrete_buf.resize(written_size, 0);
         // slice of the buffer
         // Used so we can move the offset in it with ReadBytesExt functions
         let mut buf = &conrete_buf[..];
 
-        let attributes = buf.read_u32::<LittleEndian>().unwrap();
+        let attributes = buf
+            .read_u32::<LittleEndian>()
+            .map_err(|_| Error::VarParseError)?;
 
-        let file_path_list_length = buf.read_u16::<LittleEndian>().unwrap();
+        let file_path_list_length = buf
+            .read_u16::<LittleEndian>()
+            .map_err(|_| Error::VarParseError)?;
 
-        let description = read_nt_utf16_string(&mut buf);
+        let description = read_nt_utf16_string(&mut buf)?;
 
         let mut file_path_list_buf = vec![0u8; file_path_list_length.into()];
-        buf.read_exact(&mut file_path_list_buf).unwrap();
+        buf.read_exact(&mut file_path_list_buf)
+            .map_err(|_| Error::VarParseError)?;
 
-        let file_path_list = FilePathList::parse(&mut &file_path_list_buf[..]);
+        let file_path_list = FilePathList::parse(&mut &file_path_list_buf[..])?.into();
 
-        BootEntry {
-            attributes: BootEntryAttributes::from_bits(attributes).unwrap(),
+        Ok(BootEntry {
+            attributes: BootEntryAttributes::from_bits(attributes).ok_or(Error::VarParseError)?,
             description,
             file_path_list,
             optional_data: buf.to_vec(),
-        }
+        })
     }
 }

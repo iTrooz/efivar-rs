@@ -15,6 +15,15 @@ pub struct FilePathList {
     pub hard_drive: EFIHardDrive,
 }
 
+impl From<OptFilePathList> for Option<FilePathList> {
+    fn from(value: OptFilePathList) -> Self {
+        Some(FilePathList {
+            file_path: value.file_path?,
+            hard_drive: value.hard_drive?,
+        })
+    }
+}
+
 impl Display for FilePathList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}/File({})", self.hard_drive, self.file_path.display())
@@ -22,16 +31,7 @@ impl Display for FilePathList {
 }
 
 impl FilePathList {
-    pub fn parse(full_buf: &mut &[u8]) -> Option<FilePathList> {
-        let opt_file_path_list = Self::parse_opt(full_buf);
-
-        Some(FilePathList {
-            file_path: opt_file_path_list.file_path?,
-            hard_drive: opt_file_path_list.hard_drive?,
-        })
-    }
-
-    pub fn parse_opt(full_buf: &mut &[u8]) -> OptFilePathList {
+    pub fn parse(full_buf: &mut &[u8]) -> crate::Result<OptFilePathList> {
         let mut file_path_list = OptFilePathList {
             file_path: None,
             hard_drive: None,
@@ -41,7 +41,7 @@ impl FilePathList {
             if full_buf.is_empty() {
                 break;
             } else {
-                match DevicePath::parse(full_buf) {
+                match DevicePath::parse(full_buf)? {
                     Some(DevicePath::FilePath(inner_path)) => {
                         file_path_list.file_path = Some(inner_path);
                     }
@@ -53,6 +53,6 @@ impl FilePathList {
             };
         }
 
-        file_path_list
+        Ok(file_path_list)
     }
 }
