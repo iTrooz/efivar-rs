@@ -12,47 +12,54 @@ pub fn get_entries(manager: Box<dyn VarManager>, verbose: bool) {
     println!("Boot entries (in boot order):");
 
     for entry in entries {
-        println!();
+        match entry {
+            Ok(entry) => {
+                println!();
 
-        println!("Description: {}", entry.description);
-        println!(
-            "Enabled: {}",
-            entry
-                .attributes
-                .contains(BootEntryAttributes::LOAD_OPTION_ACTIVE)
-        );
-
-        println!(
-            "Boot file: {}",
-            entry
-                .file_path_list
-                .map(|fpl| fpl.to_string())
-                .unwrap_or_else(|| "None/Invalid".to_owned())
-        );
-
-        if verbose {
-            println!(
-                "Optional data: {}",
-                if entry.optional_data.is_empty() {
-                    "None".to_owned()
-                } else {
+                println!("Description: {}", entry.description);
+                println!(
+                    "Enabled: {}",
                     entry
-                        .optional_data
-                        .iter()
-                        .map(|b| format!("{:02x}", b))
-                        .collect::<Vec<String>>()
-                        .join(" ")
-                }
-            );
+                        .attributes
+                        .contains(BootEntryAttributes::LOAD_OPTION_ACTIVE)
+                );
 
-            println!(
-                "Attributes: {}",
-                if entry.attributes.is_empty() {
-                    "None".to_owned()
-                } else {
-                    entry.attributes.to_string()
+                println!(
+                    "Boot file: {}",
+                    entry
+                        .file_path_list
+                        .map(|fpl| fpl.to_string())
+                        .unwrap_or_else(|| "None/Invalid".to_owned())
+                );
+
+                if verbose {
+                    println!(
+                        "Optional data: {}",
+                        if entry.optional_data.is_empty() {
+                            "None".to_owned()
+                        } else {
+                            entry
+                                .optional_data
+                                .iter()
+                                .map(|b| format!("{:02x}", b))
+                                .collect::<Vec<String>>()
+                                .join(" ")
+                        }
+                    );
+
+                    println!(
+                        "Attributes: {}",
+                        if entry.attributes.is_empty() {
+                            "None".to_owned()
+                        } else {
+                            entry.attributes.to_string()
+                        }
+                    );
                 }
-            );
+            }
+            Err(err) => {
+                eprintln!("Failed to get entry: {}", err);
+            }
         }
     }
 }

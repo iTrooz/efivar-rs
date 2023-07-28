@@ -20,7 +20,7 @@ impl<'a> BootEntriesIterator<'a> {
 }
 
 impl<'a> Iterator for BootEntriesIterator<'a> {
-    type Item = BootEntry;
+    type Item = Result<BootEntry, crate::Error>;
 
     fn next(&mut self) -> Option<Self::Item> {
         self.order_iter

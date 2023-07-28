@@ -3,7 +3,7 @@ use std::fmt::Display;
 use byteorder::{LittleEndian, ReadBytesExt};
 use uuid::Uuid;
 
-use crate::boot::boot_entry_parser::read_nt_utf16_string;
+use crate::{boot::boot_entry_parser::read_nt_utf16_string, Error};
 
 use super::consts;
 
@@ -58,10 +58,12 @@ impl Display for EFIHardDrive {
 }
 
 impl DevicePath {
-    pub fn parse(buf: &mut &[u8]) -> Option<DevicePath> {
-        let r#type = buf.read_u8().unwrap();
-        let subtype = buf.read_u8().unwrap();
-        let length = buf.read_u16::<LittleEndian>().unwrap();
+    pub fn parse(buf: &mut &[u8]) -> crate::Result<Option<DevicePath>> {
+        let r#type = buf.read_u8().map_err(|_| Error::VarParseError)?;
+        let subtype = buf.read_u8().map_err(|_| Error::VarParseError)?;
+        let length = buf
+            .read_u16::<LittleEndian>()
+            .map_err(|_| Error::VarParseError)?;
 
         let data_size = length - 1 - 1 - 2;
 
@@ -72,27 +74,41 @@ impl DevicePath {
         match r#type {
             consts::DEVICE_PATH_TYPE::MEDIA_DEVICE_PATH => match subtype {
                 consts::MEDIA_DEVICE_PATH_SUBTYPE::FILE_PATH => {
-                    return Some(DevicePath::FilePath(
-                        read_nt_utf16_string(&mut device_path_data).into(),
-                    ));
+                    return Ok(Some(DevicePath::FilePath(
+                        read_nt_utf16_string(&mut device_path_data)?.into(),
+                    )));
                 }
                 consts::MEDIA_DEVICE_PATH_SUBTYPE::HARD_DRIVE => {
-                    return Some(DevicePath::HardDrive(EFIHardDrive {
-                        partition_number: device_path_data.read_u32::<LittleEndian>().unwrap(),
-                        partition_start: device_path_data.read_u64::<LittleEndian>().unwrap(),
-                        partition_size: device_path_data.read_u64::<LittleEndian>().unwrap(),
+                    return Ok(Some(DevicePath::HardDrive(EFIHardDrive {
+                        partition_number: device_path_data
+                            .read_u32::<LittleEndian>()
+                            .map_err(|_| Error::VarParseError)?,
+                        partition_start: device_path_data
+                            .read_u64::<LittleEndian>()
+                            .map_err(|_| Error::VarParseError)?,
+                        partition_size: device_path_data
+                            .read_u64::<LittleEndian>()
+                            .map_err(|_| Error::VarParseError)?,
                         partition_sig: Uuid::from_u128(
-                            device_path_data.read_u128::<LittleEndian>().unwrap(),
+                            device_path_data
+                                .read_u128::<LittleEndian>()
+                                .map_err(|_| Error::VarParseError)?,
                         ),
-                        format: device_path_data.read_u8().unwrap(),
-                        sig_type: EFIHardDriveType::parse(device_path_data.read_u8().unwrap()),
-                    }));
+                        format: device_path_data
+                            .read_u8()
+                            .map_err(|_| Error::VarParseError)?,
+                        sig_type: EFIHardDriveType::parse(
+                            device_path_data
+                                .read_u8()
+                                .map_err(|_| Error::VarParseError)?,
+                        ),
+                    })));
                 }
                 _ => {}
             },
             _ => {}
         };
 
-        None
+        Ok(None)
     }
 }
