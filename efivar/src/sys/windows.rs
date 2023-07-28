@@ -1,6 +1,5 @@
 pub struct SystemManager;
 
-use std::io::Cursor;
 use std::iter;
 
 use std::ffi::OsStr;
@@ -10,8 +9,7 @@ use std::os::windows::ffi::OsStrExt;
 use winapi::ctypes::c_void;
 use winapi::um::winbase::{GetFirmwareEnvironmentVariableExW, SetFirmwareEnvironmentVariableExW};
 
-use byteorder::{LittleEndian, ReadBytesExt};
-
+use crate::boot::BootVarReader;
 use crate::efi::{VariableFlags, VariableName};
 use crate::{Error, VarEnumerator, VarManager, VarReader, VarWriter};
 
@@ -50,7 +48,7 @@ impl VarEnumerator for SystemManager {
                 .chain(iter::once(VariableName::new("BootNext")))
                 .chain(iter::once(VariableName::new("BootOrder")))
                 .chain(iter::once(VariableName::new("Timeout")))
-                .chain(BootOrderIterator::new(self)?),
+                .chain(self.get_boot_order()?),
         ))
     }
 }
