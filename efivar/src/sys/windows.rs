@@ -143,6 +143,25 @@ impl VarWriter for SystemManager {
             _ => Ok(()),
         }
     }
+
+    fn delete(&mut self, name: &VariableName) -> crate::Result<()> {
+        let (guid_wide, name_wide) = SystemManager::parse_name(name)?;
+
+        let result = unsafe {
+            SetFirmwareEnvironmentVariableExW(
+                name_wide.as_ptr(),
+                guid_wide.as_ptr(),
+                mem::transmute::<*const u8, *mut c_void>(std::ptr::null()),
+                0,
+                VariableFlags::NON_VOLATILE.bits(),
+            )
+        };
+
+        match result {
+            0 => Err(Error::for_variable_os(name)),
+            _ => Ok(()),
+        }
+    }
 }
 
 impl VarManager for SystemManager {}
