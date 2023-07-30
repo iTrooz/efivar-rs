@@ -17,4 +17,6 @@ pub trait VarWriter {
         attributes: VariableFlags,
         value: &[u8],
     ) -> crate::Result<()>;
+
+    fn delete(&mut self, name: &VariableName) -> crate::Result<()>;
 }

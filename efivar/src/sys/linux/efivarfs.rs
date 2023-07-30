@@ -126,6 +126,11 @@ impl VarWriter for SystemManager {
 
         Ok(())
     }
+
+    fn delete(&mut self, _name: &VariableName) -> crate::Result<()> {
+        // I wasn't able to enable efivars sysfs on my system
+        unimplemented!();
+    }
 }
 
 impl VarManager for SystemManager {}
