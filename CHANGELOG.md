@@ -1,3 +1,10 @@
+## [1.1.3](https://github.com/vtavernier/efiboot-rs/compare/v1.1.2...v1.1.3) (2023-07-31)
+
+
+### Bug Fixes
+
+* **deps:** update rust crate uuid to 1.4.1 ([785d77b](https://github.com/vtavernier/efiboot-rs/commit/785d77b19825fe86389bb1ba69ae697ea1b356cb))
+
 ## [1.1.2](https://github.com/vtavernier/efiboot-rs/compare/v1.1.1...v1.1.2) (2023-07-24)
 
 
