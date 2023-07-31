@@ -8,8 +8,12 @@ enum Command {
     /// Read the value of a variable
     Read {
         /// Name of the variable to read
-        #[structopt(short, long, value_name = "VARIABLE")]
+        #[structopt(value_name = "VARIABLE")]
         name: String,
+
+        /// GUID of the namespace. Default: EFI standard namespace
+        #[structopt(value_name = "GUID")]
+        namespace: Option<uuid::Uuid>,
 
         /// Print the value as an UTF-8 string
         #[structopt(short, long)]
@@ -52,8 +56,12 @@ fn main(opts: Opt) {
     };
 
     match opts.cmd {
-        Command::Read { name, string } => {
-            cli::read(manager, &name, string);
+        Command::Read {
+            name,
+            namespace,
+            string,
+        } => {
+            cli::read(manager, &name, namespace, string);
         }
         Command::List { namespace, all } => {
             cli::list(manager, namespace, all);
