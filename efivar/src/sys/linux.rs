@@ -76,6 +76,10 @@ impl VarWriter for SystemManager {
     ) -> crate::Result<()> {
         self.sys_impl.write(name, attributes, value)
     }
+
+    fn delete(&mut self, name: &VariableName) -> crate::Result<()> {
+        self.sys_impl.delete(name)
+    }
 }
 
 impl VarManager for SystemManager {}

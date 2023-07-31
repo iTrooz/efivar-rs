@@ -21,4 +21,9 @@ impl GuidGroup {
             .entry(String::from(name))
             .or_insert_with(StoreValue::new)
     }
+
+    /// Delete a variable from this GUID group.
+    pub fn del_variable(&mut self, name: &str) {
+        self.values.remove(name);
+    }
 }

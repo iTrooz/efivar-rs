@@ -121,6 +121,11 @@ impl VarWriter for SystemManager {
 
         Ok(())
     }
+
+    fn delete(&mut self, name: &VariableName) -> crate::Result<()> {
+        std::fs::remove_file(format!("{}/{}", EFIVARS_ROOT, name))
+            .map_err(|error| Error::for_variable(error, name))
+    }
 }
 
 impl VarManager for SystemManager {}
