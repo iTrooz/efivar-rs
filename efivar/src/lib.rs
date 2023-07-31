@@ -32,11 +32,14 @@ pub mod efi;
 #[cfg(feature = "store")]
 pub mod store;
 
+pub mod boot;
 mod enumerator;
 mod error;
 mod reader;
 mod sys;
 mod writer;
+
+use boot::BootVarReader;
 
 pub use crate::enumerator::VarEnumerator;
 pub use crate::reader::*;
@@ -48,7 +51,7 @@ pub use crate::error::Error;
 pub type Result<T> = std::result::Result<T, Error>;
 
 /// Represents an EFI variable manager that can read, write and list variables
-pub trait VarManager: VarEnumerator + VarReader + VarWriter {}
+pub trait VarManager: VarEnumerator + VarReader + VarWriter + BootVarReader {}
 
 /// Represents an EFI variable manager that can read (both static and dynamic sized variables),
 /// write and list variables
