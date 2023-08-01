@@ -34,6 +34,8 @@ pub enum Error {
     UuidError { error: uuid::Error },
     #[fail(display = "failed to parse variable content (invalid content)")]
     VarParseError,
+    #[fail(display = "failed to parse string: {}", 0)]
+    StringParseError(crate::utils::StringParseError),
 }
 
 #[cfg(not(target_os = "windows"))]

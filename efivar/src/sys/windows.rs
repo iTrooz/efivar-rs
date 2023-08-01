@@ -1,16 +1,18 @@
 pub struct SystemManager;
 
-use std::iter;
+use std::convert::TryInto;
 
+use byteorder::{LittleEndian, ReadBytesExt};
+use ntapi::ntexapi::NtEnumerateSystemEnvironmentValuesEx;
 use std::ffi::OsStr;
 use std::iter::once;
 use std::mem;
 use std::os::windows::ffi::OsStrExt;
-use winapi::ctypes::c_void;
+use winapi::ctypes::{c_ulong, c_void};
 use winapi::um::winbase::{GetFirmwareEnvironmentVariableExW, SetFirmwareEnvironmentVariableExW};
 
-use crate::boot::BootVarReader;
 use crate::efi::{VariableFlags, VariableName};
+use crate::utils::read_nt_utf16_string;
 use crate::{Error, VarEnumerator, VarManager, VarReader, VarWriter};
 
 #[cfg(target_os = "windows")]
@@ -38,18 +40,89 @@ impl SystemManager {
     }
 }
 
+fn parse_efi_variable(buf: &mut &[u8]) -> crate::Result<VariableName> {
+    let uuid_u128 = buf
+        .read_u128::<LittleEndian>()
+        .map_err(|err| crate::Error::UnknownIoError { error: err })?;
+
+    let guid = uuid::Uuid::from_bytes_le(uuid_u128.to_le_bytes());
+    let name = read_nt_utf16_string(buf).map_err(crate::Error::StringParseError)?;
+
+    Ok(VariableName::new_with_vendor(&name, guid))
+}
+
+fn parse_efi_variables(buf: &mut &[u8]) -> crate::Result<Vec<VariableName>> {
+    let mut vars: Vec<VariableName> = vec![];
+    while buf.len() > 0 {
+        let struct_size = buf
+            .read_u32::<LittleEndian>()
+            .map_err(|err| crate::Error::UnknownIoError { error: err })?;
+
+        if struct_size == 0 {
+            break;
+        };
+
+        let (mut efi_var_struct, new_buf) = buf.split_at(
+            (struct_size - 4)
+                .try_into()
+                .expect("EFI variable structure size should fit into a usize"),
+        );
+        *buf = new_buf;
+
+        vars.push(parse_efi_variable(&mut efi_var_struct)?);
+    }
+
+    Ok(vars)
+}
+
 impl VarEnumerator for SystemManager {
     fn get_var_names<'a>(&'a self) -> crate::Result<Box<dyn Iterator<Item = VariableName> + 'a>> {
-        // Windows doesn't provide access to the variable enumeration service
-        // We default here to a static list of variables required by the spec
-        // as well as those we can discover by reading the BootOrder variable
-        Ok(Box::new(
-            iter::once(VariableName::new("BootCurrent"))
-                .chain(iter::once(VariableName::new("BootNext")))
-                .chain(iter::once(VariableName::new("BootOrder")))
-                .chain(iter::once(VariableName::new("Timeout")))
-                .chain(self.get_boot_order()?),
-        ))
+        // get size of buffer to allocate for variables
+        let mut size: u32 = 0;
+        const STATUS_BUFFER_TOO_SMALL: i32 = 0xc0000023_u32 as i32;
+        {
+            let status: i32 = unsafe {
+                NtEnumerateSystemEnvironmentValuesEx(
+                    1, // 1 means system variables, so EFI variables
+                    std::ptr::null_mut() as *mut c_void,
+                    &mut size as *mut c_ulong,
+                )
+            };
+
+            // handle error
+            if status != STATUS_BUFFER_TOO_SMALL {
+                return Err(crate::Error::UnknownIoError {
+                    error: std::io::Error::from_raw_os_error(status),
+                });
+            }
+        }
+
+        // retrieve EFI variables
+        let buf: Vec<u8> = vec![
+            0u8;
+            size.try_into().expect(
+                "Value returned by NtEnumerateSystemEnvironmentValuesEx() should be a valid usize"
+            )
+        ];
+        {
+            let status: i32 = unsafe {
+                NtEnumerateSystemEnvironmentValuesEx(
+                    1, // 1 means system variables, so EFI variables
+                    buf.as_ptr() as *mut c_void,
+                    &mut size,
+                )
+            };
+
+            // handle error
+            if status != 0 {
+                return Err(crate::Error::UnknownIoError {
+                    error: std::io::Error::from_raw_os_error(status),
+                });
+            }
+        }
+
+        let vars = parse_efi_variables(&mut &buf[..])?;
+        Ok(Box::new(vars.into_iter()))
     }
 }
 

@@ -3,7 +3,7 @@ use std::fmt::Display;
 use byteorder::{LittleEndian, ReadBytesExt};
 use uuid::Uuid;
 
-use crate::{boot::boot_entry_parser::read_nt_utf16_string, Error};
+use crate::{utils::read_nt_utf16_string, Error};
 
 use super::consts;
 
@@ -75,7 +75,9 @@ impl DevicePath {
             consts::DEVICE_PATH_TYPE::MEDIA_DEVICE_PATH => match subtype {
                 consts::MEDIA_DEVICE_PATH_SUBTYPE::FILE_PATH => {
                     return Ok(Some(DevicePath::FilePath(
-                        read_nt_utf16_string(&mut device_path_data)?.into(),
+                        read_nt_utf16_string(&mut device_path_data)
+                            .map_err(crate::Error::StringParseError)?
+                            .into(),
                     )));
                 }
                 consts::MEDIA_DEVICE_PATH_SUBTYPE::HARD_DRIVE => {

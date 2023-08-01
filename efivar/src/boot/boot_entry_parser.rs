@@ -2,7 +2,7 @@ use std::{fmt::Display, io::Read};
 
 use byteorder::{LittleEndian, ReadBytesExt};
 
-use crate::{efi::VariableName, Error, VarReader};
+use crate::{efi::VariableName, utils::read_nt_utf16_string, Error, VarReader};
 
 use super::FilePathList;
 
@@ -20,23 +20,6 @@ bitflags! {
 impl Display for BootEntryAttributes {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         Display::fmt(&self.0, f)
-    }
-}
-
-pub fn read_nt_utf16_string(cursor: &mut &[u8]) -> crate::Result<String> {
-    let mut vec: Vec<u16> = vec![];
-    loop {
-        match cursor
-            .read_u16::<LittleEndian>()
-            .map_err(|_| Error::VarParseError)?
-        {
-            0 => {
-                return String::from_utf16(&vec).map_err(|_| Error::VarParseError);
-            }
-            chr => {
-                vec.push(chr);
-            }
-        }
     }
 }
 
@@ -69,7 +52,7 @@ impl BootEntry {
             .read_u16::<LittleEndian>()
             .map_err(|_| Error::VarParseError)?;
 
-        let description = read_nt_utf16_string(&mut buf)?;
+        let description = read_nt_utf16_string(&mut buf).map_err(crate::Error::StringParseError)?;
 
         let mut file_path_list_buf = vec![0u8; file_path_list_length.into()];
         buf.read_exact(&mut file_path_list_buf)
