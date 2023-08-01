@@ -17,7 +17,7 @@ pub enum VariableVendor {
 
 impl VariableVendor {
     /// Return true if this vendor is the EFI vendor
-    fn is_efi(&self) -> bool {
+    pub fn is_efi(&self) -> bool {
         matches!(self, VariableVendor::Efi)
     }
 }
