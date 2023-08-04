@@ -128,8 +128,8 @@ impl VarWriter for SystemManager {
     }
 
     fn delete(&mut self, _name: &VariableName) -> crate::Result<()> {
-        // I wasn't able to enable efivars sysfs on my system
-        unimplemented!();
+        // Unimplemented because I wasn't able to enable efivars sysfs on my system
+        unimplemented!("Variable deletion not supported on efivarfs");
     }
 }
 
