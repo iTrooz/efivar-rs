@@ -60,7 +60,7 @@ impl<T: VariableStore> VarWriter for T {
     fn delete(&mut self, name: &VariableName) -> crate::Result<()> {
         self.get_vendor_group_mut()
             .vendor_mut(name.vendor())
-            .del_variable(name.variable());
+            .delete_variable(name.variable());
         Ok(())
     }
 }
