@@ -24,6 +24,16 @@ enum Command {
         #[structopt(short, long)]
         all: bool,
     },
+    /// Delete an EFI variabe
+    Delete {
+        /// Name of the variable to delete
+        #[structopt(value_name = "VARIABLE")]
+        name: String,
+
+        /// GUID of the namespace. Default: EFI standard namespace
+        #[structopt(value_name = "GUID")]
+        namespace: Option<uuid::Uuid>,
+    },
 }
 
 #[derive(StructOpt)]
@@ -57,6 +67,9 @@ fn main(opts: Opt) {
         }
         Command::List { namespace, all } => {
             cli::list(manager, namespace, all);
+        }
+        Command::Delete { name, namespace } => {
+            cli::delete(manager, &name, namespace);
         }
     }
 }
