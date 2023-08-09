@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/iTrooz/efiboot-rs/compare/v1.1.3...v1.2.0) (2023-08-09)
+
+
+### Features
+
+* add `efiboot delete` and efivar implementation ([cf034bf](https://github.com/iTrooz/efiboot-rs/commit/cf034bfd7488a25c7bd251ad3f33b053b21d46b4))
+
 ## [1.1.3](https://github.com/vtavernier/efiboot-rs/compare/v1.1.2...v1.1.3) (2023-07-31)
 
 
