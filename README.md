@@ -43,6 +43,11 @@ tool.**
 - [efibootmgr](https://github.com/rhboot/efibootmgr)
 - [efivars and efivarfs](https://blog.fpmurphy.com/2012/12/efivars-and-efivarfs.html)
 
-## Author
+## Team
+
+### Maintainer
+iTrooz
+
+### Original author
 
 Vincent Tavernier <v.tavernier@pm.me>
