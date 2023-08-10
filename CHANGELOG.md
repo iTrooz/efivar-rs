@@ -1,3 +1,11 @@
+# [1.3.0](https://github.com/iTrooz/efiboot-rs/compare/v1.2.0...v1.3.0) (2023-08-10)
+
+
+### Features
+
+* add boot subcommands to read boot entries ([#57](https://github.com/iTrooz/efiboot-rs/issues/57)) ([1c083ae](https://github.com/iTrooz/efiboot-rs/commit/1c083aee85f9fa83222172b726d83f60043ab89c))
+* **efiboot:** make opinionated change to `efiboot read` to make it easier to use ([#59](https://github.com/iTrooz/efiboot-rs/issues/59)) ([2d71676](https://github.com/iTrooz/efiboot-rs/commit/2d716769b0f4cc756113f03c77b9de9612c049d6))
+
 # [1.2.0](https://github.com/iTrooz/efiboot-rs/compare/v1.1.3...v1.2.0) (2023-08-09)
 
 
