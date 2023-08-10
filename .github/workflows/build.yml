@@ -17,10 +17,10 @@ concurrency: ci-${{ github.ref }}
 
 jobs:
   check:
-    uses: vtavernier/github-workflows/.github/workflows/check-rust.yml@v1
+    uses: iTrooz/vtavernier-github-workflows/.github/workflows/check-rust.yml@v1
 
   build:
-    uses: vtavernier/github-workflows/.github/workflows/build-rust-bin.yml@v1
+    uses: iTrooz/vtavernier-github-workflows/.github/workflows/build-rust-bin.yml@v1
 
     needs:
       - check
@@ -45,7 +45,7 @@ jobs:
       GH_TOKEN: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
 
   release:
-    uses: vtavernier/github-workflows/.github/workflows/release-semantic.yml@v1
+    uses: iTrooz/vtavernier-github-workflows/.github/workflows/release-semantic.yml@v1
 
     needs:
       - build
