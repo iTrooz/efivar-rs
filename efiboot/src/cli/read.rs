@@ -1,21 +1,34 @@
 use itertools::Itertools;
-use std::str::FromStr;
 
-use efivar::{efi::VariableName, VarManager};
+use efivar::{
+    efi::{VariableName, VariableVendor},
+    VarManager,
+};
 
-pub fn run(reader: Box<dyn VarManager>, name: &str, as_string: bool) {
+pub fn run(
+    reader: Box<dyn VarManager>,
+    name: &str,
+    namespace: Option<uuid::Uuid>,
+    as_string: bool,
+) {
     let mut buf = vec![0u8; 512];
 
-    let name = VariableName::from_str(name).expect("failed to parse variable name");
+    let name = VariableName::new_with_vendor(
+        name,
+        namespace.map_or(VariableVendor::Efi, VariableVendor::Custom),
+    );
 
     match reader.read(&name, &mut buf[..]) {
         Ok((size, attr)) => {
-            eprintln!("Attributes: {}", attr.to_string());
+            println!("Attributes: {}", attr.to_string());
             if as_string {
-                println!("{}", String::from_utf8_lossy(&buf[..size]));
+                println!(
+                    "Value (as UTF8 string): {}",
+                    String::from_utf8_lossy(&buf[..size])
+                );
             } else {
                 println!(
-                    "{}",
+                    "Value: {}",
                     buf[..size]
                         .iter()
                         .tuples()
