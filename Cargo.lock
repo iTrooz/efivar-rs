@@ -97,7 +97,7 @@ dependencies = [
 
 [[package]]
 name = "efiboot"
-version = "1.3.0"
+version = "1.4.0"
 dependencies = [
  "byteorder",
  "efivar",
@@ -109,7 +109,7 @@ dependencies = [
 
 [[package]]
 name = "efivar"
-version = "1.3.0"
+version = "1.4.0"
 dependencies = [
  "base64",
  "bitflags 2.3.3",

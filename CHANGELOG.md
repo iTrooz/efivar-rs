@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/iTrooz/efiboot-rs/compare/v1.3.0...v1.4.0) (2023-08-11)
+
+
+### Features
+
+* **efiboot:** add `efiboot dump` and `efiboot import` ([#64](https://github.com/iTrooz/efiboot-rs/issues/64)) ([7773ce4](https://github.com/iTrooz/efiboot-rs/commit/7773ce48cb078a9c4d86817cfa42dfd8e0aceccf))
+
 # [1.3.0](https://github.com/iTrooz/efiboot-rs/compare/v1.2.0...v1.3.0) (2023-08-10)
 
 
