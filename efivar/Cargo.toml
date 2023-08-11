@@ -25,6 +25,7 @@ serde_derive = { version = "1.0.164", optional = true }
 toml = { version = "0.7.6", optional = true }
 uuid = { version = "1.4.1", features = ["serde"] }
 lazy_static = "1.4.0"
+ntapi = "0.4.1"
 
 [features]
 store = ["base64", "serde", "serde_derive", "toml"]
