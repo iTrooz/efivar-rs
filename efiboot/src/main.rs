@@ -23,7 +23,7 @@ enum Command {
         name: String,
 
         /// GUID of the namespace. Default: EFI standard namespace
-        #[structopt(value_name = "GUID")]
+        #[structopt(short, long, value_name = "NAMESPACE")]
         namespace: Option<uuid::Uuid>,
 
         /// Print the value as an UTF-8 string
@@ -33,7 +33,7 @@ enum Command {
     /// List known EFI variables
     List {
         /// GUID of the namespace. Default: EFI standard namespace
-        #[structopt(value_name = "GUID")]
+        #[structopt(short, long, value_name = "NAMESPACE")]
         namespace: Option<uuid::Uuid>,
         /// ignore --namespace and show all namespaces
         #[structopt(short, long)]
@@ -46,7 +46,7 @@ enum Command {
         name: String,
 
         /// GUID of the namespace. Default: EFI standard namespace
-        #[structopt(value_name = "GUID")]
+        #[structopt(short, long, value_name = "NAMESPACE")]
         namespace: Option<uuid::Uuid>,
     },
 
