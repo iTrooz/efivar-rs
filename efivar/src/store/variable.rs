@@ -1,9 +1,9 @@
 use crate::efi::{VariableFlags, VariableName};
-use crate::{Error, VarEnumerator, VarManager, VarManagerEx, VarReader, VarReaderEx, VarWriter};
+use crate::{Error, VarEnumerator, VarManager, VarReader, VarWriter};
 
 use super::VendorGroup;
 
-pub trait VariableStore: VarManagerEx {
+pub trait VariableStore: VarManager {
     fn get_vendor_group(&self) -> &VendorGroup;
     fn get_vendor_group_mut(&mut self) -> &mut VendorGroup;
 }
@@ -22,22 +22,12 @@ impl<T: VariableStore> VarEnumerator for T {
 }
 
 impl<T: VariableStore> VarReader for T {
-    fn read(&self, name: &VariableName, value: &mut [u8]) -> crate::Result<(usize, VariableFlags)> {
+    fn read(&self, name: &VariableName) -> crate::Result<(Vec<u8>, VariableFlags)> {
         self.get_vendor_group()
             .vendor(name.vendor())
             .and_then(|guid_group| guid_group.variable(name.variable()))
             .ok_or_else(|| Error::VarNotFound { name: name.clone() })
-            .and_then(|val| val.to_tuple(name, value))
-    }
-}
-
-impl<T: VariableStore> VarReaderEx for T {
-    fn read_buf(&self, name: &VariableName) -> crate::Result<(Vec<u8>, VariableFlags)> {
-        self.get_vendor_group()
-            .vendor(name.vendor())
-            .and_then(|guid_group| guid_group.variable(name.variable()))
-            .ok_or_else(|| Error::VarNotFound { name: name.clone() })
-            .and_then(|val| val.to_tuple_buf())
+            .and_then(|val| val.to_tuple())
     }
 }
 
@@ -66,4 +56,3 @@ impl<T: VariableStore> VarWriter for T {
 }
 
 impl<T: VariableStore> VarManager for T {}
-impl<T: VariableStore> VarManagerEx for T {}

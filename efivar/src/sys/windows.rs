@@ -127,29 +127,35 @@ impl VarEnumerator for SystemManager {
 }
 
 impl VarReader for SystemManager {
-    fn read(&self, name: &VariableName, value: &mut [u8]) -> crate::Result<(usize, VariableFlags)> {
+    fn read(&self, name: &VariableName) -> crate::Result<(Vec<u8>, VariableFlags)> {
         // Parse name, and split into LPCWSTR
         let (guid_wide, name_wide) = SystemManager::parse_name(name)?;
 
         // Attribute return value
         let mut attributes: u32 = 0;
 
-        let result = unsafe {
-            GetFirmwareEnvironmentVariableExW(
-                name_wide.as_ptr(),
-                guid_wide.as_ptr(),
-                value.as_mut_ptr() as *mut c_void,
-                value.len() as u32,
-                &mut attributes as *mut u32,
-            )
-        };
+        let mut buf: Vec<u8> = vec![0u8; 256];
 
-        match result {
-            0 => Err(Error::for_variable_os(name)),
-            len => Ok((
-                len as usize,
-                VariableFlags::from_bits(attributes).unwrap_or(VariableFlags::empty()),
-            )),
+        loop {
+            unsafe {
+                let written_bytes = GetFirmwareEnvironmentVariableExW(
+                    name_wide.as_ptr(),
+                    guid_wide.as_ptr(),
+                    buf.as_mut_ptr() as *mut c_void,
+                    buf.len() as u32,
+                    &mut attributes as *mut u32,
+                );
+
+                if written_bytes == 0 {
+                    buf.resize(buf.len() * 2, 0u8);
+                } else {
+                    buf.resize(written_bytes.try_into().expect("GetFirmwareEnvironmentVariableExW() return value should be a value usize"), 0u8);
+                    return Ok((
+                        buf,
+                        VariableFlags::from_bits(attributes).unwrap_or(VariableFlags::empty()),
+                    ));
+                }
+            };
         }
     }
 }

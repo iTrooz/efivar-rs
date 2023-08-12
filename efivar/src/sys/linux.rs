@@ -62,8 +62,8 @@ impl VarEnumerator for SystemManager {
 }
 
 impl VarReader for SystemManager {
-    fn read(&self, name: &VariableName, value: &mut [u8]) -> crate::Result<(usize, VariableFlags)> {
-        self.sys_impl.read(name, value)
+    fn read(&self, name: &VariableName) -> crate::Result<(Vec<u8>, VariableFlags)> {
+        self.sys_impl.read(name)
     }
 }
 
@@ -104,12 +104,11 @@ mod tests {
             return;
         }
 
-        let mut buf = vec![0u8; 512];
-        let (data_size, _flags) = manager
-            .read(&VariableName::new("BootOrder"), &mut buf)
+        let (data, _flags) = manager
+            .read(&VariableName::new("BootOrder"))
             .expect("Failed to read variable");
 
-        assert!(data_size > 0);
+        assert!(!data.is_empty());
     }
 
     #[test]

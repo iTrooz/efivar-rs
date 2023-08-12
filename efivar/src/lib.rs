@@ -54,10 +54,6 @@ pub type Result<T> = std::result::Result<T, Error>;
 /// Represents an EFI variable manager that can read, write and list variables
 pub trait VarManager: VarEnumerator + VarReader + VarWriter + BootVarReader {}
 
-/// Represents an EFI variable manager that can read (both static and dynamic sized variables),
-/// write and list variables
-pub trait VarManagerEx: VarManager + VarReaderEx {}
-
 use crate::sys::SystemManager;
 /// Returns a `VarManager` that represents the firmware variables of the running system
 ///
@@ -93,7 +89,7 @@ pub fn system() -> Box<dyn VarManager> {
 /// store.write(&boot_order, VariableFlags::NON_VOLATILE, &value);
 ///
 /// // Check the value of the written variable
-/// let (data, attributes) = store.read_buf(&boot_order).unwrap();
+/// let (data, attributes) = store.read(&boot_order).unwrap();
 /// assert_eq!(data, value);
 /// assert_eq!(attributes, VariableFlags::NON_VOLATILE);
 /// // At this point, store is dropped and doc-test.toml will be updated
@@ -101,7 +97,7 @@ pub fn system() -> Box<dyn VarManager> {
 /// # std::fs::remove_file("doc-test.toml");
 /// ```
 #[cfg(feature = "store")]
-pub fn file_store<P: Into<std::path::PathBuf>>(filename: P) -> Box<dyn VarManagerEx> {
+pub fn file_store<P: Into<std::path::PathBuf>>(filename: P) -> Box<dyn VarManager> {
     Box::new(store::FileStore::new(filename.into()))
 }
 
@@ -134,7 +130,7 @@ mod tests {
                 .expect("Failed to write value in store");
 
             // Check the value of the written variable
-            let (data, attributes) = store.read_buf(&VariableName::new("BootOrder")).unwrap();
+            let (data, attributes) = store.read(&VariableName::new("BootOrder")).unwrap();
             assert_eq!(attributes, VariableFlags::NON_VOLATILE);
             assert_eq!(data, value);
             // At this point, store is dropped and doc-test.toml will be updated
