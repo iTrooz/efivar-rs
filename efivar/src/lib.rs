@@ -101,13 +101,6 @@ pub fn file_store<P: Into<std::path::PathBuf>>(filename: P) -> Box<dyn VarManage
     Box::new(store::FileStore::new(filename.into()))
 }
 
-#[cfg(feature = "store")]
-#[doc(hidden)]
-pub fn file_store_std<P: Into<std::path::PathBuf>>(filename: P) -> Box<dyn VarManager> {
-    // TODO: Fix this knowing that VarManagerEx: VarManager
-    Box::new(store::FileStore::new(filename.into()))
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
