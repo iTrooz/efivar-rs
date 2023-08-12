@@ -21,19 +21,15 @@ pub fn run(reader: Box<dyn VarManager>, name: &str, namespace: Option<Uuid>, out
         namespace.map_or(VariableVendor::Efi, VariableVendor::Custom),
     );
 
-    let mut buf = vec![0u8; 512];
-    match reader.read(&var, &mut buf) {
-        Ok((size, flags)) => {
-            buf.resize(size, 0);
-            match dump(output_path, flags, &buf) {
-                Ok(_) => println!(
-                    "Dumped variable {} to file {}",
-                    var,
-                    output_path.canonicalize().unwrap().display()
-                ),
-                Err(err) => eprintln!("Failed to write to file: {}", err),
-            }
-        }
+    match reader.read(&var) {
+        Ok((buf, flags)) => match dump(output_path, flags, &buf) {
+            Ok(_) => println!(
+                "Dumped variable {} to file {}",
+                var,
+                output_path.canonicalize().unwrap().display()
+            ),
+            Err(err) => eprintln!("Failed to write to file: {}", err),
+        },
         Err(err) => eprintln!("Failed to read variable: {}", err),
     }
 }

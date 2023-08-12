@@ -16,22 +16,5 @@ pub trait VarReader {
     /// # Return value
     ///
     /// On success, number of bytes read and associated EFI variable flags.
-    fn read(&self, name: &VariableName, value: &mut [u8]) -> crate::Result<(usize, VariableFlags)>;
-}
-
-/// Represents the capability of reading EFI variables of a dynamic size
-pub trait VarReaderEx {
-    /// Read the EFI variable `name` and return its attributes and raw value
-    ///
-    /// This function will allocate a large enough buffer to hold the resulting
-    /// value and return it.
-    ///
-    /// # Arguments
-    ///
-    /// * `name`: name of the variable to read
-    ///
-    /// # Return value
-    ///
-    /// On success, read bytes and associated EFI variable flags.
-    fn read_buf(&self, name: &VariableName) -> crate::Result<(Vec<u8>, VariableFlags)>;
+    fn read(&self, name: &VariableName) -> crate::Result<(Vec<u8>, VariableFlags)>;
 }

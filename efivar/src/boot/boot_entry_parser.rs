@@ -35,14 +35,11 @@ impl BootEntry {
         manager: &(impl ?Sized + VarReader),
         variable: &VariableName,
     ) -> crate::Result<Self> {
-        let mut conrete_buf = vec![0u8; 512];
+        let (value, _flags) = manager.read(variable)?;
 
-        let (written_size, _flags) = manager.read(variable, &mut conrete_buf)?;
-
-        conrete_buf.resize(written_size, 0);
         // slice of the buffer
         // Used so we can move the offset in it with ReadBytesExt functions
-        let mut buf = &conrete_buf[..];
+        let mut buf = &value[..];
 
         let attributes = buf
             .read_u32::<LittleEndian>()

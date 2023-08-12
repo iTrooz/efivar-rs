@@ -11,17 +11,11 @@ pub struct BootOrderIterator {
 
 impl BootOrderIterator {
     pub(in super::super) fn new(sm: &dyn VarReader) -> crate::Result<BootOrderIterator> {
-        // Buffer for BootOrder
-        let mut buf = vec![0u8; 512];
-
-        // Read BootOrder
-        let (boot_order_size, _flags) = sm.read(&VariableName::new("BootOrder"), &mut buf[..])?;
-
-        // Resize to actual value size
-        buf.resize(boot_order_size, 0);
+        // Read BootOrder variable
+        let (value, _flags) = sm.read(&VariableName::new("BootOrder"))?;
 
         Ok(BootOrderIterator {
-            cursor: Cursor::new(buf),
+            cursor: Cursor::new(value),
         })
     }
 }
