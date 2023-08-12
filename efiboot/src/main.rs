@@ -102,7 +102,7 @@ struct Opt {
 #[paw::main]
 fn main(opts: Opt) {
     let manager = if let Some(filename) = opts.file_store {
-        efivar::file_store_std(filename)
+        efivar::file_store(filename)
     } else {
         efivar::system()
     };
