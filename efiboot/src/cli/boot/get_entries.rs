@@ -4,10 +4,6 @@ use efivar::{
     VarManager,
 };
 
-fn is_boot_var(name: &str) -> bool {
-    name.len() == 8 && &name[0..4] == "Boot" && name[4..8].chars().all(|c| c.is_ascii_digit())
-}
-
 /// prints a boot entry to the console, and consume it
 fn print_var(entry: BootEntry, verbose: bool) {
     println!();
@@ -70,7 +66,7 @@ pub fn get_entries(manager: Box<dyn VarManager>, verbose: bool) {
             return;
         }
     }
-    .filter(|var| is_boot_var(var.variable()))
+    .filter(|var| var.boot_var_id().is_some())
     .filter(|var| var.vendor().is_efi())
     .collect();
 

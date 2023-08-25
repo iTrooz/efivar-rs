@@ -152,6 +152,15 @@ impl VariableName {
             self.to_string()
         }
     }
+
+    /// Returns the boot var ID (4 digits hex number) if this variable is a boot entry. Else, return None
+    pub fn boot_var_id(&self) -> Option<u16> {
+        if self.variable.len() == 8 && &self.variable[0..4] == "Boot" {
+            self.variable[4..8].parse().ok()
+        } else {
+            None
+        }
+    }
 }
 
 impl FromStr for VariableName {
