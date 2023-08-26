@@ -3,6 +3,7 @@ use std::{fmt::Display, path::PathBuf};
 use super::{DevicePath, EFIHardDrive};
 
 /// holds the potential fields we may get from a packed file path list
+/// TODO remove ?
 pub struct OptFilePathList {
     pub file_path: Option<PathBuf>,
     pub hard_drive: Option<EFIHardDrive>,
