@@ -25,7 +25,7 @@ impl VariableStore for MemoryStore {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::efi::{VariableFlags, VariableName};
+    use crate::efi::{Variable, VariableFlags};
     use crate::VarWriter;
 
     #[test]
@@ -42,7 +42,7 @@ mod tests {
     fn missing_variable() {
         let mut store = MemoryStore::new();
         store
-            .write(&VariableName::new("BootOrder"), VariableFlags::empty(), &[])
+            .write(&Variable::new("BootOrder"), VariableFlags::empty(), &[])
             .unwrap();
 
         let group = store
@@ -56,7 +56,7 @@ mod tests {
     fn existing_variable() {
         let mut store = MemoryStore::new();
         store
-            .write(&VariableName::new("BootOrder"), VariableFlags::empty(), &[])
+            .write(&Variable::new("BootOrder"), VariableFlags::empty(), &[])
             .unwrap();
 
         let group = store

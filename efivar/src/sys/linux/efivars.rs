@@ -4,7 +4,7 @@ use std::io::prelude::*;
 use std::str::FromStr;
 
 use super::LinuxSystemManager;
-use crate::efi::{VariableFlags, VariableName};
+use crate::efi::{Variable, VariableFlags};
 use crate::{Error, VarEnumerator, VarManager, VarReader, VarWriter};
 
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
@@ -27,7 +27,7 @@ impl LinuxSystemManager for SystemManager {
 }
 
 impl VarEnumerator for SystemManager {
-    fn get_var_names<'a>(&'a self) -> crate::Result<Box<dyn Iterator<Item = VariableName> + 'a>> {
+    fn get_var_names<'a>(&'a self) -> crate::Result<Box<dyn Iterator<Item = Variable> + 'a>> {
         fs::read_dir(EFIVARS_ROOT)
             .map(|list| {
                 list.filter_map(|result| {
@@ -38,12 +38,12 @@ impl VarEnumerator for SystemManager {
                                 .file_name()
                                 .into_string()
                                 .map_err(|_str| Error::InvalidUTF8)
-                                .and_then(|s| VariableName::from_str(&s))
+                                .and_then(|s| Variable::from_str(&s))
                         })
                         .ok()
                 })
             })
-            .map(|it| -> Box<dyn Iterator<Item = VariableName>> { Box::new(it) })
+            .map(|it| -> Box<dyn Iterator<Item = Variable>> { Box::new(it) })
             .map_err(|error| {
                 // TODO: check for specific error types
                 Error::UnknownIoError { error }
@@ -52,7 +52,7 @@ impl VarEnumerator for SystemManager {
 }
 
 impl VarReader for SystemManager {
-    fn read(&self, name: &VariableName) -> crate::Result<(Vec<u8>, VariableFlags)> {
+    fn read(&self, name: &Variable) -> crate::Result<(Vec<u8>, VariableFlags)> {
         // Filename to the matching efivarfs file for this variable
         let filename = format!("{}/{}", EFIVARS_ROOT, name);
 
@@ -76,7 +76,7 @@ impl VarReader for SystemManager {
 impl VarWriter for SystemManager {
     fn write(
         &mut self,
-        name: &VariableName,
+        name: &Variable,
         attributes: VariableFlags,
         value: &[u8],
     ) -> crate::Result<()> {
@@ -112,7 +112,7 @@ impl VarWriter for SystemManager {
         Ok(())
     }
 
-    fn delete(&mut self, name: &VariableName) -> crate::Result<()> {
+    fn delete(&mut self, name: &Variable) -> crate::Result<()> {
         std::fs::remove_file(format!("{}/{}", EFIVARS_ROOT, name))
             .map_err(|error| Error::for_variable(error, name))
     }

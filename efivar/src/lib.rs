@@ -81,10 +81,10 @@ pub fn system() -> Box<dyn VarManager> {
 ///
 /// ```
 /// # use efivar::file_store;
-/// use efivar::efi::{VariableFlags, VariableName};
+/// use efivar::efi::{VariableFlags, Variable};
 /// # {
 /// // Name of the BootOrder variable
-/// let boot_order = VariableName::new("BootOrder");
+/// let boot_order = Variable::new("BootOrder");
 ///
 /// // Create a store from the file doc-test.toml
 /// let mut store = file_store("doc-test.toml");
@@ -111,7 +111,7 @@ mod tests {
     #[test]
     #[cfg(feature = "store")]
     fn file_store_roundtrip() {
-        use crate::efi::{VariableFlags, VariableName};
+        use crate::efi::{Variable, VariableFlags};
 
         {
             // Create a store from the file doc-test.toml
@@ -120,14 +120,14 @@ mod tests {
             // Write the value of a variable
             store
                 .write(
-                    &VariableName::new("BootOrder"),
+                    &Variable::new("BootOrder"),
                     VariableFlags::NON_VOLATILE,
                     &value,
                 )
                 .expect("Failed to write value in store");
 
             // Check the value of the written variable
-            let (data, attributes) = store.read(&VariableName::new("BootOrder")).unwrap();
+            let (data, attributes) = store.read(&Variable::new("BootOrder")).unwrap();
             assert_eq!(attributes, VariableFlags::NON_VOLATILE);
             assert_eq!(data, value);
             // At this point, store is dropped and doc-test.toml will be updated

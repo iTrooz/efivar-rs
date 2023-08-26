@@ -1,6 +1,6 @@
 use crate::{
     boot::BootVarName,
-    efi::{VariableFlags, VariableName},
+    efi::{Variable, VariableFlags},
     VarWriter,
 };
 
@@ -15,7 +15,7 @@ impl<T: VarWriter> BootVarWriter for T {
         let bytes = entry.to_bytes();
 
         self.write(
-            &VariableName::new(&id.boot_var_name()),
+            &Variable::new(&id.boot_var_name()),
             VariableFlags::NON_VOLATILE
                 | VariableFlags::BOOTSERVICE_ACCESS
                 | VariableFlags::RUNTIME_ACCESS,

@@ -1,7 +1,7 @@
 use itertools::Itertools;
 
 use efivar::{
-    efi::{VariableName, VariableVendor},
+    efi::{Variable, VariableVendor},
     VarManager,
 };
 
@@ -11,7 +11,7 @@ pub fn run(
     namespace: Option<uuid::Uuid>,
     as_string: bool,
 ) {
-    let name = VariableName::new_with_vendor(
+    let name = Variable::new_with_vendor(
         name,
         namespace.map_or(VariableVendor::Efi, VariableVendor::Custom),
     );

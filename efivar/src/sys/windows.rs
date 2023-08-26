@@ -11,7 +11,7 @@ use std::os::windows::ffi::OsStrExt;
 use winapi::ctypes::{c_ulong, c_void};
 use winapi::um::winbase::{GetFirmwareEnvironmentVariableExW, SetFirmwareEnvironmentVariableExW};
 
-use crate::efi::{VariableFlags, VariableName};
+use crate::efi::{Variable, VariableFlags};
 use crate::utils::read_nt_utf16_string;
 use crate::{Error, VarEnumerator, VarManager, VarReader, VarWriter};
 
@@ -25,7 +25,7 @@ impl SystemManager {
         SystemManager {}
     }
 
-    fn parse_name(name: &VariableName) -> crate::Result<(Vec<u16>, Vec<u16>)> {
+    fn parse_name(name: &Variable) -> crate::Result<(Vec<u16>, Vec<u16>)> {
         // Split into LPCWSTR
         let guid_wide: Vec<u16> = OsStr::new(&format!("{{{}}}", name.vendor()))
             .encode_wide()
@@ -40,7 +40,7 @@ impl SystemManager {
     }
 }
 
-fn parse_efi_variable(buf: &mut &[u8]) -> crate::Result<VariableName> {
+fn parse_efi_variable(buf: &mut &[u8]) -> crate::Result<Variable> {
     let uuid_u128 = buf
         .read_u128::<LittleEndian>()
         .map_err(|err| crate::Error::UnknownIoError { error: err })?;
@@ -48,11 +48,11 @@ fn parse_efi_variable(buf: &mut &[u8]) -> crate::Result<VariableName> {
     let guid = uuid::Uuid::from_bytes_le(uuid_u128.to_le_bytes());
     let name = read_nt_utf16_string(buf).map_err(crate::Error::StringParseError)?;
 
-    Ok(VariableName::new_with_vendor(&name, guid))
+    Ok(Variable::new_with_vendor(&name, guid))
 }
 
-fn parse_efi_variables(buf: &mut &[u8]) -> crate::Result<Vec<VariableName>> {
-    let mut vars: Vec<VariableName> = vec![];
+fn parse_efi_variables(buf: &mut &[u8]) -> crate::Result<Vec<Variable>> {
+    let mut vars: Vec<Variable> = vec![];
     while buf.len() > 0 {
         let struct_size = buf
             .read_u32::<LittleEndian>()
@@ -76,7 +76,7 @@ fn parse_efi_variables(buf: &mut &[u8]) -> crate::Result<Vec<VariableName>> {
 }
 
 impl VarEnumerator for SystemManager {
-    fn get_var_names<'a>(&'a self) -> crate::Result<Box<dyn Iterator<Item = VariableName> + 'a>> {
+    fn get_var_names<'a>(&'a self) -> crate::Result<Box<dyn Iterator<Item = Variable> + 'a>> {
         // get size of buffer to allocate for variables
         let mut size: u32 = 0;
         const STATUS_BUFFER_TOO_SMALL: i32 = 0xc0000023_u32 as i32;
@@ -127,7 +127,7 @@ impl VarEnumerator for SystemManager {
 }
 
 impl VarReader for SystemManager {
-    fn read(&self, name: &VariableName) -> crate::Result<(Vec<u8>, VariableFlags)> {
+    fn read(&self, name: &Variable) -> crate::Result<(Vec<u8>, VariableFlags)> {
         // Parse name, and split into LPCWSTR
         let (guid_wide, name_wide) = SystemManager::parse_name(name)?;
 
@@ -163,7 +163,7 @@ impl VarReader for SystemManager {
 impl VarWriter for SystemManager {
     fn write(
         &mut self,
-        name: &VariableName,
+        name: &Variable,
         attributes: VariableFlags,
         value: &[u8],
     ) -> crate::Result<()> {
@@ -188,7 +188,7 @@ impl VarWriter for SystemManager {
         }
     }
 
-    fn delete(&mut self, name: &VariableName) -> crate::Result<()> {
+    fn delete(&mut self, name: &Variable) -> crate::Result<()> {
         let (guid_wide, name_wide) = SystemManager::parse_name(name)?;
 
         let result = unsafe {

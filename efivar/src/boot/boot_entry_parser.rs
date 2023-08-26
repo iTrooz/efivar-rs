@@ -2,7 +2,7 @@ use std::{convert::TryInto, fmt::Display, io::Read};
 
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
 
-use crate::{efi::VariableName, utils::read_nt_utf16_string, Error, VarReader};
+use crate::{efi::Variable, utils::read_nt_utf16_string, Error, VarReader};
 
 use super::FilePathList;
 
@@ -31,10 +31,7 @@ pub struct BootEntry {
 }
 
 impl BootEntry {
-    pub fn parse(
-        manager: &(impl ?Sized + VarReader),
-        variable: &VariableName,
-    ) -> crate::Result<Self> {
+    pub fn parse(manager: &(impl ?Sized + VarReader), variable: &Variable) -> crate::Result<Self> {
         let (value, _flags) = manager.read(variable)?;
 
         // slice of the buffer

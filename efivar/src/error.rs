@@ -1,6 +1,6 @@
 use std::io;
 
-use crate::efi::VariableName;
+use crate::efi::Variable;
 
 /// Describes an error returned by EFI variable operations
 #[derive(Debug, Fail)]
@@ -8,14 +8,11 @@ pub enum Error {
     #[fail(display = "failed to parse variable name: {}", name)]
     InvalidVarName { name: String },
     #[fail(display = "variable not found: {}", name)]
-    VarNotFound { name: VariableName },
+    VarNotFound { name: Variable },
     #[fail(display = "permission denied for variable: {}", name)]
-    PermissionDenied { name: VariableName },
+    PermissionDenied { name: Variable },
     #[fail(display = "unknown i/o error for variable: {}", name)]
-    VarUnknownError {
-        name: VariableName,
-        error: io::Error,
-    },
+    VarUnknownError { name: Variable, error: io::Error },
     #[fail(display = "base64 decoding error: {}", error)]
     #[cfg(feature = "store")]
     Base64DecodeError { error: base64::DecodeError },
@@ -29,7 +26,7 @@ pub enum Error {
     #[fail(display = "failed to decode name as valid UTF-8")]
     InvalidUTF8,
     #[fail(display = "buffer too small for variable: {}", name)]
-    BufferTooSmall { name: VariableName },
+    BufferTooSmall { name: Variable },
     #[fail(display = "failed to decode uuid: {}", error)]
     UuidError { error: uuid::Error },
     #[fail(display = "failed to parse variable content (invalid content)")]
@@ -70,7 +67,7 @@ fn is_permission_denied_error(err: &io::Error) -> bool {
 }
 
 impl Error {
-    pub fn for_variable(error: io::Error, name: &VariableName) -> Self {
+    pub fn for_variable(error: io::Error, name: &Variable) -> Self {
         let name = name.clone();
 
         if is_variable_not_found_error(&error) {
@@ -89,7 +86,7 @@ impl Error {
     }
 
     #[cfg(target_os = "windows")]
-    pub fn for_variable_os(name: &VariableName) -> Self {
+    pub fn for_variable_os(name: &Variable) -> Self {
         Error::for_variable(io::Error::last_os_error(), name)
     }
 }

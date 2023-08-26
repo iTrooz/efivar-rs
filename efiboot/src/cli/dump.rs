@@ -3,7 +3,7 @@ use std::{fs::File, io::Write, path::Path};
 use uuid::Uuid;
 
 use efivar::{
-    efi::{VariableFlags, VariableName, VariableVendor},
+    efi::{Variable, VariableFlags, VariableVendor},
     VarManager,
 };
 
@@ -16,7 +16,7 @@ fn dump(output_path: &Path, flags: VariableFlags, data: &[u8]) -> Result<(), std
 }
 
 pub fn run(reader: Box<dyn VarManager>, name: &str, namespace: Option<Uuid>, output_path: &Path) {
-    let var = VariableName::new_with_vendor(
+    let var = Variable::new_with_vendor(
         name,
         namespace.map_or(VariableVendor::Efi, VariableVendor::Custom),
     );
