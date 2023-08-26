@@ -1,10 +1,10 @@
 use efivar::{
-    efi::{VariableName, VariableVendor},
+    efi::{Variable, VariableVendor},
     VarManager,
 };
 
 pub fn run(mut manager: Box<dyn VarManager>, name: &str, namespace: Option<uuid::Uuid>) {
-    let var_name = VariableName::new_with_vendor(
+    let var_name = Variable::new_with_vendor(
         name,
         namespace.map_or(VariableVendor::Efi, VariableVendor::Custom),
     );

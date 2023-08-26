@@ -2,7 +2,7 @@ use std::io::Cursor;
 
 use byteorder::{LittleEndian, ReadBytesExt};
 
-use crate::{efi::VariableName, VarReader};
+use crate::{efi::Variable, VarReader};
 
 use super::BootVarName;
 
@@ -14,7 +14,7 @@ pub struct BootOrderIterator {
 impl BootOrderIterator {
     pub(in super::super) fn new(sm: &dyn VarReader) -> crate::Result<BootOrderIterator> {
         // Read BootOrder variable
-        let (value, _flags) = sm.read(&VariableName::new("BootOrder"))?;
+        let (value, _flags) = sm.read(&Variable::new("BootOrder"))?;
 
         Ok(BootOrderIterator {
             cursor: Cursor::new(value),
@@ -23,12 +23,12 @@ impl BootOrderIterator {
 }
 
 impl Iterator for BootOrderIterator {
-    type Item = VariableName;
+    type Item = Variable;
 
     fn next(&mut self) -> Option<Self::Item> {
         self.cursor
             .read_u16::<LittleEndian>()
-            .map(|id| VariableName::new(&id.boot_var_name()))
+            .map(|id| Variable::new(&id.boot_var_name()))
             .ok()
     }
 }

@@ -1,4 +1,4 @@
-use crate::{efi::VariableName, VarReader};
+use crate::{efi::Variable, VarReader};
 
 use super::{boot_entry_parser::BootEntry, boot_order_reader::BootOrderIterator};
 
@@ -20,7 +20,7 @@ impl<'a> BootEntriesIterator<'a> {
 }
 
 impl<'a> Iterator for BootEntriesIterator<'a> {
-    type Item = (Result<BootEntry, crate::Error>, VariableName);
+    type Item = (Result<BootEntry, crate::Error>, Variable);
 
     fn next(&mut self) -> Option<Self::Item> {
         self.order_iter

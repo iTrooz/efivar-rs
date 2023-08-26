@@ -1,4 +1,4 @@
-//! Definition of the VariableName type
+//! Definition of the Variable type
 
 use std::fmt;
 use std::str::FromStr;
@@ -76,8 +76,8 @@ impl fmt::Display for VariableVendor {
 ///
 /// ```
 /// # use std::str::FromStr;
-/// # use efivar::efi::VariableName;
-/// let name = VariableName::from_str("BootOrder-8be4df61-93ca-11d2-aa0d-00e098032b8c").unwrap();
+/// # use efivar::efi::Variable;
+/// let name = Variable::from_str("BootOrder-8be4df61-93ca-11d2-aa0d-00e098032b8c").unwrap();
 /// assert_eq!(*name.vendor().as_ref(), uuid::Uuid::from_str("8be4df61-93ca-11d2-aa0d-00e098032b8c").unwrap());
 /// assert_eq!(name.variable(), "BootOrder");
 /// ```
@@ -86,27 +86,27 @@ impl fmt::Display for VariableVendor {
 ///
 /// ```
 /// # use std::str::FromStr;
-/// # use efivar::efi::VariableName;
-/// let result = VariableName::from_str("invalid name");
+/// # use efivar::efi::Variable;
+/// let result = Variable::from_str("invalid name");
 /// assert!(result.is_err());
 /// ```
 ///
 /// Turning the structure back into a string:
 ///
 /// ```
-/// # use efivar::efi::VariableName;
-/// let name = VariableName::new("BootOrder");
+/// # use efivar::efi::Variable;
+/// let name = Variable::new("BootOrder");
 /// assert_eq!(name.to_string(), "BootOrder-8be4df61-93ca-11d2-aa0d-00e098032b8c");
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct VariableName {
+pub struct Variable {
     /// Variable name
     variable: String,
     /// Vendor identifier
     vendor: VariableVendor,
 }
 
-impl VariableName {
+impl Variable {
     /// Create a new EFI standard variable name
     ///
     /// # Parameters
@@ -163,7 +163,7 @@ impl VariableName {
     }
 }
 
-impl FromStr for VariableName {
+impl FromStr for Variable {
     type Err = Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -180,7 +180,7 @@ impl FromStr for VariableName {
     }
 }
 
-impl fmt::Display for VariableName {
+impl fmt::Display for Variable {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}-{}", self.variable, self.vendor)
     }
@@ -192,13 +192,13 @@ mod tests {
 
     #[test]
     fn parse_name_invalid() {
-        assert!(VariableName::from_str("BootOrder_Invalid").is_err());
+        assert!(Variable::from_str("BootOrder_Invalid").is_err());
     }
 
     #[test]
     fn to_fullname_partial() {
         assert_eq!(
-            VariableName::new("BootOrder").to_string(),
+            Variable::new("BootOrder").to_string(),
             "BootOrder-8be4df61-93ca-11d2-aa0d-00e098032b8c"
         );
     }

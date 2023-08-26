@@ -3,7 +3,7 @@ use std::fs;
 mod efivarfs;
 mod efivars;
 
-use crate::efi::{VariableFlags, VariableName};
+use crate::efi::{Variable, VariableFlags};
 use crate::{VarEnumerator, VarManager, VarReader, VarWriter};
 
 trait LinuxSystemManager: VarManager {
@@ -56,13 +56,13 @@ impl SystemManager {
 }
 
 impl VarEnumerator for SystemManager {
-    fn get_var_names<'a>(&'a self) -> crate::Result<Box<dyn Iterator<Item = VariableName> + 'a>> {
+    fn get_var_names<'a>(&'a self) -> crate::Result<Box<dyn Iterator<Item = Variable> + 'a>> {
         self.sys_impl.get_var_names()
     }
 }
 
 impl VarReader for SystemManager {
-    fn read(&self, name: &VariableName) -> crate::Result<(Vec<u8>, VariableFlags)> {
+    fn read(&self, name: &Variable) -> crate::Result<(Vec<u8>, VariableFlags)> {
         self.sys_impl.read(name)
     }
 }
@@ -70,14 +70,14 @@ impl VarReader for SystemManager {
 impl VarWriter for SystemManager {
     fn write(
         &mut self,
-        name: &VariableName,
+        name: &Variable,
         attributes: VariableFlags,
         value: &[u8],
     ) -> crate::Result<()> {
         self.sys_impl.write(name, attributes, value)
     }
 
-    fn delete(&mut self, name: &VariableName) -> crate::Result<()> {
+    fn delete(&mut self, name: &Variable) -> crate::Result<()> {
         self.sys_impl.delete(name)
     }
 }
@@ -87,7 +87,7 @@ impl VarManager for SystemManager {}
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::efi::VariableName;
+    use crate::efi::Variable;
 
     fn linux_get_var_names(manager: &SystemManager) {
         if !manager.supported() {
@@ -95,7 +95,7 @@ mod tests {
         }
 
         let mut var_names = manager.get_var_names().unwrap();
-        let name = VariableName::new("BootOrder");
+        let name = Variable::new("BootOrder");
         assert!(var_names.any(|n| n == name));
     }
 
@@ -105,7 +105,7 @@ mod tests {
         }
 
         let (data, _flags) = manager
-            .read(&VariableName::new("BootOrder"))
+            .read(&Variable::new("BootOrder"))
             .expect("Failed to read variable");
 
         assert!(!data.is_empty());

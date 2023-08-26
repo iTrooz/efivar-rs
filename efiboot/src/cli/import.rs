@@ -5,7 +5,7 @@ use uuid::Uuid;
 use byteorder::{LittleEndian, ReadBytesExt};
 
 use efivar::{
-    efi::{VariableFlags, VariableName, VariableVendor},
+    efi::{Variable, VariableFlags, VariableVendor},
     VarManager,
 };
 
@@ -25,7 +25,7 @@ pub fn run(
     name: &str,
     namespace: Option<Uuid>,
 ) {
-    let var = VariableName::new_with_vendor(
+    let var = Variable::new_with_vendor(
         name,
         namespace.map_or(VariableVendor::Efi, VariableVendor::Custom),
     );
