@@ -4,6 +4,8 @@ use byteorder::{LittleEndian, ReadBytesExt};
 
 use crate::{efi::VariableName, VarReader};
 
+use super::BootVarName;
+
 /// Loop over boot order IDs. The corresponding entries are not queried
 pub struct BootOrderIterator {
     cursor: Cursor<Vec<u8>>,
@@ -26,7 +28,7 @@ impl Iterator for BootOrderIterator {
     fn next(&mut self) -> Option<Self::Item> {
         self.cursor
             .read_u16::<LittleEndian>()
-            .map(|id| VariableName::new(&format!("Boot{:04X}", id)))
+            .map(|id| VariableName::new(&id.boot_var_name()))
             .ok()
     }
 }

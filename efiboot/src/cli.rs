@@ -5,6 +5,7 @@ mod import;
 mod list;
 mod read;
 
+pub use self::boot::add as add_boot_entry;
 pub use self::boot::get_entries as get_boot_entries;
 pub use self::boot::get_order as get_boot_order;
 pub use self::delete::run as delete;

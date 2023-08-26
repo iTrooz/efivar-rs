@@ -1,6 +1,6 @@
-use std::fmt::Display;
+use std::{convert::TryInto, fmt::Display, io::Write, path::PathBuf};
 
-use byteorder::{LittleEndian, ReadBytesExt};
+use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
 use uuid::Uuid;
 
 use crate::{utils::read_nt_utf16_string, Error};
@@ -8,14 +8,14 @@ use crate::{utils::read_nt_utf16_string, Error};
 use super::consts;
 
 pub enum DevicePath {
-    FilePath(std::path::PathBuf),
+    FilePath(FilePath),
     HardDrive(EFIHardDrive),
 }
 
 pub enum EFIHardDriveType {
     Mbr,
     Gpt,
-    Unknown,
+    Unknown, // TODO: remove ?
 }
 
 impl EFIHardDriveType {
@@ -24,6 +24,14 @@ impl EFIHardDriveType {
             0x01 => Self::Mbr,
             0x02 => Self::Gpt,
             _ => Self::Unknown,
+        }
+    }
+
+    pub fn as_u8(&self) -> u8 {
+        match self {
+            EFIHardDriveType::Mbr => 0x01,
+            EFIHardDriveType::Gpt => 0x02,
+            EFIHardDriveType::Unknown => panic!(),
         }
     }
 }
@@ -74,11 +82,11 @@ impl DevicePath {
         match r#type {
             consts::DEVICE_PATH_TYPE::MEDIA_DEVICE_PATH => match subtype {
                 consts::MEDIA_DEVICE_PATH_SUBTYPE::FILE_PATH => {
-                    return Ok(Some(DevicePath::FilePath(
-                        read_nt_utf16_string(&mut device_path_data)
+                    return Ok(Some(DevicePath::FilePath(FilePath {
+                        path: read_nt_utf16_string(&mut device_path_data)
                             .map_err(crate::Error::StringParseError)?
                             .into(),
-                    )));
+                    })));
                 }
                 consts::MEDIA_DEVICE_PATH_SUBTYPE::HARD_DRIVE => {
                     return Ok(Some(DevicePath::HardDrive(EFIHardDrive {
@@ -113,4 +121,87 @@ impl DevicePath {
 
         Ok(None)
     }
+}
+
+fn encap_as_device_path(r#type: u8, r#subtype: u8, mut raw_data: Vec<u8>) -> Vec<u8> {
+    let mut bytes: Vec<u8> = vec![];
+
+    bytes.write_u8(r#type).unwrap();
+    bytes.write_u8(r#subtype).unwrap();
+
+    let raw_data_size: u16 = raw_data.len().try_into().unwrap();
+    bytes
+        .write_u16::<LittleEndian>(raw_data_size + 1 + 1 + 2)
+        .unwrap();
+
+    bytes.append(&mut raw_data);
+
+    bytes
+}
+
+impl EFIHardDrive {
+    /// get bytes representation for a EFIHardDrive, without encapsulating them in a DevicePath structure
+    fn to_bytes_raw(&self) -> Vec<u8> {
+        let mut bytes: Vec<u8> = vec![];
+        bytes
+            .write_u32::<LittleEndian>(self.partition_number)
+            .unwrap();
+        bytes
+            .write_u64::<LittleEndian>(self.partition_start)
+            .unwrap();
+        bytes
+            .write_u64::<LittleEndian>(self.partition_size)
+            .unwrap();
+        bytes.write_all(&self.partition_sig.to_bytes_le()).unwrap();
+        bytes.write_u8(self.format).unwrap();
+        bytes.write_u8(self.sig_type.as_u8()).unwrap();
+
+        bytes
+    }
+
+    /// get bytes representation for a EFIHardDrive, as a DevicePath (EFI_DEVICE_PATH_PROTOCOL) structure
+    pub fn to_bytes_encap(&self) -> Vec<u8> {
+        encap_as_device_path(
+            consts::DEVICE_PATH_TYPE::MEDIA_DEVICE_PATH,
+            consts::MEDIA_DEVICE_PATH_SUBTYPE::HARD_DRIVE,
+            self.to_bytes_raw(),
+        )
+    }
+}
+
+pub struct FilePath {
+    pub path: PathBuf, // TODO: do not use PathBuf, because it is a OS-specific type ?
+}
+
+impl FilePath {
+    /// get bytes representation for a FilePath, without encapsulating them in a DevicePath structure
+    fn to_bytes_raw(&self) -> Vec<u8> {
+        let utf16_bytes = self.path.to_str().unwrap().encode_utf16();
+        let mut utf8_bytes: Vec<u8> = utf16_bytes
+            .into_iter()
+            .flat_map(|var| var.to_le_bytes())
+            .collect();
+
+        // write null termination
+        utf8_bytes.write_u16::<LittleEndian>(0x0000).unwrap();
+
+        utf8_bytes
+    }
+
+    /// get bytes representation for a FilePath, as a DevicePath (EFI_DEVICE_PATH_PROTOCOL) structure
+    pub fn to_bytes_encap(&self) -> Vec<u8> {
+        encap_as_device_path(
+            consts::DEVICE_PATH_TYPE::MEDIA_DEVICE_PATH,
+            consts::MEDIA_DEVICE_PATH_SUBTYPE::FILE_PATH,
+            self.to_bytes_raw(),
+        )
+    }
+}
+
+pub fn get_end_device_path_bytes() -> Vec<u8> {
+    encap_as_device_path(
+        consts::DEVICE_PATH_TYPE::END_OF_HARDWARE_DEVICE_PATH,
+        consts::END_OF_HARDWARE_DEVICE_PATH_SUBTYPE::END_ENTIRE_DEVICE_PATH,
+        vec![],
+    )
 }
