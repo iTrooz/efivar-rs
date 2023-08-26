@@ -15,7 +15,7 @@ pub enum DevicePath {
 pub enum EFIHardDriveType {
     Mbr,
     Gpt,
-    Unknown,
+    Unknown, // TODO: remove ?
 }
 
 impl EFIHardDriveType {
