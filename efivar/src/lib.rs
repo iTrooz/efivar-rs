@@ -40,6 +40,7 @@ mod sys;
 mod utils;
 mod writer;
 
+use boot::writer::BootVarWriter;
 use boot::BootVarReader;
 
 pub use crate::enumerator::VarEnumerator;
@@ -52,7 +53,10 @@ pub use crate::error::Error;
 pub type Result<T> = std::result::Result<T, Error>;
 
 /// Represents an EFI variable manager that can read, write and list variables
-pub trait VarManager: VarEnumerator + VarReader + VarWriter + BootVarReader {}
+pub trait VarManager:
+    VarEnumerator + VarReader + VarWriter + BootVarReader + BootVarWriter
+{
+}
 
 use crate::sys::SystemManager;
 /// Returns a `VarManager` that represents the firmware variables of the running system

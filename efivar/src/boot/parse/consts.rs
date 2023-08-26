@@ -13,6 +13,14 @@ pub mod MEDIA_DEVICE_PATH_SUBTYPE {
     pub const RAM_DISK_DEVICE_PATH: u8 = 0x09;
 }
 
+/// Holds magic numbers of the different subtypes for the device path type END_OF_HARDWARE_DEVICE_PATH
+#[allow(unused)]
+#[allow(non_snake_case)] // module only holds constants
+pub mod END_OF_HARDWARE_DEVICE_PATH_SUBTYPE {
+    pub const END_THIS_INSTANCE_OF_DEVICE_PATH: u8 = 0x01;
+    pub const END_ENTIRE_DEVICE_PATH: u8 = 0xFF;
+}
+
 /// Holds magic numbers of the different types of device path types
 #[allow(unused)]
 #[allow(non_snake_case)] // module only holds constants

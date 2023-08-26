@@ -1,6 +1,6 @@
-use std::{fmt::Display, io::Read};
+use std::{convert::TryInto, fmt::Display, io::Read};
 
-use byteorder::{LittleEndian, ReadBytesExt};
+use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
 
 use crate::{efi::VariableName, utils::read_nt_utf16_string, Error, VarReader};
 
@@ -63,5 +63,40 @@ impl BootEntry {
             file_path_list,
             optional_data: buf.to_vec(),
         })
+    }
+
+    pub fn to_bytes(&self) -> Vec<u8> {
+        let mut bytes: Vec<u8> = vec![];
+
+        // append attribute bytes
+        bytes.append(&mut self.attributes.bits().to_le_bytes().to_vec());
+
+        // append file path list length
+        let mut fpl_bytes: Vec<u8> = if let Some(fpl) = &self.file_path_list {
+            fpl.to_bytes()
+        } else {
+            vec![]
+        };
+        bytes
+            .write_u16::<LittleEndian>(fpl_bytes.len().try_into().unwrap())
+            .unwrap();
+
+        // append description bytes
+        let mut desc_bytes = self
+            .description
+            .encode_utf16()
+            .flat_map(|var| var.to_le_bytes())
+            .collect();
+        bytes.append(&mut desc_bytes);
+        // write description null termination
+        bytes.write_u16::<LittleEndian>(0x0000).unwrap();
+
+        // append file path list bytes
+        bytes.append(&mut fpl_bytes);
+
+        // append optional data
+        bytes.append(&mut self.optional_data.clone());
+
+        bytes
     }
 }

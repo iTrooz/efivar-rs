@@ -1,18 +1,21 @@
-use std::{fmt::Display, path::PathBuf};
+use std::fmt::Display;
 
-use super::{DevicePath, EFIHardDrive};
+use super::{
+    device_path::{self, FilePath},
+    DevicePath, EFIHardDrive,
+};
 
 /// holds the potential fields we may get from a packed file path list
 /// TODO remove ?
 pub struct OptFilePathList {
-    pub file_path: Option<PathBuf>,
+    pub file_path: Option<FilePath>,
     pub hard_drive: Option<EFIHardDrive>,
 }
 
 /// Same structure as OptFilePathList, but we ensure that the file path list
 /// is a valid file path overall
 pub struct FilePathList {
-    pub file_path: PathBuf,
+    pub file_path: FilePath,
     pub hard_drive: EFIHardDrive,
 }
 
@@ -27,7 +30,12 @@ impl From<OptFilePathList> for Option<FilePathList> {
 
 impl Display for FilePathList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}/File({})", self.hard_drive, self.file_path.display())
+        write!(
+            f,
+            "{}/File({})",
+            self.hard_drive,
+            self.file_path.path.display()
+        )
     }
 }
 
@@ -55,5 +63,15 @@ impl FilePathList {
         }
 
         Ok(file_path_list)
+    }
+
+    pub fn to_bytes(&self) -> Vec<u8> {
+        let mut bytes: Vec<u8> = vec![];
+
+        bytes.append(&mut self.hard_drive.to_bytes_encap());
+        bytes.append(&mut self.file_path.to_bytes_encap());
+        bytes.append(&mut device_path::get_end_device_path_bytes());
+
+        bytes
     }
 }
