@@ -9,4 +9,15 @@ on:
 
 jobs:
   pullrequest:
-    uses: iTrooz/vtavernier-github-workflows/.github/workflows/pullrequest-semantic.yml@v1
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Check commits
+        uses: vtavernier/github-workflows/actions/commitlint@463fff6e61c01fc139d544de20af9e80fdd6ee51
+        with:
+          lint-from: HEAD~${{ github.event.pull_request.commits }}
+          lint-to: HEAD
