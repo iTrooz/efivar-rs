@@ -68,7 +68,7 @@ impl fmt::Display for VariableVendor {
     }
 }
 
-/// An EFI variable name
+/// Represents an EFI variable, with a name and a vendor (namespace)
 ///
 /// # Examples
 ///
