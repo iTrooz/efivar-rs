@@ -12,6 +12,27 @@ enum BootCommand {
         #[structopt(short, long)]
         verbose: bool,
     },
+    Add {
+        /// Partition that holds the file to boot from
+        #[structopt(short, long, default_value = "/dev/sda1")]
+        partition: String,
+
+        /// File to boot from, inside the partition
+        #[structopt(short, long)]
+        file: String,
+
+        /// Set entry description
+        #[structopt(short, long)]
+        description: String,
+
+        /// Skip checks to ensure data is valid
+        #[structopt(long)]
+        force: bool,
+
+        /// ID to give to the boot entry
+        #[structopt(long)]
+        id: Option<u16>,
+    },
 }
 
 #[derive(StructOpt)]
@@ -127,6 +148,15 @@ fn main(opts: Opt) {
             }
             BootCommand::GetEntries { verbose } => {
                 cli::get_boot_entries(manager, verbose);
+            }
+            BootCommand::Add {
+                partition,
+                file,
+                description,
+                force,
+                id,
+            } => {
+                cli::add_boot_entry(manager, partition, file, description, force, id);
             }
         },
         Command::Dump {
