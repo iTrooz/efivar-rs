@@ -101,7 +101,7 @@ impl fmt::Display for VariableVendor {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Variable {
     /// Variable name
-    variable: String,
+    name: String,
     /// Vendor identifier
     vendor: VariableVendor,
 }
@@ -114,7 +114,7 @@ impl Variable {
     /// * `variable`: name of the variable
     pub fn new(variable: &str) -> Self {
         Self {
-            variable: variable.to_owned(),
+            name: variable.to_owned(),
             vendor: VariableVendor::Efi,
         }
     }
@@ -127,14 +127,14 @@ impl Variable {
     /// * `vendor`: vendor identifier
     pub fn new_with_vendor<V: Into<VariableVendor>>(variable: &str, vendor: V) -> Self {
         Self {
-            variable: variable.to_owned(),
+            name: variable.to_owned(),
             vendor: vendor.into(),
         }
     }
 
     /// Get the variable name for this instance
     pub fn variable(&self) -> &str {
-        &self.variable
+        &self.name
     }
 
     /// Get the vendor for this instance
@@ -147,7 +147,7 @@ impl Variable {
     /// If the vendor GUID is the EFI one, it will not be added to the name.
     pub fn short_name(&self) -> String {
         if self.vendor.is_efi() {
-            self.variable.clone()
+            self.name.clone()
         } else {
             self.to_string()
         }
@@ -155,8 +155,8 @@ impl Variable {
 
     /// Returns the boot var ID (4 digits hex number) if this variable is a boot entry. Else, return None
     pub fn boot_var_id(&self) -> Option<u16> {
-        if self.variable.len() == 8 && &self.variable[0..4] == "Boot" {
-            self.variable[4..8].parse().ok()
+        if self.name.len() == 8 && &self.name[0..4] == "Boot" {
+            self.name[4..8].parse().ok()
         } else {
             None
         }
@@ -182,7 +182,7 @@ impl FromStr for Variable {
 
 impl fmt::Display for Variable {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}-{}", self.variable, self.vendor)
+        write!(f, "{}-{}", self.name, self.vendor)
     }
 }
 
