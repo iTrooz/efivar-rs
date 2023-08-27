@@ -14,8 +14,6 @@ on:
     tags-ignore:
       - "**"
 
-concurrency: ci-${{ github.ref }}
-
 jobs:
   check:
     runs-on: ubuntu-latest
