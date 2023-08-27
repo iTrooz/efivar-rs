@@ -34,7 +34,7 @@ jobs:
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          key: check-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       # Calling rustup show will install the toolchain in rust-toolchain
       - name: Install toolchain
@@ -83,7 +83,7 @@ jobs:
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          key: test-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
           
       # Calling rustup show will install the toolchain in rust-toolchain
       - name: Install toolchain
@@ -144,14 +144,14 @@ jobs:
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          key: build-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Setup Rust cache
         uses: actions/cache@v3
         with:
           path: |
             target/
-          key: ${{ runner.os }}-rust-${{ hashFiles('**/Cargo.lock') }}
+          key: build-${{ runner.os }}-rust-${{ hashFiles('**/Cargo.lock') }}
 
       # Calling rustup show will install the toolchain in rust-toolchain
       - name: Install toolchain
