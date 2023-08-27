@@ -20,28 +20,128 @@ jobs:
   check:
     uses: iTrooz/vtavernier-github-workflows/.github/workflows/check-rust.yml@v1
 
-  build:
-    uses: iTrooz/vtavernier-github-workflows/.github/workflows/build-rust-bin.yml@v1
-
-    needs:
-      - check
+  test:
+    runs-on: ${{ matrix.runs-on }}
 
     strategy:
       fail-fast: false
-
       matrix:
         include:
           - runs-on: ubuntu-latest
             target: x86_64-unknown-linux-gnu
           - runs-on: windows-latest
             target: x86_64-pc-windows-msvc
+    
+    needs:
+      - check
 
-    with:
-      runs-on: ${{ matrix.runs-on }}
-      rust-target: ${{ matrix.target }}
-      artifact-name: artifact
-      upload-coverage-to: codecov
+    steps:
+        - name: Checkout repository
+          uses: actions/checkout@v3
+          with:
+            fetch-depth: 0
 
-    secrets:
-      GH_TOKEN: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
+        - name: Setup Cargo cache
+          uses: actions/cache@v3
+          with:
+            path: |
+              ~/.cargo/bin/
+              ~/.cargo/registry/index/
+              ~/.cargo/registry/cache/
+              ~/.cargo/git/db/
+            key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+            
+        # Calling rustup show will install the toolchain in rust-toolchain
+        - name: Install toolchain
+          id: rustup
+          run: rustup show
 
+        # Install cargo-make which will drive the build
+        - name: Install cargo-make
+          uses: davidB/rust-cargo-make@v1
+          with:
+            version: 0.36.2
+
+        - name: Fetch dependencies
+          run: cargo fetch
+        
+        # Run tests
+        - name: Run tests
+          shell: bash
+          run: |
+            if cargo make --list-all-steps --output-format autocomplete --quiet | grep -E '(^|\W)ci-test($|\W)' >/dev/null 2>&1; then
+              cargo make ci-test
+            else
+              echo "No test task found in Makefile.toml."
+            fi
+
+        - name: Upload coverage to codecov.io
+          uses: codecov/codecov-action@v3
+          with:
+            files: coverage/info.lcov
+            fail_ci_if_error: false # upload can randomly fail, see https://github.com/codecov/codecov-action/issues/557
+            token: ${{ secrets.CODECOV_TOKEN }}
+            verbose: true
+
+  build:
+    runs-on: ${{ matrix.runs-on }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runs-on: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - runs-on: windows-latest
+            target: x86_64-pc-windows-msvc
+    
+    needs:
+      - check
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup Cargo cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Setup Rust cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            target/
+          key: ${{ runner.os }}-rust-${{ hashFiles('**/Cargo.lock') }}
+
+      # Calling rustup show will install the toolchain in rust-toolchain
+      - name: Install toolchain
+        id: rustup
+        run: rustup show
+
+      # Install cargo-make which will drive the build
+      - name: Install cargo-make
+        uses: davidB/rust-cargo-make@v1
+        with:
+          version: 0.36.2
+
+      - name: Fetch dependencies
+        run: cargo fetch
+
+      # Run binary build
+      - name: Build binaries
+        run: cargo make ci-build
+
+      # Upload artifacts
+      - name: Upload binaries from dist/
+        uses: actions/upload-artifact@v3
+        with:
+          name: Artifact
+          path: dist/
