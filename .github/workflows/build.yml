@@ -6,7 +6,7 @@ on:
       - renovate/*
   push:
     branches:
-      - master
+      - main
       - alpha
       - beta
       - test
