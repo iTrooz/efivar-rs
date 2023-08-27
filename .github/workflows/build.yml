@@ -9,6 +9,7 @@ on:
       - master
       - alpha
       - beta
+      - test
       - renovate/*
     tags-ignore:
       - "**"
