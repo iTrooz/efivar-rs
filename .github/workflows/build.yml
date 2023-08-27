@@ -18,7 +18,45 @@ concurrency: ci-${{ github.ref }}
 
 jobs:
   check:
-    uses: iTrooz/vtavernier-github-workflows/.github/workflows/check-rust.yml@v1
+    runs-on: ubuntu-latest
+
+    env:
+      RUSTFLAGS: "-D warnings"
+      RUSTDOCFLAGS: "-D warnings"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Cargo cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      # Calling rustup show will install the toolchain in rust-toolchain
+      - name: Install toolchain
+        id: rustup
+        run: rustup show
+
+      - name: Fetch dependencies
+        run: cargo fetch
+
+      - name: Run cargo fmt
+        run: cargo fmt -- --check
+
+      - name: Run cargo check
+        run: cargo check --all-features
+          
+      - name: Run cargo clippy
+        run: cargo clippy --all-features
+
+      - name: Run cargo doc
+        run: cargo doc --all-features --no-deps
 
   test:
     runs-on: ${{ matrix.runs-on }}
