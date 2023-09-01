@@ -83,13 +83,12 @@ pub fn get_entries(manager: Box<dyn VarManager>, verbose: bool) {
         }
     }
 
-    println!();
     if vars.is_empty() {
-        println!("All boot entries are in boot sequence");
         return;
     }
 
-    println!("Boot entries not in boot sequence:");
+    println!();
+    println!("Found boot entries not in boot sequence:");
     for var in vars {
         match BootEntry::parse(&*manager, &var) {
             Ok(entry) => print_var(&var, entry, verbose),
