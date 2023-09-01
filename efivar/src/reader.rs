@@ -10,11 +10,11 @@ pub trait VarReader {
     ///
     /// # Arguments
     ///
-    /// * `name`: name of the variable to read
+    /// * `var`: variable to read
     /// * `value`: target buffer for returning the variable value
     ///
     /// # Return value
     ///
     /// On success, number of bytes read and associated EFI variable flags.
-    fn read(&self, name: &Variable) -> crate::Result<(Vec<u8>, VariableFlags)>;
+    fn read(&self, var: &Variable) -> crate::Result<(Vec<u8>, VariableFlags)>;
 }

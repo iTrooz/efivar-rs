@@ -62,23 +62,23 @@ impl VarEnumerator for SystemManager {
 }
 
 impl VarReader for SystemManager {
-    fn read(&self, name: &Variable) -> crate::Result<(Vec<u8>, VariableFlags)> {
-        self.sys_impl.read(name)
+    fn read(&self, var: &Variable) -> crate::Result<(Vec<u8>, VariableFlags)> {
+        self.sys_impl.read(var)
     }
 }
 
 impl VarWriter for SystemManager {
     fn write(
         &mut self,
-        name: &Variable,
+        var: &Variable,
         attributes: VariableFlags,
         value: &[u8],
     ) -> crate::Result<()> {
-        self.sys_impl.write(name, attributes, value)
+        self.sys_impl.write(var, attributes, value)
     }
 
-    fn delete(&mut self, name: &Variable) -> crate::Result<()> {
-        self.sys_impl.delete(name)
+    fn delete(&mut self, var: &Variable) -> crate::Result<()> {
+        self.sys_impl.delete(var)
     }
 }
 

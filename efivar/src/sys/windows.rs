@@ -25,13 +25,13 @@ impl SystemManager {
         SystemManager {}
     }
 
-    fn parse_name(name: &Variable) -> crate::Result<(Vec<u16>, Vec<u16>)> {
+    fn parse_name(var: &Variable) -> crate::Result<(Vec<u16>, Vec<u16>)> {
         // Split into LPCWSTR
-        let guid_wide: Vec<u16> = OsStr::new(&format!("{{{}}}", name.vendor()))
+        let guid_wide: Vec<u16> = OsStr::new(&format!("{{{}}}", var.vendor()))
             .encode_wide()
             .chain(once(0))
             .collect();
-        let name_wide: Vec<u16> = OsStr::new(name.variable())
+        let name_wide: Vec<u16> = OsStr::new(var.name())
             .encode_wide()
             .chain(once(0))
             .collect();
@@ -127,9 +127,9 @@ impl VarEnumerator for SystemManager {
 }
 
 impl VarReader for SystemManager {
-    fn read(&self, name: &Variable) -> crate::Result<(Vec<u8>, VariableFlags)> {
+    fn read(&self, var: &Variable) -> crate::Result<(Vec<u8>, VariableFlags)> {
         // Parse name, and split into LPCWSTR
-        let (guid_wide, name_wide) = SystemManager::parse_name(name)?;
+        let (guid_wide, name_wide) = SystemManager::parse_name(var)?;
 
         // Attribute return value
         let mut attributes: u32 = 0;
@@ -163,12 +163,12 @@ impl VarReader for SystemManager {
 impl VarWriter for SystemManager {
     fn write(
         &mut self,
-        name: &Variable,
+        var: &Variable,
         attributes: VariableFlags,
         value: &[u8],
     ) -> crate::Result<()> {
         // Parse name, and split into LPCWSTR
-        let (guid_wide, name_wide) = SystemManager::parse_name(name)?;
+        let (guid_wide, name_wide) = SystemManager::parse_name(var)?;
 
         let result = unsafe {
             SetFirmwareEnvironmentVariableExW(
@@ -183,13 +183,13 @@ impl VarWriter for SystemManager {
         };
 
         match result {
-            0 => Err(Error::for_variable_os(name)),
+            0 => Err(Error::for_variable_os(var)),
             _ => Ok(()),
         }
     }
 
-    fn delete(&mut self, name: &Variable) -> crate::Result<()> {
-        let (guid_wide, name_wide) = SystemManager::parse_name(name)?;
+    fn delete(&mut self, var: &Variable) -> crate::Result<()> {
+        let (guid_wide, name_wide) = SystemManager::parse_name(var)?;
 
         let result = unsafe {
             SetFirmwareEnvironmentVariableExW(
@@ -202,7 +202,7 @@ impl VarWriter for SystemManager {
         };
 
         match result {
-            0 => Err(Error::for_variable_os(name)),
+            0 => Err(Error::for_variable_os(var)),
             _ => Ok(()),
         }
     }

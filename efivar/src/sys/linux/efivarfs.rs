@@ -52,31 +52,30 @@ impl VarEnumerator for SystemManager {
 }
 
 impl VarReader for SystemManager {
-    fn read(&self, name: &Variable) -> crate::Result<(Vec<u8>, VariableFlags)> {
+    fn read(&self, var: &Variable) -> crate::Result<(Vec<u8>, VariableFlags)> {
         // Path to the attributes file
-        let attributes_filename = format!("{}/{}/attributes", EFIVARFS_ROOT, name);
+        let attributes_filename = format!("{}/{}/attributes", EFIVARFS_ROOT, var);
 
         // Open attributes file
-        let f =
-            File::open(attributes_filename).map_err(|error| Error::for_variable(error, name))?;
+        let f = File::open(attributes_filename).map_err(|error| Error::for_variable(error, var))?;
         let reader = BufReader::new(&f);
 
         let mut flags = VariableFlags::empty();
         for line in reader.lines() {
-            let line = line.map_err(|error| Error::for_variable(error, name))?;
+            let line = line.map_err(|error| Error::for_variable(error, var))?;
             let parsed = VariableFlags::from_str(&line)?;
             flags |= parsed;
         }
 
         // Filename to the matching efivarfs data for this variable
-        let filename = format!("{}/{}/data", EFIVARFS_ROOT, name);
+        let filename = format!("{}/{}/data", EFIVARFS_ROOT, var);
 
-        let mut f = File::open(filename).map_err(|error| Error::for_variable(error, name))?;
+        let mut f = File::open(filename).map_err(|error| Error::for_variable(error, var))?;
 
         // Read variable contents
         let mut value: Vec<u8> = vec![];
         f.read_to_end(&mut value)
-            .map_err(|error| Error::for_variable(error, name))?;
+            .map_err(|error| Error::for_variable(error, var))?;
 
         Ok((value, flags))
     }
@@ -85,39 +84,39 @@ impl VarReader for SystemManager {
 impl VarWriter for SystemManager {
     fn write(
         &mut self,
-        name: &Variable,
+        var: &Variable,
         attributes: VariableFlags,
         value: &[u8],
     ) -> crate::Result<()> {
         // Path to the attributes file
-        let attributes_filename = format!("{}/{}/attributes", EFIVARFS_ROOT, name);
+        let attributes_filename = format!("{}/{}/attributes", EFIVARFS_ROOT, var);
         // Open attributes file
         let mut f =
-            File::open(attributes_filename).map_err(|error| Error::for_variable(error, name))?;
+            File::open(attributes_filename).map_err(|error| Error::for_variable(error, var))?;
         let mut writer = BufWriter::new(&mut f);
 
         // Write attributes
         writer
             .write_all(attributes.to_string().as_bytes())
-            .map_err(|error| Error::for_variable(error, name))?;
+            .map_err(|error| Error::for_variable(error, var))?;
 
         // Filename to the matching efivarfs file for this variable
-        let filename = format!("{}/{}/data", EFIVARFS_ROOT, name);
+        let filename = format!("{}/{}/data", EFIVARFS_ROOT, var);
 
         let mut f = OpenOptions::new()
             .write(true)
             .truncate(true)
             .open(filename)
-            .map_err(|error| Error::for_variable(error, name))?;
+            .map_err(|error| Error::for_variable(error, var))?;
 
         // Write variable contents
         f.write(value)
-            .map_err(|error| Error::for_variable(error, name))?;
+            .map_err(|error| Error::for_variable(error, var))?;
 
         Ok(())
     }
 
-    fn delete(&mut self, _name: &Variable) -> crate::Result<()> {
+    fn delete(&mut self, _var: &Variable) -> crate::Result<()> {
         // Unimplemented because I wasn't able to enable efivars sysfs on my system
         unimplemented!("Variable deletion not supported on efivarfs. See https://github.com/iTrooz/efiboot-rs/issues/55");
     }

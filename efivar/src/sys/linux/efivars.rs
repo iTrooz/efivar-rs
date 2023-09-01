@@ -52,22 +52,22 @@ impl VarEnumerator for SystemManager {
 }
 
 impl VarReader for SystemManager {
-    fn read(&self, name: &Variable) -> crate::Result<(Vec<u8>, VariableFlags)> {
+    fn read(&self, var: &Variable) -> crate::Result<(Vec<u8>, VariableFlags)> {
         // Filename to the matching efivarfs file for this variable
-        let filename = format!("{}/{}", EFIVARS_ROOT, name);
+        let filename = format!("{}/{}", EFIVARS_ROOT, var);
 
-        let mut f = File::open(filename).map_err(|error| Error::for_variable(error, name))?;
+        let mut f = File::open(filename).map_err(|error| Error::for_variable(error, var))?;
 
         // Read attributes
         let attr = f
             .read_u32::<LittleEndian>()
-            .map_err(|error| Error::for_variable(error, name))?;
+            .map_err(|error| Error::for_variable(error, var))?;
         let attr = VariableFlags::from_bits(attr).unwrap_or(VariableFlags::empty());
 
         // Read variable contents
         let mut value: Vec<u8> = vec![];
         f.read_to_end(&mut value)
-            .map_err(|error| Error::for_variable(error, name))?;
+            .map_err(|error| Error::for_variable(error, var))?;
 
         Ok((value, attr))
     }
@@ -76,7 +76,7 @@ impl VarReader for SystemManager {
 impl VarWriter for SystemManager {
     fn write(
         &mut self,
-        name: &Variable,
+        var: &Variable,
         attributes: VariableFlags,
         value: &[u8],
     ) -> crate::Result<()> {
@@ -88,14 +88,14 @@ impl VarWriter for SystemManager {
 
         // Write attributes
         buf.write_u32::<LittleEndian>(attribute_bits)
-            .map_err(|error| Error::for_variable(error, name))?;
+            .map_err(|error| Error::for_variable(error, var))?;
 
         // Write variable contents
         buf.write(value)
-            .map_err(|error| Error::for_variable(error, name))?;
+            .map_err(|error| Error::for_variable(error, var))?;
 
         // Filename to the matching efivarfs file for this variable
-        let filename = format!("{}/{}", EFIVARS_ROOT, name);
+        let filename = format!("{}/{}", EFIVARS_ROOT, var);
 
         // Open file.
         let mut f = OpenOptions::new()
@@ -103,18 +103,18 @@ impl VarWriter for SystemManager {
             .truncate(true)
             .create(true)
             .open(filename)
-            .map_err(|error| Error::for_variable(error, name))?;
+            .map_err(|error| Error::for_variable(error, var))?;
 
         // Write the value using a single write.
         f.write(&buf)
-            .map_err(|error| Error::for_variable(error, name))?;
+            .map_err(|error| Error::for_variable(error, var))?;
 
         Ok(())
     }
 
-    fn delete(&mut self, name: &Variable) -> crate::Result<()> {
-        std::fs::remove_file(format!("{}/{}", EFIVARS_ROOT, name))
-            .map_err(|error| Error::for_variable(error, name))
+    fn delete(&mut self, var: &Variable) -> crate::Result<()> {
+        std::fs::remove_file(format!("{}/{}", EFIVARS_ROOT, var))
+            .map_err(|error| Error::for_variable(error, var))
     }
 }
 

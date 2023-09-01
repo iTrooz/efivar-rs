@@ -22,11 +22,11 @@ impl<T: VariableStore> VarEnumerator for T {
 }
 
 impl<T: VariableStore> VarReader for T {
-    fn read(&self, name: &Variable) -> crate::Result<(Vec<u8>, VariableFlags)> {
+    fn read(&self, var: &Variable) -> crate::Result<(Vec<u8>, VariableFlags)> {
         self.get_vendor_group()
-            .vendor(name.vendor())
-            .and_then(|guid_group| guid_group.variable(name.variable()))
-            .ok_or_else(|| Error::VarNotFound { name: name.clone() })
+            .vendor(var.vendor())
+            .and_then(|guid_group| guid_group.variable(var.name()))
+            .ok_or_else(|| Error::VarNotFound { name: var.clone() })
             .and_then(|val| val.to_tuple())
     }
 }
@@ -34,23 +34,23 @@ impl<T: VariableStore> VarReader for T {
 impl<T: VariableStore> VarWriter for T {
     fn write(
         &mut self,
-        name: &Variable,
+        var: &Variable,
         attributes: VariableFlags,
         value: &[u8],
     ) -> crate::Result<()> {
         // Set variable
         self.get_vendor_group_mut()
-            .vendor_mut(name.vendor())
-            .variable_mut(name.variable())
+            .vendor_mut(var.vendor())
+            .variable_mut(var.name())
             .set_from(&(attributes, value));
 
         Ok(())
     }
 
-    fn delete(&mut self, name: &Variable) -> crate::Result<()> {
+    fn delete(&mut self, var: &Variable) -> crate::Result<()> {
         self.get_vendor_group_mut()
-            .vendor_mut(name.vendor())
-            .delete_variable(name.variable());
+            .vendor_mut(var.vendor())
+            .delete_variable(var.name());
         Ok(())
     }
 }

@@ -67,27 +67,27 @@ fn is_permission_denied_error(err: &io::Error) -> bool {
 }
 
 impl Error {
-    pub fn for_variable(error: io::Error, name: &Variable) -> Self {
-        let name = name.clone();
+    pub fn for_variable(error: io::Error, var: &Variable) -> Self {
+        let var = var.clone();
 
         if is_variable_not_found_error(&error) {
-            return Error::VarNotFound { name };
+            return Error::VarNotFound { name: var };
         }
 
         if is_buffer_too_small_error(&error) {
-            return Error::BufferTooSmall { name };
+            return Error::BufferTooSmall { name: var };
         }
 
         if is_permission_denied_error(&error) {
-            return Error::PermissionDenied { name };
+            return Error::PermissionDenied { name: var };
         }
 
-        Error::VarUnknownError { name, error }
+        Error::VarUnknownError { name: var, error }
     }
 
     #[cfg(target_os = "windows")]
-    pub fn for_variable_os(name: &Variable) -> Self {
-        Error::for_variable(io::Error::last_os_error(), name)
+    pub fn for_variable_os(var: &Variable) -> Self {
+        Error::for_variable(io::Error::last_os_error(), var)
     }
 }
 

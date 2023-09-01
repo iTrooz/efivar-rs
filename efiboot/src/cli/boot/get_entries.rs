@@ -74,7 +74,7 @@ pub fn get_entries(manager: Box<dyn VarManager>, verbose: bool) {
 
     for (entry, var) in entries {
         // remove this variable from the list of variables to show
-        vars.retain(|loop_var| loop_var.variable() != var.variable());
+        vars.retain(|loop_var| loop_var.name() != var.name());
 
         match entry {
             Ok(entry) => print_var(entry, verbose),

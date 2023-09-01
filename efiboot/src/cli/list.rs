@@ -6,7 +6,7 @@ fn list_all(enumerator: Box<dyn VarManager>) {
         .get_all_vars()
         .expect("Failed to list variable names")
     {
-        println!("{} {}", var.vendor(), var.variable());
+        println!("{} {}", var.vendor(), var.name());
     }
 }
 
@@ -17,7 +17,7 @@ fn list_namespace(enumerator: Box<dyn VarManager>, vendor: VariableVendor) {
         .expect("Failed to list variable names")
     {
         if var.vendor() == &vendor {
-            println!("{}", var.variable());
+            println!("{}", var.name());
         }
     }
 }

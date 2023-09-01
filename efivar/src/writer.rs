@@ -8,15 +8,15 @@ pub trait VarWriter {
     ///
     /// # Arguments
     ///
-    /// * `name`: name of the variable to write
+    /// * `var`: the variable to write
     /// * `attributes`: EFI variable attributes
     /// * `value`: EFI variable contents
     fn write(
         &mut self,
-        name: &Variable,
+        var: &Variable,
         attributes: VariableFlags,
         value: &[u8],
     ) -> crate::Result<()>;
 
-    fn delete(&mut self, name: &Variable) -> crate::Result<()>;
+    fn delete(&mut self, var: &Variable) -> crate::Result<()>;
 }

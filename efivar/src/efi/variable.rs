@@ -79,7 +79,7 @@ impl fmt::Display for VariableVendor {
 /// # use efivar::efi::Variable;
 /// let name = Variable::from_str("BootOrder-8be4df61-93ca-11d2-aa0d-00e098032b8c").unwrap();
 /// assert_eq!(*name.vendor().as_ref(), uuid::Uuid::from_str("8be4df61-93ca-11d2-aa0d-00e098032b8c").unwrap());
-/// assert_eq!(name.variable(), "BootOrder");
+/// assert_eq!(name.name(), "BootOrder");
 /// ```
 ///
 /// Parsing an invalid name fails:
@@ -111,10 +111,10 @@ impl Variable {
     ///
     /// # Parameters
     ///
-    /// * `variable`: name of the variable
-    pub fn new(variable: &str) -> Self {
+    /// * `name`: name of the variable
+    pub fn new(name: &str) -> Self {
         Self {
-            name: variable.to_owned(),
+            name: name.to_owned(),
             vendor: VariableVendor::Efi,
         }
     }
@@ -123,17 +123,17 @@ impl Variable {
     ///
     /// # Parameters
     ///
-    /// * `variable`: name of the variable
+    /// * `name`: name of the variable
     /// * `vendor`: vendor identifier
-    pub fn new_with_vendor<V: Into<VariableVendor>>(variable: &str, vendor: V) -> Self {
+    pub fn new_with_vendor<V: Into<VariableVendor>>(name: &str, vendor: V) -> Self {
         Self {
-            name: variable.to_owned(),
+            name: name.to_owned(),
             vendor: vendor.into(),
         }
     }
 
     /// Get the variable name for this instance
-    pub fn variable(&self) -> &str {
+    pub fn name(&self) -> &str {
         &self.name
     }
 
