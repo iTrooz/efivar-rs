@@ -1,6 +1,6 @@
 //! This module handles everything related to boot entries
 
-mod boot_entries_reader;
+mod boot_entry_iter;
 mod parse;
 mod reader;
 mod writer;

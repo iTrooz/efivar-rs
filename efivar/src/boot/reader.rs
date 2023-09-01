@@ -2,7 +2,7 @@ use byteorder::{LittleEndian, ReadBytesExt};
 
 use crate::{efi::Variable, VarReader};
 
-use super::boot_entries_reader::BootEntriesIterator;
+use super::boot_entry_iter::BootEntriesIterator;
 
 pub trait BootVarReader {
     fn get_boot_order(&self) -> crate::Result<Vec<u16>>;
