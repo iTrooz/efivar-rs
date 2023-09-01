@@ -1,6 +1,6 @@
 use efivar::{boot::BootVarName, VarManager};
 
-pub fn get_order(manager: Box<dyn VarManager>) {
+pub fn run(manager: Box<dyn VarManager>) {
     let ids = match manager.get_boot_order() {
         Ok(ids) => ids,
         Err(err) => {

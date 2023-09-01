@@ -134,20 +134,20 @@ fn main(opts: Opt) {
             namespace,
             string,
         } => {
-            cli::read(manager, &name, namespace, string);
+            cli::read::run(manager, &name, namespace, string);
         }
         Command::List { namespace, all } => {
-            cli::list(manager, namespace, all);
+            cli::list::run(manager, namespace, all);
         }
         Command::Delete { name, namespace } => {
-            cli::delete(manager, &name, namespace);
+            cli::delete::run(manager, &name, namespace);
         }
         Command::Boot(arg) => match arg {
             BootCommand::GetOrder => {
-                cli::get_boot_order(manager);
+                cli::boot::get_order::run(manager);
             }
             BootCommand::GetEntries { verbose } => {
-                cli::get_boot_entries(manager, verbose);
+                cli::boot::get_entries::run(manager, verbose);
             }
             BootCommand::Add {
                 partition,
@@ -156,7 +156,7 @@ fn main(opts: Opt) {
                 force,
                 id,
             } => {
-                cli::add_boot_entry(manager, partition, file, description, force, id);
+                cli::boot::add::run(manager, partition, file, description, force, id);
             }
         },
         Command::Dump {
@@ -164,14 +164,14 @@ fn main(opts: Opt) {
             namespace,
             output_file,
         } => {
-            cli::dump(manager, &name, namespace, &output_file);
+            cli::dump::run(manager, &name, namespace, &output_file);
         }
         Command::Import {
             input_file,
             name,
             namespace,
         } => {
-            cli::import(manager, &input_file, &name, namespace);
+            cli::import::run(manager, &input_file, &name, namespace);
         }
     }
 }

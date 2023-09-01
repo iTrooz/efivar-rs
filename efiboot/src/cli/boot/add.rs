@@ -40,7 +40,7 @@ fn check(partition: &str, file: &str) -> bool {
     }
 }
 
-pub fn add(
+pub fn run(
     mut manager: Box<dyn VarManager>,
     partition: String,
     file_path: String,

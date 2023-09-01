@@ -8,7 +8,11 @@ use efivar::{
 fn print_var(var: &Variable, entry: BootEntry, verbose: bool) {
     println!();
 
-    println!("ID: {:04X}", var.boot_var_id().expect("No entry ID for variable that should bot a boot variable"));
+    println!(
+        "ID: {:04X}",
+        var.boot_var_id()
+            .expect("No entry ID for variable that should bot a boot variable")
+    );
     println!("Description: {}", entry.description);
     println!(
         "Enabled: {}",
@@ -51,7 +55,7 @@ fn print_var(var: &Variable, entry: BootEntry, verbose: bool) {
     }
 }
 
-pub fn get_entries(manager: Box<dyn VarManager>, verbose: bool) {
+pub fn run(manager: Box<dyn VarManager>, verbose: bool) {
     let entries = match manager.get_boot_entries() {
         Ok(entries) => entries,
         Err(err) => {
