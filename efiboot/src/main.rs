@@ -1,6 +1,8 @@
 mod cli;
+pub mod id;
 
 use cli::boot::order::OrderCommand;
+use id::BootEntryId;
 use std::path::PathBuf;
 use structopt::StructOpt;
 
@@ -32,7 +34,7 @@ enum BootCommand {
 
         /// ID to give to the boot entry
         #[structopt(long)]
-        id: Option<u16>,
+        id: Option<BootEntryId>,
     },
     /// Manage boot order
     Order(OrderCommand),
@@ -159,7 +161,14 @@ fn main(opts: Opt) {
                 force,
                 id,
             } => {
-                cli::boot::add::run(manager, partition, file, description, force, id);
+                cli::boot::add::run(
+                    manager,
+                    partition,
+                    file,
+                    description,
+                    force,
+                    id.map(|id| id.0),
+                );
             }
             BootCommand::Order(arg) => {
                 cli::boot::order::run(manager, arg);

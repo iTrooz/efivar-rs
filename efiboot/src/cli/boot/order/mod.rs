@@ -2,6 +2,8 @@ use efivar::VarManager;
 use itertools::Itertools;
 use structopt::StructOpt;
 
+use crate::id::BootEntryId;
+
 pub mod add;
 pub mod remove;
 pub mod set;
@@ -12,7 +14,7 @@ pub enum OrderCommand {
     Add {
         /// ID of the entry to add
         #[structopt(value_name = "ID")]
-        id: u16,
+        id: BootEntryId,
 
         /// Position to insert the ID at. 0 is the beginning of the boot order. Defaults to the end.
         #[structopt(value_name = "POSITION")]
@@ -22,21 +24,23 @@ pub enum OrderCommand {
     Remove {
         /// ID of the entry to remove
         #[structopt(value_name = "ID")]
-        id: u16,
+        id: BootEntryId,
     },
     /// Overwrite the boot order with the ids provided
     /// Warning: the old boot order will be erased !
     Set {
         /// ids that will compose the new boot order
-        ids: Vec<u16>,
+        ids: Vec<BootEntryId>,
     },
 }
 
 pub fn run(manager: Box<dyn VarManager>, cmd: OrderCommand) {
     match cmd {
-        OrderCommand::Add { id, position } => add::run(manager, id, position),
-        OrderCommand::Remove { id } => remove::run(manager, id),
-        OrderCommand::Set { ids } => set::run(manager, ids),
+        OrderCommand::Add { id, position } => add::run(manager, id.0, position),
+        OrderCommand::Remove { id } => remove::run(manager, id.0),
+        OrderCommand::Set { ids } => {
+            set::run(manager, ids.into_iter().map(|id| id.0).collect_vec())
+        }
     }
 }
 
