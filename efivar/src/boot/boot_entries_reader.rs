@@ -1,6 +1,6 @@
 use crate::{efi::Variable, VarReader};
 
-use super::{boot_entry_parser::BootEntry, BootVarName, BootVarReader};
+use super::{BootEntry, BootVarName, BootVarReader};
 
 /// Loop over boot entries. On each iteration, a variable data will be queried from the OS
 pub struct BootEntriesIterator<'a> {

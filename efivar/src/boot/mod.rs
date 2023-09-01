@@ -1,12 +1,11 @@
 //! This module handles everything related to boot entries
 
 mod boot_entries_reader;
-mod boot_entry_parser;
 mod parse;
 mod reader;
 mod writer;
 
-pub use boot_entry_parser::{BootEntry, BootEntryAttributes};
+pub use parse::*;
 pub use parse::{EFIHardDrive, EFIHardDriveType, FilePath, FilePathList};
 pub use reader::BootVarReader;
 pub use writer::BootVarWriter;
