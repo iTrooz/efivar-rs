@@ -56,8 +56,8 @@ impl SystemManager {
 }
 
 impl VarEnumerator for SystemManager {
-    fn get_var_names<'a>(&'a self) -> crate::Result<Box<dyn Iterator<Item = Variable> + 'a>> {
-        self.sys_impl.get_var_names()
+    fn get_all_vars<'a>(&'a self) -> crate::Result<Box<dyn Iterator<Item = Variable> + 'a>> {
+        self.sys_impl.get_all_vars()
     }
 }
 
@@ -94,7 +94,7 @@ mod tests {
             return;
         }
 
-        let mut var_names = manager.get_var_names().unwrap();
+        let mut var_names = manager.get_all_vars().unwrap();
         let name = Variable::new("BootOrder");
         assert!(var_names.any(|n| n == name));
     }

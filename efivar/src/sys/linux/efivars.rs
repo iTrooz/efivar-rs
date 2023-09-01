@@ -27,7 +27,7 @@ impl LinuxSystemManager for SystemManager {
 }
 
 impl VarEnumerator for SystemManager {
-    fn get_var_names<'a>(&'a self) -> crate::Result<Box<dyn Iterator<Item = Variable> + 'a>> {
+    fn get_all_vars<'a>(&'a self) -> crate::Result<Box<dyn Iterator<Item = Variable> + 'a>> {
         fs::read_dir(EFIVARS_ROOT)
             .map(|list| {
                 list.filter_map(|result| {

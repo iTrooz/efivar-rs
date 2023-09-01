@@ -59,7 +59,7 @@ pub fn get_entries(manager: Box<dyn VarManager>, verbose: bool) {
         }
     };
 
-    let mut vars: Vec<Variable> = match manager.get_var_names() {
+    let mut vars: Vec<Variable> = match manager.get_all_vars() {
         Ok(vars) => vars,
         Err(err) => {
             eprintln!("Failed to list EFI variable: {:?}", err);

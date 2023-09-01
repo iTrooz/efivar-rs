@@ -3,7 +3,7 @@ use efivar::{efi::VariableVendor, VarManager};
 fn list_all(enumerator: Box<dyn VarManager>) {
     println!("{: >36} Variable", "Namespace");
     for var in enumerator
-        .get_var_names()
+        .get_all_vars()
         .expect("Failed to list variable names")
     {
         println!("{} {}", var.vendor(), var.variable());
@@ -13,7 +13,7 @@ fn list_all(enumerator: Box<dyn VarManager>) {
 fn list_namespace(enumerator: Box<dyn VarManager>, vendor: VariableVendor) {
     println!("Variables in namespace {} :", vendor);
     for var in enumerator
-        .get_var_names()
+        .get_all_vars()
         .expect("Failed to list variable names")
     {
         if var.vendor() == &vendor {

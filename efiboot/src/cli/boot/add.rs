@@ -11,7 +11,7 @@ use itertools::Itertools;
 /// get a boot entry ID that isnt used
 fn get_used_ids(manager: &dyn VarManager) -> Vec<u16> {
     manager
-        .get_var_names()
+        .get_all_vars()
         .unwrap()
         .filter(|var| var.vendor().is_efi())
         .filter_map(|var| var.boot_var_id())

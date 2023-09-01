@@ -76,7 +76,7 @@ fn parse_efi_variables(buf: &mut &[u8]) -> crate::Result<Vec<Variable>> {
 }
 
 impl VarEnumerator for SystemManager {
-    fn get_var_names<'a>(&'a self) -> crate::Result<Box<dyn Iterator<Item = Variable> + 'a>> {
+    fn get_all_vars<'a>(&'a self) -> crate::Result<Box<dyn Iterator<Item = Variable> + 'a>> {
         // get size of buffer to allocate for variables
         let mut size: u32 = 0;
         const STATUS_BUFFER_TOO_SMALL: i32 = 0xc0000023_u32 as i32;
