@@ -1,3 +1,5 @@
+//! This module contains the custom iterator used to loop lazily over boot entries
+
 use crate::{efi::Variable, VarReader};
 
 use super::{BootEntry, BootVarName, BootVarReader};

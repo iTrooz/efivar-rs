@@ -1,3 +1,5 @@
+//! This module contains parsing code for a boot entry
+
 use std::{convert::TryInto, fmt::Display, io::Read};
 
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};

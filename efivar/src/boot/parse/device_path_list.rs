@@ -1,3 +1,5 @@
+//! This module contains parsing code for the device path list component of a boot entry
+
 use std::fmt::Display;
 
 use super::{

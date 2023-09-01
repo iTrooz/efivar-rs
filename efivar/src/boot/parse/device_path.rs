@@ -1,3 +1,5 @@
+//! This module contains parsing code for a device path, part of a device path list
+
 use std::{convert::TryInto, fmt::Display, io::Write, path::PathBuf};
 
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};

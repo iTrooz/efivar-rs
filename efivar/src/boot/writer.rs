@@ -1,3 +1,5 @@
+//! This module contains functions to write boot entries
+
 use crate::{
     boot::BootVarName,
     efi::{Variable, VariableFlags},
