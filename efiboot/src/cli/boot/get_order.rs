@@ -1,8 +1,8 @@
-use efivar::VarManager;
+use efivar::{boot::BootVarName, VarManager};
 
 pub fn get_order(manager: Box<dyn VarManager>) {
-    let entries = match manager.get_boot_order() {
-        Ok(entries) => entries,
+    let ids = match manager.get_boot_order() {
+        Ok(ids) => ids,
         Err(err) => {
             eprintln!("Failed to get boot order IDs: {}", err);
             return;
@@ -11,7 +11,7 @@ pub fn get_order(manager: Box<dyn VarManager>) {
 
     println!("Boot order:");
 
-    for entry in entries {
-        println!("{}", entry.variable());
+    for id in ids {
+        println!("{}", id.boot_var_name());
     }
 }

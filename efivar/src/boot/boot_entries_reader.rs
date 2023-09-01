@@ -1,19 +1,19 @@
 use crate::{efi::Variable, VarReader};
 
-use super::{boot_entry_parser::BootEntry, boot_order_reader::BootOrderIterator};
+use super::{boot_entry_parser::BootEntry, BootVarName, BootVarReader};
 
 /// Loop over boot entries. On each iteration, a variable data will be queried from the OS
 pub struct BootEntriesIterator<'a> {
-    order_iter: BootOrderIterator,
+    ids: Vec<u16>,
     var_reader: &'a dyn VarReader,
 }
 
 impl<'a> BootEntriesIterator<'a> {
     pub(in super::super) fn new(
-        var_reader: &'a dyn VarReader,
+        var_reader: &'a impl VarReader,
     ) -> crate::Result<BootEntriesIterator<'a>> {
         Ok(BootEntriesIterator {
-            order_iter: BootOrderIterator::new(var_reader)?,
+            ids: var_reader.get_boot_order()?,
             var_reader,
         })
     }
@@ -23,8 +23,9 @@ impl<'a> Iterator for BootEntriesIterator<'a> {
     type Item = (Result<BootEntry, crate::Error>, Variable);
 
     fn next(&mut self) -> Option<Self::Item> {
-        self.order_iter
-            .next()
+        self.ids
+            .pop()
+            .map(|id| Variable::new(&id.boot_var_name()))
             .map(|var| (BootEntry::parse(self.var_reader, &var), var))
     }
 }
