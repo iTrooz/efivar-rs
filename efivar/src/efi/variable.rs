@@ -156,7 +156,7 @@ impl Variable {
     /// Returns the boot var ID (4 digits hex number) if this variable is a boot entry. Else, return None
     pub fn boot_var_id(&self) -> Option<u16> {
         if self.name.len() == 8 && &self.name[0..4] == "Boot" {
-            self.name[4..8].parse().ok()
+            u16::from_str_radix(&self.name[4..8], 16).ok()
         } else {
             None
         }
