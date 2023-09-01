@@ -89,6 +89,13 @@ pub fn add(
         }
     };
 
+    // create the entry
     manager.add_boot_entry(id, entry).unwrap();
+
+    // add it to boot order
+    let mut ids = manager.get_boot_order().unwrap();
+    ids.insert(0, id);
+    manager.set_boot_order(ids).unwrap();
+
     println!("Added entry with success");
 }
