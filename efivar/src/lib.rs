@@ -40,8 +40,7 @@ mod sys;
 mod utils;
 mod writer;
 
-use boot::writer::BootVarWriter;
-use boot::BootVarReader;
+use boot::{BootVarReader, BootVarWriter};
 
 pub use crate::enumerator::VarEnumerator;
 pub use crate::reader::*;

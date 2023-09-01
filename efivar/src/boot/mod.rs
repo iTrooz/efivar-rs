@@ -4,11 +4,12 @@ mod boot_entries_reader;
 mod boot_entry_parser;
 mod parse;
 mod reader;
-pub mod writer;
+mod writer;
 
 pub use boot_entry_parser::{BootEntry, BootEntryAttributes};
 pub use parse::{EFIHardDrive, EFIHardDriveType, FilePath, FilePathList};
 pub use reader::BootVarReader;
+pub use writer::BootVarWriter;
 
 pub trait BootVarName {
     fn boot_var_name(self) -> String;
