@@ -1,7 +1,7 @@
 //! This module handles everything related to boot entries
 
 mod boot_entry_iter;
-mod parse;
+pub(crate) mod parse;
 mod reader;
 mod writer;
 

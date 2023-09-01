@@ -1,3 +1,5 @@
+//! This module contains functions to read boot entries. Actual boot entry parsing is done in [`crate::boot::parse`]
+
 use byteorder::{LittleEndian, ReadBytesExt};
 
 use crate::{efi::Variable, VarReader};
