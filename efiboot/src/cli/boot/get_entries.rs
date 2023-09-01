@@ -5,9 +5,10 @@ use efivar::{
 };
 
 /// prints a boot entry to the console, and consume it
-fn print_var(entry: BootEntry, verbose: bool) {
+fn print_var(var: &Variable, entry: BootEntry, verbose: bool) {
     println!();
 
+    println!("ID: {:04X}", var.boot_var_id().expect("No entry ID for variable that should bot a boot variable"));
     println!("Description: {}", entry.description);
     println!(
         "Enabled: {}",
@@ -77,7 +78,7 @@ pub fn get_entries(manager: Box<dyn VarManager>, verbose: bool) {
         vars.retain(|loop_var| loop_var.name() != var.name());
 
         match entry {
-            Ok(entry) => print_var(entry, verbose),
+            Ok(entry) => print_var(&var, entry, verbose),
             Err(err) => eprintln!("Failed to get entry from variable {}: {}", var, err),
         }
     }
@@ -91,7 +92,7 @@ pub fn get_entries(manager: Box<dyn VarManager>, verbose: bool) {
     println!("Boot entries not in boot sequence:");
     for var in vars {
         match BootEntry::parse(&*manager, &var) {
-            Ok(entry) => print_var(entry, verbose),
+            Ok(entry) => print_var(&var, entry, verbose),
             Err(err) => eprintln!("Failed to get entry from variable {}: {}", var, err),
         };
     }
