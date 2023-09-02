@@ -17,3 +17,30 @@ impl FromStr for BootEntryId {
         ))
     }
 }
+
+#[cfg(test)]
+mod tests {
+    pub use super::*;
+
+    #[test]
+    fn valid_ids() -> Result<(), String> {
+        assert_eq!(BootEntryId::from_str("0")?.0, 0);
+        assert_eq!(BootEntryId::from_str("5")?.0, 5);
+        assert_eq!(BootEntryId::from_str("0005")?.0, 5);
+        assert_eq!(BootEntryId::from_str("1000")?.0, 4096);
+        assert_eq!(BootEntryId::from_str("AAAA")?.0, 43690);
+        Ok(())
+    }
+
+    #[test]
+    fn id_too_long() -> Result<(), String> {
+        assert!(BootEntryId::from_str("00000").is_err());
+        Ok(())
+    }
+
+    #[test]
+    fn id_invalid_hex() -> Result<(), String> {
+        assert!(BootEntryId::from_str("000G").is_err());
+        Ok(())
+    }
+}
