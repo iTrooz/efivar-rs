@@ -1,44 +1,9 @@
 mod cli;
 pub mod id;
 
-use cli::boot::order::OrderCommand;
-use id::BootEntryId;
+use cli::boot::BootCommand;
 use std::path::PathBuf;
 use structopt::StructOpt;
-
-#[derive(StructOpt)]
-enum BootCommand {
-    /// Get current boot order IDs. See get-entries to get boot entries information
-    GetOrder,
-    GetEntries {
-        /// Show more information, such as optional data
-        #[structopt(short, long)]
-        verbose: bool,
-    },
-    Add {
-        /// Partition that holds the file to boot from
-        #[structopt(short, long, default_value = "/dev/sda1")]
-        partition: String,
-
-        /// File to boot from, inside the partition
-        #[structopt(short, long)]
-        file: String,
-
-        /// Set entry description
-        #[structopt(short, long)]
-        description: String,
-
-        /// Skip checks to ensure data is valid
-        #[structopt(long)]
-        force: bool,
-
-        /// ID to give to the boot entry
-        #[structopt(long)]
-        id: Option<BootEntryId>,
-    },
-    /// Manage boot order
-    Order(OrderCommand),
-}
 
 #[derive(StructOpt)]
 enum Command {
@@ -147,33 +112,9 @@ fn main(opts: Opt) {
         Command::Delete { name, namespace } => {
             cli::delete::run(manager, &name, namespace);
         }
-        Command::Boot(arg) => match arg {
-            BootCommand::GetOrder => {
-                cli::boot::get_order::run(manager);
-            }
-            BootCommand::GetEntries { verbose } => {
-                cli::boot::get_entries::run(manager, verbose);
-            }
-            BootCommand::Add {
-                partition,
-                file,
-                description,
-                force,
-                id,
-            } => {
-                cli::boot::add::run(
-                    manager,
-                    partition,
-                    file,
-                    description,
-                    force,
-                    id.map(|id| id.0),
-                );
-            }
-            BootCommand::Order(arg) => {
-                cli::boot::order::run(manager, arg);
-            }
-        },
+        Command::Boot(arg) => {
+            cli::boot::run(manager, arg);
+        }
         Command::Dump {
             name,
             namespace,
