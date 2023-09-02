@@ -95,7 +95,7 @@ enum Command {
     /// Import a variable from a file
     Import {
         /// Input file
-        #[structopt(value_name = "OUTPUT_FILE")]
+        #[structopt(value_name = "INPUT_FILE")]
         input_file: PathBuf,
 
         /// Name of the variable to create
