@@ -15,7 +15,7 @@ This repository contains the source code for:
 The efiboot tool supports both Windows and Linux:
 
 * Windows: administrative rights are required to both *read* and *write* variables.
-* Linux: efivarfs should be mounted at /sys/firmware/efi/efivars on all major
+* Linux: the efivar filesystem should be mounted at /sys/firmware/efi/efivars on all major
   distros. With the default settings, standard users should be able to read
   variables, while writing to variables requires being root.
 
