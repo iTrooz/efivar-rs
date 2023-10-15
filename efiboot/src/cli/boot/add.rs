@@ -2,8 +2,10 @@
 
 mod disk;
 
+use byteorder::{LittleEndian, ReadBytesExt};
 use efivar::{
-    boot::{BootEntry, BootEntryAttributes, FilePath, FilePathList},
+    boot::{BootEntry, BootEntryAttributes, BootVarName, FilePath, FilePathList},
+    efi::Variable,
     VarManager,
 };
 use itertools::Itertools;
@@ -42,19 +44,36 @@ fn check(partition: &str, file: &str) -> bool {
 
 pub fn run(
     mut manager: Box<dyn VarManager>,
-    partition: String,
+    partition: Option<String>,
     file_path: String,
     description: String,
     force: bool,
     id: Option<u16>,
 ) {
-    // do not continue is the file has been identified as non-existant
-    if !force && !check(&partition, &file_path) {
-        return;
-    }
-
     // get necessary information from the partition to create an entry
-    let efi_partition = disk::retrieve_efi_partition_data(&partition);
+    let efi_partition = {
+        if let Some(partition) = partition {
+            // do not continue is the file has been identified as non-existant
+            if !force && !check(&partition, &file_path) {
+                return;
+            }
+            disk::retrieve_efi_partition_data(&partition)
+        } else {
+            eprintln!("No partition selected. Using active boot partition");
+            let active_id = manager
+                .read(&Variable::new("BootCurrent"))
+                .unwrap()
+                .0
+                .as_slice()
+                .read_u16::<LittleEndian>()
+                .unwrap();
+
+            let boot_entry =
+                BootEntry::parse(&*manager, &Variable::new(&active_id.boot_var_name())).unwrap();
+
+            boot_entry.file_path_list.unwrap().hard_drive
+        }
+    };
 
     let file_path_list = FilePathList {
         hard_drive: efi_partition,

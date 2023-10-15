@@ -21,9 +21,9 @@ pub enum BootCommand {
         verbose: bool,
     },
     Add {
-        /// Partition that holds the file to boot from
-        #[structopt(short, long, default_value = "/dev/sda1")]
-        partition: String,
+        /// Partition that holds the file to boot from. Defaults to the currently active boot partition
+        #[structopt(short, long)]
+        partition: Option<String>,
 
         /// File to boot from, inside the partition
         #[structopt(short, long)]
