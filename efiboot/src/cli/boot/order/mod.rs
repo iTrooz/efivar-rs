@@ -10,7 +10,7 @@ pub mod set;
 
 #[derive(StructOpt)]
 pub enum OrderCommand {
-    /// Adds an id from the boot order
+    /// Adds an id to the boot order
     Add {
         /// ID of the entry to add
         #[structopt(value_name = "ID")]
