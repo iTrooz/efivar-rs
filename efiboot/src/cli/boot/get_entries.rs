@@ -1,3 +1,4 @@
+use byteorder::{LittleEndian, ReadBytesExt};
 use efivar::{
     boot::{BootEntry, BootEntryAttributes},
     efi::Variable,
@@ -5,14 +6,14 @@ use efivar::{
 };
 
 /// prints a boot entry to the console, and consume it
-fn print_var(var: &Variable, entry: BootEntry, verbose: bool) {
+fn print_var(var: &Variable, entry: BootEntry, verbose: bool, active_boot_id: u16) {
     println!();
 
-    println!(
-        "ID: {:04X}",
-        var.boot_var_id()
-            .expect("No entry ID for variable that should bot a boot variable")
-    );
+    let id = var
+        .boot_var_id()
+        .expect("No entry ID for variable that should bot a boot variable");
+
+    println!("ID: {:04X}", id);
     println!("Description: {}", entry.description);
     println!(
         "Enabled: {}",
@@ -53,6 +54,10 @@ fn print_var(var: &Variable, entry: BootEntry, verbose: bool) {
             }
         );
     }
+
+    if active_boot_id == id {
+        println!("Active boot entry: true")
+    }
 }
 
 pub fn run(manager: Box<dyn VarManager>, verbose: bool) {
@@ -77,12 +82,20 @@ pub fn run(manager: Box<dyn VarManager>, verbose: bool) {
 
     println!("Boot entries in boot sequence (in boot order):");
 
+    let active_id = manager
+        .read(&Variable::new("BootCurrent"))
+        .unwrap()
+        .0
+        .as_slice()
+        .read_u16::<LittleEndian>()
+        .unwrap();
+
     for (entry, var) in entries {
         // remove this variable from the list of variables to show
         vars.retain(|loop_var| loop_var.name() != var.name());
 
         match entry {
-            Ok(entry) => print_var(&var, entry, verbose),
+            Ok(entry) => print_var(&var, entry, verbose, active_id),
             Err(err) => eprintln!("Failed to get entry from variable {}: {}", var, err),
         }
     }
@@ -95,7 +108,7 @@ pub fn run(manager: Box<dyn VarManager>, verbose: bool) {
     println!("Found boot entries not in boot sequence:");
     for var in vars {
         match BootEntry::parse(&*manager, &var) {
-            Ok(entry) => print_var(&var, entry, verbose),
+            Ok(entry) => print_var(&var, entry, verbose, active_id),
             Err(err) => eprintln!("Failed to get entry from variable {}: {}", var, err),
         };
     }
