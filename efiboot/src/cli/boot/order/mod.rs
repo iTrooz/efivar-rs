@@ -25,6 +25,10 @@ pub enum OrderCommand {
         /// ID of the entry to remove
         #[structopt(value_name = "ID")]
         id: BootEntryId,
+
+        /// whether to override warnings
+        #[structopt(long)]
+        force: bool,
     },
     /// Overwrite the boot order with the ids provided
     /// Warning: the old boot order will be erased !
@@ -37,7 +41,7 @@ pub enum OrderCommand {
 pub fn run(manager: Box<dyn VarManager>, cmd: OrderCommand) {
     match cmd {
         OrderCommand::Add { id, position } => add::run(manager, id.0, position),
-        OrderCommand::Remove { id } => remove::run(manager, id.0),
+        OrderCommand::Remove { id, force } => remove::run(manager, id.0, force),
         OrderCommand::Set { ids } => {
             set::run(manager, ids.into_iter().map(|id| id.0).collect_vec())
         }
