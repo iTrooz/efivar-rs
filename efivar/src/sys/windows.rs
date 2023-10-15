@@ -9,6 +9,8 @@ use std::iter::once;
 use std::mem;
 use std::os::windows::ffi::OsStrExt;
 use winapi::ctypes::{c_ulong, c_void};
+use winapi::shared::minwindef::DWORD;
+use winapi::um::errhandlingapi::GetLastError;
 use winapi::um::winbase::{GetFirmwareEnvironmentVariableExW, SetFirmwareEnvironmentVariableExW};
 
 use crate::efi::{Variable, VariableFlags};
@@ -136,6 +138,7 @@ impl VarReader for SystemManager {
 
         let mut buf: Vec<u8> = vec![0u8; 256];
 
+        const ERROR_BUFFER_TOO_SMALL: DWORD = 122;
         loop {
             unsafe {
                 let written_bytes = GetFirmwareEnvironmentVariableExW(
@@ -147,7 +150,11 @@ impl VarReader for SystemManager {
                 );
 
                 if written_bytes == 0 {
-                    buf.resize(buf.len() * 2, 0u8);
+                    if GetLastError() == ERROR_BUFFER_TOO_SMALL {
+                        buf.resize(buf.len() * 2, 0u8);
+                    } else {
+                        return Err(Error::for_variable_os(var));
+                    }
                 } else {
                     buf.resize(written_bytes.try_into().expect("GetFirmwareEnvironmentVariableExW() return value should be a value usize"), 0u8);
                     return Ok((
