@@ -3,11 +3,12 @@ use structopt::StructOpt;
 
 use crate::id::BootEntryId;
 
-use self::order::OrderCommand;
+use self::{next::BootNextCommand, order::OrderCommand};
 
 pub mod add;
 pub mod del;
 pub mod get_entries;
+pub mod next;
 pub mod order;
 
 #[derive(StructOpt)]
@@ -47,6 +48,8 @@ pub enum BootCommand {
     },
     /// Manage boot order
     Order(OrderCommand),
+    /// Manage BootNext variable
+    Next(BootNextCommand),
 }
 
 pub fn run(manager: Box<dyn VarManager>, cmd: BootCommand) {
@@ -75,6 +78,9 @@ pub fn run(manager: Box<dyn VarManager>, cmd: BootCommand) {
         }
         BootCommand::Order(arg) => {
             order::run(manager, arg);
+        }
+        BootCommand::Next(arg) => {
+            next::run(manager, arg);
         }
     }
 }
