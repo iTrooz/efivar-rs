@@ -6,6 +6,7 @@ use crate::id::BootEntryId;
 use self::order::OrderCommand;
 
 pub mod add;
+pub mod del;
 pub mod get_entries;
 pub mod get_order;
 pub mod order;
@@ -40,6 +41,12 @@ pub enum BootCommand {
         #[structopt(long)]
         id: Option<BootEntryId>,
     },
+    /// Delete boot entry
+    Del {
+        /// ID of the boot entry to delete
+        #[structopt()]
+        id: BootEntryId,
+    },
     /// Manage boot order
     Order(OrderCommand),
 }
@@ -67,6 +74,9 @@ pub fn run(manager: Box<dyn VarManager>, cmd: BootCommand) {
                 force,
                 id.map(|id| id.0),
             );
+        }
+        BootCommand::Del { id } => {
+            del::run(manager, id.0);
         }
         BootCommand::Order(arg) => {
             order::run(manager, arg);
