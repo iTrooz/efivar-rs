@@ -11,7 +11,7 @@ fn print_var(var: &Variable, entry: BootEntry, verbose: bool, active_boot_id: u1
 
     let id = var
         .boot_var_id()
-        .expect("No entry ID for variable that should bot a boot variable");
+        .expect("No entry ID for variable that should be a boot variable");
 
     println!("ID: {:04X}", id);
     println!("Description: {}", entry.description);
