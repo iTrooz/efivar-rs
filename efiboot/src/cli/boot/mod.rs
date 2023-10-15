@@ -8,13 +8,11 @@ use self::order::OrderCommand;
 pub mod add;
 pub mod del;
 pub mod get_entries;
-pub mod get_order;
 pub mod order;
 
 #[derive(StructOpt)]
 pub enum BootCommand {
-    /// Get current boot order IDs. See get-entries to get boot entries information
-    GetOrder,
+    /// Get all boot entries found, both in the boot order, and outside it if the name matchs
     GetEntries {
         /// Show more information, such as optional data
         #[structopt(short, long)]
@@ -53,9 +51,6 @@ pub enum BootCommand {
 
 pub fn run(manager: Box<dyn VarManager>, cmd: BootCommand) {
     match cmd {
-        BootCommand::GetOrder => {
-            get_order::run(manager);
-        }
         BootCommand::GetEntries { verbose } => {
             get_entries::run(manager, verbose);
         }

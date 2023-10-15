@@ -5,11 +5,14 @@ use structopt::StructOpt;
 use crate::id::BootEntryId;
 
 pub mod add;
+pub mod get;
 pub mod remove;
 pub mod set;
 
 #[derive(StructOpt)]
 pub enum OrderCommand {
+    /// Get current boot order IDs. See `efiboot boot get-entries` to get boot entries information
+    Get,
     /// Adds an id to the boot order
     Add {
         /// ID of the entry to add
@@ -40,6 +43,7 @@ pub enum OrderCommand {
 
 pub fn run(manager: Box<dyn VarManager>, cmd: OrderCommand) {
     match cmd {
+        OrderCommand::Get => get::run(manager),
         OrderCommand::Add { id, position } => add::run(manager, id.0, position),
         OrderCommand::Remove { id, force } => remove::run(manager, id.0, force),
         OrderCommand::Set { ids } => {
