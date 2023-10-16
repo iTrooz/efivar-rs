@@ -7,6 +7,7 @@ use self::{next::BootNextCommand, order::OrderCommand};
 
 pub mod add;
 pub mod del;
+pub mod enable_disable;
 pub mod get_entries;
 pub mod next;
 pub mod order;
@@ -46,6 +47,18 @@ pub enum BootCommand {
         #[structopt()]
         id: BootEntryId,
     },
+    /// Enable boot entry
+    Enable {
+        /// ID of the boot entry to enable
+        #[structopt()]
+        id: BootEntryId,
+    },
+    /// Disable boot entry
+    Disable {
+        /// ID of the boot entry to disable
+        #[structopt()]
+        id: BootEntryId,
+    },
     /// Manage boot order
     Order(OrderCommand),
     /// Manage BootNext variable
@@ -75,6 +88,12 @@ pub fn run(manager: Box<dyn VarManager>, cmd: BootCommand) {
         }
         BootCommand::Del { id } => {
             del::run(manager, id.0);
+        }
+        BootCommand::Enable { id } => {
+            enable_disable::enable(manager, id.0);
+        }
+        BootCommand::Disable { id } => {
+            enable_disable::disable(manager, id.0);
         }
         BootCommand::Order(arg) => {
             order::run(manager, arg);
