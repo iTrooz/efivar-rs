@@ -38,6 +38,8 @@ pub enum Command {
         all: bool,
     },
     /// Delete an EFI variabe
+    #[structopt(visible_alias = "del")]
+    #[structopt(visible_alias = "remove")]
     Delete {
         /// Name of the variable to delete
         #[structopt(value_name = "VARIABLE")]

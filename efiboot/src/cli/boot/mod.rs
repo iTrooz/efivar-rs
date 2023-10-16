@@ -42,7 +42,9 @@ pub enum BootCommand {
         id: Option<BootEntryId>,
     },
     /// Delete boot entry
-    Del {
+    #[structopt(visible_alias = "del")]
+    #[structopt(visible_alias = "remove")]
+    Delete {
         /// ID of the boot entry to delete
         #[structopt()]
         id: BootEntryId,
@@ -86,7 +88,7 @@ pub fn run(manager: Box<dyn VarManager>, cmd: BootCommand) {
                 id.map(|id| id.0),
             );
         }
-        BootCommand::Del { id } => {
+        BootCommand::Delete { id } => {
             del::run(manager, id.0);
         }
         BootCommand::Enable { id } => {

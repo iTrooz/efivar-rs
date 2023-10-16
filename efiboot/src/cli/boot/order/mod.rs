@@ -24,6 +24,8 @@ pub enum OrderCommand {
         position: Option<usize>,
     },
     /// Remove an id from the boot order
+    #[structopt(visible_alias = "del")]
+    #[structopt(visible_alias = "delete")]
     Remove {
         /// ID of the entry to remove
         #[structopt(value_name = "ID")]
