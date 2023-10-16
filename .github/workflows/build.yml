@@ -119,7 +119,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: Ubuntu
+          - name: Linux
             runs-on: ubuntu-latest
             target: x86_64-unknown-linux-gnu
           - name: Windows
