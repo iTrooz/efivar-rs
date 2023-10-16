@@ -1,14 +1,17 @@
+//! efivarfs is the new interface to access EFI variables
+
 use std::fs;
 use std::fs::{File, OpenOptions};
 use std::io::prelude::*;
-use std::io::{BufReader, BufWriter};
 use std::str::FromStr;
 
 use super::LinuxSystemManager;
 use crate::efi::{Variable, VariableFlags};
 use crate::{Error, VarEnumerator, VarManager, VarReader, VarWriter};
 
-pub const EFIVARFS_ROOT: &str = "/sys/firmware/efi/vars";
+use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
+
+pub const EFIVARFS_ROOT: &str = "/sys/firmware/efi/efivars";
 
 pub struct SystemManager;
 
@@ -29,19 +32,18 @@ impl VarEnumerator for SystemManager {
     fn get_all_vars<'a>(&'a self) -> crate::Result<Box<dyn Iterator<Item = Variable> + 'a>> {
         fs::read_dir(EFIVARFS_ROOT)
             .map(|list| {
-                list.filter_map(Result::ok)
-                    .filter(|entry| match entry.file_type() {
-                        Ok(file_type) => file_type.is_dir(),
-                        _ => false,
-                    })
-                    .filter_map(|entry| {
-                        entry
-                            .file_name()
-                            .into_string()
-                            .map_err(|_str| Error::InvalidUTF8)
-                            .and_then(|s| Variable::from_str(&s))
-                            .ok()
-                    })
+                list.filter_map(|result| {
+                    result
+                        .map_err(|error| Error::UnknownIoError { error })
+                        .and_then(|entry| {
+                            entry
+                                .file_name()
+                                .into_string()
+                                .map_err(|_str| Error::InvalidUTF8)
+                                .and_then(|s| Variable::from_str(&s))
+                        })
+                        .ok()
+                })
             })
             .map(|it| -> Box<dyn Iterator<Item = Variable>> { Box::new(it) })
             .map_err(|error| {
@@ -53,31 +55,23 @@ impl VarEnumerator for SystemManager {
 
 impl VarReader for SystemManager {
     fn read(&self, var: &Variable) -> crate::Result<(Vec<u8>, VariableFlags)> {
-        // Path to the attributes file
-        let attributes_filename = format!("{}/{}/attributes", EFIVARFS_ROOT, var);
-
-        // Open attributes file
-        let f = File::open(attributes_filename).map_err(|error| Error::for_variable(error, var))?;
-        let reader = BufReader::new(&f);
-
-        let mut flags = VariableFlags::empty();
-        for line in reader.lines() {
-            let line = line.map_err(|error| Error::for_variable(error, var))?;
-            let parsed = VariableFlags::from_str(&line)?;
-            flags |= parsed;
-        }
-
-        // Filename to the matching efivarfs data for this variable
-        let filename = format!("{}/{}/data", EFIVARFS_ROOT, var);
+        // Filename to the matching efivarfs file for this variable
+        let filename = format!("{}/{}", EFIVARFS_ROOT, var);
 
         let mut f = File::open(filename).map_err(|error| Error::for_variable(error, var))?;
+
+        // Read attributes
+        let attr = f
+            .read_u32::<LittleEndian>()
+            .map_err(|error| Error::for_variable(error, var))?;
+        let attr = VariableFlags::from_bits(attr).unwrap_or(VariableFlags::empty());
 
         // Read variable contents
         let mut value: Vec<u8> = vec![];
         f.read_to_end(&mut value)
             .map_err(|error| Error::for_variable(error, var))?;
 
-        Ok((value, flags))
+        Ok((value, attr))
     }
 }
 
@@ -88,37 +82,41 @@ impl VarWriter for SystemManager {
         attributes: VariableFlags,
         value: &[u8],
     ) -> crate::Result<()> {
-        // Path to the attributes file
-        let attributes_filename = format!("{}/{}/attributes", EFIVARFS_ROOT, var);
-        // Open attributes file
-        let mut f =
-            File::open(attributes_filename).map_err(|error| Error::for_variable(error, var))?;
-        let mut writer = BufWriter::new(&mut f);
+        // Prepare attributes
+        let attribute_bits = attributes.bits();
+
+        // Prepare buffer (we must only write once)
+        let mut buf = Vec::with_capacity(std::mem::size_of_val(&attribute_bits));
 
         // Write attributes
-        writer
-            .write_all(attributes.to_string().as_bytes())
-            .map_err(|error| Error::for_variable(error, var))?;
-
-        // Filename to the matching efivarfs file for this variable
-        let filename = format!("{}/{}/data", EFIVARFS_ROOT, var);
-
-        let mut f = OpenOptions::new()
-            .write(true)
-            .truncate(true)
-            .open(filename)
+        buf.write_u32::<LittleEndian>(attribute_bits)
             .map_err(|error| Error::for_variable(error, var))?;
 
         // Write variable contents
-        f.write(value)
+        buf.write(value)
+            .map_err(|error| Error::for_variable(error, var))?;
+
+        // Filename to the matching efivarfs file for this variable
+        let filename = format!("{}/{}", EFIVARFS_ROOT, var);
+
+        // Open file.
+        let mut f = OpenOptions::new()
+            .write(true)
+            .truncate(true)
+            .create(true)
+            .open(filename)
+            .map_err(|error| Error::for_variable(error, var))?;
+
+        // Write the value using a single write.
+        f.write(&buf)
             .map_err(|error| Error::for_variable(error, var))?;
 
         Ok(())
     }
 
-    fn delete(&mut self, _var: &Variable) -> crate::Result<()> {
-        // Unimplemented because I wasn't able to enable efivars sysfs on my system
-        unimplemented!("Variable deletion not supported on efivarfs. See https://github.com/iTrooz/efiboot-rs/issues/55");
+    fn delete(&mut self, var: &Variable) -> crate::Result<()> {
+        std::fs::remove_file(format!("{}/{}", EFIVARFS_ROOT, var))
+            .map_err(|error| Error::for_variable(error, var))
     }
 }
 

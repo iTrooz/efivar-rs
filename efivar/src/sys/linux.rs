@@ -23,9 +23,9 @@ impl SystemManager {
     }
 
     pub fn new() -> SystemManager {
-        if !Self::is_empty(efivars::EFIVARS_ROOT) {
+        if !Self::is_empty(efivarfs::EFIVARFS_ROOT) {
             Self::efivars()
-        } else if !Self::is_empty(efivarfs::EFIVARFS_ROOT) {
+        } else if !Self::is_empty(efivars::EFIVARS_ROOT) {
             Self::efivarfs()
         } else if cfg!(test) {
             // CI environments do not have efivarfs mounted,
@@ -39,13 +39,13 @@ impl SystemManager {
 
     pub fn efivars() -> SystemManager {
         SystemManager {
-            sys_impl: Box::new(efivars::SystemManager::new()),
+            sys_impl: Box::new(efivarfs::SystemManager::new()),
         }
     }
 
     pub fn efivarfs() -> SystemManager {
         SystemManager {
-            sys_impl: Box::new(efivarfs::SystemManager::new()),
+            sys_impl: Box::new(efivars::SystemManager::new()),
         }
     }
 
