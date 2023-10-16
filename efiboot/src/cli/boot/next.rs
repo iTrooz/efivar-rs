@@ -60,7 +60,7 @@ pub fn run(mut manager: Box<dyn VarManager>, cmd: BootNextCommand) {
                 .attributes
                 .contains(BootEntryAttributes::LOAD_OPTION_ACTIVE)
             {
-                eprintln!("Warning: boot entry is not active, and may not boot");
+                eprintln!("Warning: boot entry is not active, and may not boot. Enable it with `efiboot boot enable {id:04X}`");
             }
 
             manager
