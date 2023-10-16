@@ -28,10 +28,10 @@ if is_windows
 end
 
 target_binary_name = set efiboot
-target_binary = set "target/${CARGO_BUILD_TARGET}/release/${target_binary_name}${suffix}"
+target_binary = set "target/release/${target_binary_name}${suffix}"
 
 mkdir ${output_dir}
-cp ${target_binary} ${output_dir}/${target_binary_name}_${CARGO_BUILD_TARGET}${suffix}
+cp ${target_binary} ${output_dir}/${target_binary_name}${suffix}
 '''
 
 [tasks.install-grcov]
