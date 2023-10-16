@@ -119,9 +119,11 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - runs-on: ubuntu-latest
+          - name: Ubuntu
+            runs-on: ubuntu-latest
             target: x86_64-unknown-linux-gnu
-          - runs-on: windows-latest
+          - name: Windows
+            runs-on: windows-latest
             target: x86_64-pc-windows-msvc
     
     needs:
@@ -170,5 +172,5 @@ jobs:
       - name: Upload binaries from dist/
         uses: actions/upload-artifact@v3
         with:
-          name: Artifact
+          name: ${{ matrix.name }}
           path: dist/
