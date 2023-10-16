@@ -5,12 +5,7 @@ on:
     branches-ignore:
       - renovate/*
   push:
-    branches:
-      - main
-      - alpha
-      - beta
-      - test
-      - renovate/*
+    branches: ["*"]
     tags-ignore:
       - "**"
 
