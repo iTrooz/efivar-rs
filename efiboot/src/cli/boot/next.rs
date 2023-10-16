@@ -2,7 +2,7 @@ use core::panic;
 
 use byteorder::{LittleEndian, ReadBytesExt};
 use efivar::{
-    boot::BootVarName,
+    boot::{BootEntry, BootEntryAttributes, BootVarName},
     efi::{Variable, VariableFlags},
     Error, VarManager,
 };
@@ -46,14 +46,22 @@ pub fn run(mut manager: Box<dyn VarManager>, cmd: BootNextCommand) {
         BootNextCommand::Set { id } => {
             let id = id.0;
 
-            match manager.read(&Variable::new(&id.boot_var_name())) {
-                Ok(_) => {}
+            let boot_entry = match BootEntry::parse(&*manager, &Variable::new(&id.boot_var_name()))
+            {
+                Ok(boot_entry) => boot_entry,
                 Err(Error::VarNotFound { name: _ }) => {
                     println!("No boot entry with id {id:04X} found");
                     return;
                 }
                 Err(err) => panic!("{}", err),
             };
+
+            if !boot_entry
+                .attributes
+                .contains(BootEntryAttributes::LOAD_OPTION_ACTIVE)
+            {
+                eprintln!("Warning: boot entry is not active, and may not boot");
+            }
 
             manager
                 .write(
@@ -64,7 +72,11 @@ pub fn run(mut manager: Box<dyn VarManager>, cmd: BootNextCommand) {
                     &id.to_le_bytes(),
                 )
                 .unwrap();
-            println!("BootNext set to {id:04X} with success");
+
+            println!(
+                "BootNext set to {id:04X} ({}) with success",
+                boot_entry.description
+            );
         }
         BootNextCommand::Unset => {
             match manager.delete(&Variable::new("BootNext")) {
