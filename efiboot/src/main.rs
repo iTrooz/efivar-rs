@@ -22,8 +22,8 @@ struct Opt {
     cmd: Command,
 }
 
-#[paw::main]
-fn main(opts: Opt) {
+fn main() {
+    let opts = Opt::from_args();
     let manager = if let Some(filename) = opts.file_store {
         efivar::file_store(filename)
     } else {

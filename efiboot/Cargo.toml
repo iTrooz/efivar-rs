@@ -16,8 +16,7 @@ edition = "2018"
 byteorder = "1.4.3"
 efivar = { version = "1.4.0", path = "../efivar", features = ["store"] }
 itertools = "0.11.0"
-paw = "1.0.0"
-structopt = { version = "0.3.26", features = ["paw"] }
+structopt = { version = "0.3.26" }
 uuid = { version = "1.4.1" }
 
 [package.metadata.binstall]
