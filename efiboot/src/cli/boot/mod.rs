@@ -13,6 +13,8 @@ pub mod enable_disable;
 pub mod get_entries;
 pub mod next;
 pub mod order;
+#[cfg(test)]
+pub mod tests;
 
 #[derive(StructOpt)]
 pub enum BootCommand {
