@@ -7,7 +7,7 @@ use self::boot::BootCommand;
 
 pub mod boot;
 pub mod delete;
-pub mod dump;
+pub mod export;
 pub mod import;
 pub mod list;
 pub mod read;
@@ -52,9 +52,9 @@ pub enum Command {
 
     /// Manage boot-related variables
     Boot(BootCommand),
-    /// Dump a variable to file
-    Dump {
-        /// Name of the variable to dump
+    /// Export a variable to file
+    Export {
+        /// Name of the variable to export
         #[structopt(value_name = "VARIABLE")]
         name: String,
 
@@ -92,11 +92,11 @@ pub fn run(manager: Box<dyn VarManager>, cmd: Command) -> ExitCode {
         Command::List { namespace, all } => list::run(manager, namespace, all),
         Command::Delete { name, namespace } => delete::run(manager, &name, namespace),
         Command::Boot(arg) => boot::run(manager, arg),
-        Command::Dump {
+        Command::Export {
             name,
             namespace,
             output_file,
-        } => dump::run(manager, &name, namespace, &output_file),
+        } => export::run(manager, &name, namespace, &output_file),
         Command::Import {
             input_file,
             name,

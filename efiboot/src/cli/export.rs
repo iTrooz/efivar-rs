@@ -7,7 +7,7 @@ use efivar::{
     VarManager,
 };
 
-fn dump(output_path: &Path, flags: VariableFlags, data: &[u8]) -> Result<(), std::io::Error> {
+fn export(output_path: &Path, flags: VariableFlags, data: &[u8]) -> Result<(), std::io::Error> {
     let mut file = File::create(output_path)?;
     file.write_all(&flags.bits().to_le_bytes())?;
     file.write_all(data)?;
@@ -27,10 +27,10 @@ pub fn run(
     );
 
     match reader.read(&var) {
-        Ok((buf, flags)) => match dump(output_path, flags, &buf) {
+        Ok((buf, flags)) => match export(output_path, flags, &buf) {
             Ok(_) => {
                 println!(
-                    "Dumped variable {} to file {}",
+                    "Exported variable {} to file {}",
                     var,
                     output_path.canonicalize().unwrap().display()
                 );
