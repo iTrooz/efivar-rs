@@ -1,4 +1,4 @@
-use std::{fs::File, io::Read, path::Path, process::ExitCode};
+use std::{fs::File, io::Read, path::Path};
 
 use uuid::Uuid;
 
@@ -8,6 +8,8 @@ use efivar::{
     efi::{Variable, VariableFlags, VariableVendor},
     VarManager,
 };
+
+use crate::exit_code::ExitCode;
 
 fn read_var_from_file(input_path: &Path) -> Result<(VariableFlags, Vec<u8>), std::io::Error> {
     let mut file = File::open(input_path)?;

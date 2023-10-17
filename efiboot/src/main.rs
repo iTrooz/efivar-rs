@@ -1,8 +1,10 @@
 mod cli;
+pub mod exit_code;
 pub mod id;
 
 use cli::Command;
-use std::{path::PathBuf, process::ExitCode};
+use exit_code::ExitCode;
+use std::path::PathBuf;
 use structopt::StructOpt;
 
 #[derive(StructOpt)]
@@ -22,8 +24,11 @@ struct Opt {
     cmd: Command,
 }
 
-fn main() -> ExitCode {
-    let opts = Opt::from_args();
+fn main() -> std::process::ExitCode {
+    run(Opt::from_args()).into()
+}
+
+fn run(opts: Opt) -> ExitCode {
     let manager = if let Some(filename) = opts.file_store {
         efivar::file_store(filename)
     } else {

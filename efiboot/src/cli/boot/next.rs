@@ -1,5 +1,5 @@
+use crate::exit_code::ExitCode;
 use core::panic;
-use std::process::ExitCode;
 
 use byteorder::{LittleEndian, ReadBytesExt};
 use efivar::{

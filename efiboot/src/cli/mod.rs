@@ -1,7 +1,9 @@
-use std::{path::PathBuf, process::ExitCode};
+use std::path::PathBuf;
 
 use efivar::VarManager;
 use structopt::StructOpt;
+
+use crate::exit_code::ExitCode;
 
 use self::boot::BootCommand;
 

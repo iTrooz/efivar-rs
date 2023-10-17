@@ -2,7 +2,7 @@
 
 mod disk;
 
-use std::process::ExitCode;
+use crate::exit_code::ExitCode;
 
 use byteorder::{LittleEndian, ReadBytesExt};
 use efivar::{

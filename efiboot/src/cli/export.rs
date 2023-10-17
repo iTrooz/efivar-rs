@@ -1,4 +1,4 @@
-use std::{fs::File, io::Write, path::Path, process::ExitCode};
+use std::{fs::File, io::Write, path::Path};
 
 use uuid::Uuid;
 
@@ -6,6 +6,8 @@ use efivar::{
     efi::{Variable, VariableFlags, VariableVendor},
     VarManager,
 };
+
+use crate::exit_code::ExitCode;
 
 fn export(output_path: &Path, flags: VariableFlags, data: &[u8]) -> Result<(), std::io::Error> {
     let mut file = File::create(output_path)?;

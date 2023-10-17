@@ -1,4 +1,4 @@
-use std::process::ExitCode;
+use crate::exit_code::ExitCode;
 
 use efivar::{boot::BootVarName, VarManager};
 
