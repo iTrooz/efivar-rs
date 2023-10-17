@@ -12,8 +12,6 @@ use super::*;
 
 #[test]
 fn list() {
-    // let manager = Box::new(MemoryStore::new());
-
     // normal list command
     assert_eq!(
         ExitCode::SUCCESS,
