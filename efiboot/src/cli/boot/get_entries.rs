@@ -62,7 +62,7 @@ fn print_var(var: &Variable, entry: BootEntry, verbose: bool, active_boot_id: u1
     }
 }
 
-pub fn run(manager: Box<dyn VarManager>, verbose: bool) -> ExitCode {
+pub fn run(manager: &dyn VarManager, verbose: bool) -> ExitCode {
     let entries = match manager.get_boot_entries() {
         Ok(entries) => entries,
         Err(err) => {
@@ -109,7 +109,7 @@ pub fn run(manager: Box<dyn VarManager>, verbose: bool) -> ExitCode {
     println!();
     println!("Found boot entries not in boot sequence:");
     for var in vars {
-        match BootEntry::parse(&*manager, &var) {
+        match BootEntry::parse(manager, &var) {
             Ok(entry) => print_var(&var, entry, verbose, active_id),
             Err(err) => eprintln!("Failed to get entry from variable {}: {}", var, err),
         };

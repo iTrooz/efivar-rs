@@ -2,7 +2,7 @@ use crate::exit_code::ExitCode;
 
 use efivar::VarManager;
 
-pub fn run(mut manager: Box<dyn VarManager>, ids: Vec<u16>) -> ExitCode {
+pub fn run(manager: &mut dyn VarManager, ids: Vec<u16>) -> ExitCode {
     manager.set_boot_order(ids.clone()).unwrap(); // TODO remove clone() call
 
     println!(

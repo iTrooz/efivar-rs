@@ -45,7 +45,7 @@ pub enum OrderCommand {
     },
 }
 
-pub fn run(manager: Box<dyn VarManager>, cmd: OrderCommand) -> ExitCode {
+pub fn run(manager: &mut dyn VarManager, cmd: OrderCommand) -> ExitCode {
     match cmd {
         OrderCommand::Get => get::run(manager),
         OrderCommand::Add { id, position } => add::run(manager, id.0, position),

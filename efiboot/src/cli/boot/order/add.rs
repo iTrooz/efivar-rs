@@ -2,7 +2,7 @@ use crate::exit_code::ExitCode;
 
 use efivar::VarManager;
 
-pub fn run(mut manager: Box<dyn VarManager>, id: u16, position: Option<usize>) -> ExitCode {
+pub fn run(manager: &mut dyn VarManager, id: u16, position: Option<usize>) -> ExitCode {
     let mut ids = manager.get_boot_order().unwrap();
     if let Some(position) = position {
         ids.insert(position, id);

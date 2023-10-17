@@ -25,7 +25,7 @@ pub enum BootNextCommand {
     },
 }
 
-pub fn run(mut manager: Box<dyn VarManager>, cmd: BootNextCommand) -> ExitCode {
+pub fn run(manager: &mut dyn VarManager, cmd: BootNextCommand) -> ExitCode {
     match cmd {
         BootNextCommand::Get => {
             let res = manager.read(&Variable::new("BootNext"));

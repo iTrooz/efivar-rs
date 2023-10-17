@@ -3,6 +3,7 @@ pub mod exit_code;
 pub mod id;
 
 use cli::Command;
+use efivar::VarManager;
 use exit_code::ExitCode;
 use std::path::PathBuf;
 use structopt::StructOpt;
@@ -25,15 +26,17 @@ struct Opt {
 }
 
 fn main() -> std::process::ExitCode {
-    run(Opt::from_args()).into()
-}
+    let opts = Opt::from_args();
 
-fn run(opts: Opt) -> ExitCode {
-    let manager = if let Some(filename) = opts.file_store {
+    let manager = &mut *if let Some(filename) = opts.file_store {
         efivar::file_store(filename)
     } else {
         efivar::system()
     };
 
-    cli::run(manager, opts.cmd)
+    run(opts.cmd, manager).into()
+}
+
+fn run(cmd: Command, manager: &mut dyn VarManager) -> ExitCode {
+    cli::run(manager, cmd)
 }

@@ -45,7 +45,7 @@ fn check(partition: &str, file: &str) -> bool {
 }
 
 pub fn run(
-    mut manager: Box<dyn VarManager>,
+    manager: &mut dyn VarManager,
     partition: Option<String>,
     file_path: String,
     description: String,

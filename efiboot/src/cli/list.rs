@@ -2,7 +2,7 @@ use crate::exit_code::ExitCode;
 
 use efivar::{efi::VariableVendor, VarManager};
 
-fn list_all(enumerator: Box<dyn VarManager>) {
+fn list_all(enumerator: &dyn VarManager) {
     println!("{: >36} Variable", "Namespace");
     for var in enumerator
         .get_all_vars()
@@ -12,7 +12,7 @@ fn list_all(enumerator: Box<dyn VarManager>) {
     }
 }
 
-fn list_namespace(enumerator: Box<dyn VarManager>, vendor: VariableVendor) {
+fn list_namespace(enumerator: &dyn VarManager, vendor: VariableVendor) {
     println!("Variables in namespace {} :", vendor);
     for var in enumerator
         .get_all_vars()
@@ -24,7 +24,7 @@ fn list_namespace(enumerator: Box<dyn VarManager>, vendor: VariableVendor) {
     }
 }
 
-pub fn run(enumerator: Box<dyn VarManager>, namespace: Option<uuid::Uuid>, all: bool) -> ExitCode {
+pub fn run(enumerator: &dyn VarManager, namespace: Option<uuid::Uuid>, all: bool) -> ExitCode {
     if all {
         list_all(enumerator);
     } else {

@@ -8,7 +8,7 @@ use efivar::{
 };
 
 pub fn run(
-    reader: Box<dyn VarManager>,
+    reader: &dyn VarManager,
     name: &str,
     namespace: Option<uuid::Uuid>,
     as_string: bool,

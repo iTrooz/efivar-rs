@@ -2,7 +2,7 @@ use crate::exit_code::ExitCode;
 
 use efivar::{boot::BootVarName, VarManager};
 
-pub fn run(manager: Box<dyn VarManager>) -> ExitCode {
+pub fn run(manager: &dyn VarManager) -> ExitCode {
     let ids = match manager.get_boot_order() {
         Ok(ids) => ids,
         Err(err) => {

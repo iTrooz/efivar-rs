@@ -2,7 +2,7 @@ use crate::exit_code::ExitCode;
 
 use efivar::{boot::BootVarName, efi::Variable, VarManager};
 
-pub fn run(mut manager: Box<dyn VarManager>, id: u16) -> ExitCode {
+pub fn run(manager: &mut dyn VarManager, id: u16) -> ExitCode {
     // in this function, we assume that boot entry presence and boot order id presence are not correlated,
     // so we need to remove both of them, no matter if one of these steps raises an error
 

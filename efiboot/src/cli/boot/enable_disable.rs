@@ -6,7 +6,7 @@ use efivar::{
     VarManager,
 };
 
-pub fn enable(mut manager: Box<dyn VarManager>, id: u16) -> ExitCode {
+pub fn enable(manager: &mut dyn VarManager, id: u16) -> ExitCode {
     let mut boot_entry = BootEntry::parse(&*manager, &Variable::new(&id.boot_var_name())).unwrap();
 
     if boot_entry
@@ -27,7 +27,7 @@ pub fn enable(mut manager: Box<dyn VarManager>, id: u16) -> ExitCode {
     ExitCode::SUCCESS
 }
 
-pub fn disable(mut manager: Box<dyn VarManager>, id: u16) -> ExitCode {
+pub fn disable(manager: &mut dyn VarManager, id: u16) -> ExitCode {
     let mut boot_entry = BootEntry::parse(&*manager, &Variable::new(&id.boot_var_name())).unwrap();
 
     if !boot_entry

@@ -71,7 +71,7 @@ pub enum BootCommand {
     Next(BootNextCommand),
 }
 
-pub fn run(manager: Box<dyn VarManager>, cmd: BootCommand) -> ExitCode {
+pub fn run(manager: &mut dyn VarManager, cmd: BootCommand) -> ExitCode {
     match cmd {
         BootCommand::GetEntries { verbose } => get_entries::run(manager, verbose),
         BootCommand::Add {

@@ -18,7 +18,7 @@ fn export(output_path: &Path, flags: VariableFlags, data: &[u8]) -> Result<(), s
 }
 
 pub fn run(
-    reader: Box<dyn VarManager>,
+    reader: &dyn VarManager,
     name: &str,
     namespace: Option<Uuid>,
     output_path: &Path,

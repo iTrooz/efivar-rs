@@ -22,7 +22,7 @@ fn read_var_from_file(input_path: &Path) -> Result<(VariableFlags, Vec<u8>), std
 }
 
 pub fn run(
-    mut manager: Box<dyn VarManager>,
+    manager: &mut dyn VarManager,
     input_path: &Path,
     name: &str,
     namespace: Option<Uuid>,

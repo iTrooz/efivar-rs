@@ -84,7 +84,7 @@ pub enum Command {
     },
 }
 
-pub fn run(manager: Box<dyn VarManager>, cmd: Command) -> ExitCode {
+pub fn run(manager: &mut dyn VarManager, cmd: Command) -> ExitCode {
     match cmd {
         Command::Read {
             name,

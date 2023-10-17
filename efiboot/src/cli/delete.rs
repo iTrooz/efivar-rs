@@ -5,11 +5,7 @@ use efivar::{
     VarManager,
 };
 
-pub fn run(
-    mut manager: Box<dyn VarManager>,
-    name: &str,
-    namespace: Option<uuid::Uuid>,
-) -> ExitCode {
+pub fn run(manager: &mut dyn VarManager, name: &str, namespace: Option<uuid::Uuid>) -> ExitCode {
     let var_name = Variable::new_with_vendor(
         name,
         namespace.map_or(VariableVendor::Efi, VariableVendor::Custom),
