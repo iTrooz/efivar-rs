@@ -1,4 +1,10 @@
-use efivar::store::MemoryStore;
+use std::{fs::File, io::Write};
+
+use efivar::{
+    efi::{Variable, VariableFlags},
+    store::MemoryStore,
+    VarReader, VarWriter,
+};
 
 use crate::{cli::Command, exit_code::ExitCode};
 
@@ -29,5 +35,81 @@ fn list() {
             ]),
             &mut MemoryStore::new()
         )
+    );
+}
+
+#[test]
+fn import() {
+    let mut manager = MemoryStore::new();
+
+    let tmpdir = tempfile::tempdir().unwrap();
+    let file_path = tmpdir.path().join("in.bin");
+    {
+        let mut file = File::create(&file_path).unwrap();
+        file.write_all(&[0x07, 0x00, 0x00, 0x00]).unwrap(); // write header
+        file.write_all(&[0x01, 0x02, 0x03, 0x04]).unwrap(); // write content
+    }
+
+    // import variable
+    assert_eq!(
+        ExitCode::SUCCESS,
+        crate::run(
+            Command::from_iter([
+                "efiboot",
+                "import",
+                file_path.to_str().unwrap(),
+                "MyVariable",
+            ]),
+            &mut manager
+        )
+    );
+
+    // Verify variable content
+    let (output_data, flags) = manager.read(&Variable::new("MyVariable")).unwrap();
+    assert_eq!(vec![0x01, 0x02, 0x03, 0x04], output_data);
+    assert_eq!(
+        flags,
+        VariableFlags::NON_VOLATILE
+            | VariableFlags::BOOTSERVICE_ACCESS
+            | VariableFlags::RUNTIME_ACCESS
+    );
+}
+
+#[test]
+fn export() {
+    let mut manager = MemoryStore::new();
+
+    manager
+        .write(
+            &Variable::new("MyVariable"),
+            VariableFlags::NON_VOLATILE
+                | VariableFlags::BOOTSERVICE_ACCESS
+                | VariableFlags::RUNTIME_ACCESS,
+            &[0x01, 0x02, 0x03, 0x04],
+        )
+        .unwrap();
+
+    let tmpdir = tempfile::tempdir().unwrap();
+    let file_path = tmpdir.path().join("in.bin");
+
+    // export variable
+    assert_eq!(
+        ExitCode::SUCCESS,
+        crate::run(
+            Command::from_iter([
+                "efiboot",
+                "export",
+                "MyVariable",
+                file_path.to_str().unwrap(),
+            ]),
+            &mut manager
+        )
+    );
+
+    // Verify file content
+    let output_data = std::fs::read(file_path).unwrap();
+    assert_eq!(
+        vec![0x07, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03, 0x04],
+        output_data
     );
 }
