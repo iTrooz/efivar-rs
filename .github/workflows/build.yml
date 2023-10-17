@@ -63,9 +63,6 @@ jobs:
             target: x86_64-unknown-linux-gnu
           - runs-on: windows-latest
             target: x86_64-pc-windows-msvc
-    
-    needs:
-      - check
 
     steps:
       - name: Checkout repository
@@ -126,9 +123,6 @@ jobs:
           - name: Windows
             runs-on: windows-latest
             target: x86_64-pc-windows-msvc
-    
-    needs:
-      - check
 
     steps:
       - name: Checkout repository
