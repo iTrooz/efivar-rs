@@ -8,7 +8,7 @@ use crate::id::BootEntryId;
 use self::{next::BootNextCommand, order::OrderCommand};
 
 pub mod add;
-pub mod del;
+pub mod delete;
 pub mod enable_disable;
 pub mod get_entries;
 pub mod next;
@@ -86,7 +86,7 @@ pub fn run(manager: Box<dyn VarManager>, cmd: BootCommand) -> ExitCode {
             force,
             id.map(|id| id.0),
         ),
-        BootCommand::Delete { id } => del::run(manager, id.0),
+        BootCommand::Delete { id } => delete::run(manager, id.0),
         BootCommand::Enable { id } => enable_disable::enable(manager, id.0),
         BootCommand::Disable { id } => enable_disable::disable(manager, id.0),
         BootCommand::Order(arg) => order::run(manager, arg),
