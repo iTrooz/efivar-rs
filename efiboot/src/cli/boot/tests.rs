@@ -1,9 +1,10 @@
+use core::panic;
 use std::{fs::File, io::Write};
 
 use efivar::{
     efi::{Variable, VariableFlags},
     store::MemoryStore,
-    VarReader, VarWriter,
+    Error, VarReader, VarWriter,
 };
 
 use crate::{cli::Command, exit_code::ExitCode};
@@ -110,4 +111,33 @@ fn export() {
         vec![0x07, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03, 0x04],
         output_data
     );
+}
+
+#[test]
+fn export_no_var() {
+    //! Try `efiboot export` with a variable that doesn't exist
+
+    let mut manager = MemoryStore::new();
+
+    let tmpdir = tempfile::tempdir().unwrap();
+    let file_path = tmpdir.path().join("in.bin");
+
+    assert_eq!(
+        ExitCode::FAILURE,
+        crate::run(
+            Command::from_iter([
+                "efiboot",
+                "export",
+                "MyVariable",
+                file_path.to_str().unwrap(),
+            ]),
+            &mut manager
+        )
+    );
+
+    if let Error::VarNotFound { name } = manager.read(&Variable::new("MyVariable")).unwrap_err() {
+        assert_eq!(name, Variable::new("MyVariable"));
+    } else {
+        panic!("Reading a non-existent variable should raise VarNotFound");
+    }
 }
