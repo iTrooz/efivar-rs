@@ -1,3 +1,5 @@
+use std::process::ExitCode;
+
 use efivar::VarManager;
 use structopt::StructOpt;
 
@@ -67,41 +69,27 @@ pub enum BootCommand {
     Next(BootNextCommand),
 }
 
-pub fn run(manager: Box<dyn VarManager>, cmd: BootCommand) {
+pub fn run(manager: Box<dyn VarManager>, cmd: BootCommand) -> ExitCode {
     match cmd {
-        BootCommand::GetEntries { verbose } => {
-            get_entries::run(manager, verbose);
-        }
+        BootCommand::GetEntries { verbose } => get_entries::run(manager, verbose),
         BootCommand::Add {
             partition,
             file,
             description,
             force,
             id,
-        } => {
-            add::run(
-                manager,
-                partition,
-                file,
-                description,
-                force,
-                id.map(|id| id.0),
-            );
-        }
-        BootCommand::Delete { id } => {
-            del::run(manager, id.0);
-        }
-        BootCommand::Enable { id } => {
-            enable_disable::enable(manager, id.0);
-        }
-        BootCommand::Disable { id } => {
-            enable_disable::disable(manager, id.0);
-        }
-        BootCommand::Order(arg) => {
-            order::run(manager, arg);
-        }
-        BootCommand::Next(arg) => {
-            next::run(manager, arg);
-        }
+        } => add::run(
+            manager,
+            partition,
+            file,
+            description,
+            force,
+            id.map(|id| id.0),
+        ),
+        BootCommand::Delete { id } => del::run(manager, id.0),
+        BootCommand::Enable { id } => enable_disable::enable(manager, id.0),
+        BootCommand::Disable { id } => enable_disable::disable(manager, id.0),
+        BootCommand::Order(arg) => order::run(manager, arg),
+        BootCommand::Next(arg) => next::run(manager, arg),
     }
 }

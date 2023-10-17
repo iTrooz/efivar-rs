@@ -1,4 +1,4 @@
-use std::{fs::File, io::Write, path::Path};
+use std::{fs::File, io::Write, path::Path, process::ExitCode};
 
 use uuid::Uuid;
 
@@ -15,7 +15,12 @@ fn dump(output_path: &Path, flags: VariableFlags, data: &[u8]) -> Result<(), std
     Ok(())
 }
 
-pub fn run(reader: Box<dyn VarManager>, name: &str, namespace: Option<Uuid>, output_path: &Path) {
+pub fn run(
+    reader: Box<dyn VarManager>,
+    name: &str,
+    namespace: Option<Uuid>,
+    output_path: &Path,
+) -> ExitCode {
     let var = Variable::new_with_vendor(
         name,
         namespace.map_or(VariableVendor::Efi, VariableVendor::Custom),
@@ -23,13 +28,18 @@ pub fn run(reader: Box<dyn VarManager>, name: &str, namespace: Option<Uuid>, out
 
     match reader.read(&var) {
         Ok((buf, flags)) => match dump(output_path, flags, &buf) {
-            Ok(_) => println!(
-                "Dumped variable {} to file {}",
-                var,
-                output_path.canonicalize().unwrap().display()
-            ),
+            Ok(_) => {
+                println!(
+                    "Dumped variable {} to file {}",
+                    var,
+                    output_path.canonicalize().unwrap().display()
+                );
+                return ExitCode::SUCCESS;
+            }
             Err(err) => eprintln!("Failed to write to file: {}", err),
         },
         Err(err) => eprintln!("Failed to read variable: {}", err),
-    }
+    };
+
+    ExitCode::FAILURE
 }

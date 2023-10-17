@@ -2,6 +2,8 @@
 
 mod disk;
 
+use std::process::ExitCode;
+
 use byteorder::{LittleEndian, ReadBytesExt};
 use efivar::{
     boot::{BootEntry, BootEntryAttributes, BootVarName, FilePath, FilePathList},
@@ -49,13 +51,14 @@ pub fn run(
     description: String,
     force: bool,
     id: Option<u16>,
-) {
+) -> ExitCode {
     // get necessary information from the partition to create an entry
     let efi_partition = {
         if let Some(partition) = partition {
             // do not continue is the file has been identified as non-existant
+            // ( check() has already printed the error message to the user )
             if !force && !check(&partition, &file_path) {
-                return;
+                return ExitCode::FAILURE;
             }
             disk::retrieve_efi_partition_data(&partition)
         } else {
@@ -96,7 +99,7 @@ pub fn run(
         if let Some(id) = id {
             if used_boot_ids.contains(&id) {
                 eprintln!("Boot entry with id {id:04X} already exists. Delete it first");
-                return;
+                return ExitCode::FAILURE;
             }
             id
         } else {
@@ -117,4 +120,6 @@ pub fn run(
     manager.set_boot_order(ids).unwrap();
 
     println!("Added entry with success");
+
+    ExitCode::SUCCESS
 }

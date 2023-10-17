@@ -1,4 +1,4 @@
-use std::{fs::File, io::Read, path::Path};
+use std::{fs::File, io::Read, path::Path, process::ExitCode};
 
 use uuid::Uuid;
 
@@ -24,7 +24,7 @@ pub fn run(
     input_path: &Path,
     name: &str,
     namespace: Option<Uuid>,
-) {
+) -> ExitCode {
     let var = Variable::new_with_vendor(
         name,
         namespace.map_or(VariableVendor::Efi, VariableVendor::Custom),
@@ -38,12 +38,18 @@ pub fn run(
                 input_path.display(),
                 err
             );
-            return;
+            return ExitCode::FAILURE;
         }
     };
 
     match manager.write(&var, flags, &data) {
-        Ok(()) => println!("Imported variable {} with success", var),
-        Err(err) => eprintln!("Failed to write variable {}: {}", var, err),
+        Ok(()) => {
+            println!("Imported variable {} with success", var);
+            ExitCode::SUCCESS
+        }
+        Err(err) => {
+            eprintln!("Failed to write variable {}: {}", var, err);
+            ExitCode::FAILURE
+        }
     }
 }

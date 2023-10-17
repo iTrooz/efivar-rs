@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::{path::PathBuf, process::ExitCode};
 
 use efivar::VarManager;
 use structopt::StructOpt;
@@ -82,37 +82,25 @@ pub enum Command {
     },
 }
 
-pub fn run(manager: Box<dyn VarManager>, cmd: Command) {
+pub fn run(manager: Box<dyn VarManager>, cmd: Command) -> ExitCode {
     match cmd {
         Command::Read {
             name,
             namespace,
             string,
-        } => {
-            read::run(manager, &name, namespace, string);
-        }
-        Command::List { namespace, all } => {
-            list::run(manager, namespace, all);
-        }
-        Command::Delete { name, namespace } => {
-            delete::run(manager, &name, namespace);
-        }
-        Command::Boot(arg) => {
-            boot::run(manager, arg);
-        }
+        } => read::run(manager, &name, namespace, string),
+        Command::List { namespace, all } => list::run(manager, namespace, all),
+        Command::Delete { name, namespace } => delete::run(manager, &name, namespace),
+        Command::Boot(arg) => boot::run(manager, arg),
         Command::Dump {
             name,
             namespace,
             output_file,
-        } => {
-            dump::run(manager, &name, namespace, &output_file);
-        }
+        } => dump::run(manager, &name, namespace, &output_file),
         Command::Import {
             input_file,
             name,
             namespace,
-        } => {
-            import::run(manager, &input_file, &name, namespace);
-        }
+        } => import::run(manager, &input_file, &name, namespace),
     }
 }

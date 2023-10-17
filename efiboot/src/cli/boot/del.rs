@@ -1,6 +1,8 @@
+use std::process::ExitCode;
+
 use efivar::{boot::BootVarName, efi::Variable, VarManager};
 
-pub fn run(mut manager: Box<dyn VarManager>, id: u16) {
+pub fn run(mut manager: Box<dyn VarManager>, id: u16) -> ExitCode {
     // in this function, we assume that boot entry presence and boot order id presence are not correlated,
     // so we need to remove both of them, no matter if one of these steps raises an error
 
@@ -16,4 +18,6 @@ pub fn run(mut manager: Box<dyn VarManager>, id: u16) {
     manager.set_boot_order(ids).unwrap();
 
     println!("Deleted entry with success");
+
+    ExitCode::SUCCESS
 }

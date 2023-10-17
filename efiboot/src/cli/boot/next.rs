@@ -1,4 +1,5 @@
 use core::panic;
+use std::process::ExitCode;
 
 use byteorder::{LittleEndian, ReadBytesExt};
 use efivar::{
@@ -24,7 +25,7 @@ pub enum BootNextCommand {
     },
 }
 
-pub fn run(mut manager: Box<dyn VarManager>, cmd: BootNextCommand) {
+pub fn run(mut manager: Box<dyn VarManager>, cmd: BootNextCommand) -> ExitCode {
     match cmd {
         BootNextCommand::Get => {
             let res = manager.read(&Variable::new("BootNext"));
@@ -34,9 +35,11 @@ pub fn run(mut manager: Box<dyn VarManager>, cmd: BootNextCommand) {
                         "Next booting on: {:04X}",
                         data.as_slice().read_u16::<LittleEndian>().unwrap()
                     );
+                    ExitCode::SUCCESS
                 }
                 Err(Error::VarNotFound { name: _ }) => {
-                    println!("BootNext is not set")
+                    println!("BootNext is not set");
+                    ExitCode::FAILURE
                 }
                 Err(err) => {
                     panic!("{}", err);
@@ -51,9 +54,11 @@ pub fn run(mut manager: Box<dyn VarManager>, cmd: BootNextCommand) {
                 Ok(boot_entry) => boot_entry,
                 Err(Error::VarNotFound { name: _ }) => {
                     println!("No boot entry with id {id:04X} found");
-                    return;
+                    return ExitCode::FAILURE;
                 }
-                Err(err) => panic!("{}", err),
+                Err(err) => {
+                    panic!("{}", err);
+                }
             };
 
             if !boot_entry
@@ -77,13 +82,19 @@ pub fn run(mut manager: Box<dyn VarManager>, cmd: BootNextCommand) {
                 "BootNext set to {id:04X} ({}) with success",
                 boot_entry.description
             );
+
+            ExitCode::SUCCESS
         }
-        BootNextCommand::Unset => {
-            match manager.delete(&Variable::new("BootNext")) {
-                Ok(_) => println!("BootNext unset with success"),
-                Err(Error::VarNotFound { name: _ }) => println!("BootNext not set"),
-                Err(err) => panic!("{}", err),
-            };
-        }
+        BootNextCommand::Unset => match manager.delete(&Variable::new("BootNext")) {
+            Ok(_) => {
+                println!("BootNext unset with success");
+                ExitCode::SUCCESS
+            }
+            Err(Error::VarNotFound { name: _ }) => {
+                println!("BootNext not set");
+                ExitCode::FAILURE
+            }
+            Err(err) => panic!("{}", err),
+        },
     }
 }

@@ -1,3 +1,5 @@
+use std::process::ExitCode;
+
 use byteorder::{LittleEndian, ReadBytesExt};
 use efivar::{
     boot::{BootEntry, BootEntryAttributes},
@@ -60,12 +62,12 @@ fn print_var(var: &Variable, entry: BootEntry, verbose: bool, active_boot_id: u1
     }
 }
 
-pub fn run(manager: Box<dyn VarManager>, verbose: bool) {
+pub fn run(manager: Box<dyn VarManager>, verbose: bool) -> ExitCode {
     let entries = match manager.get_boot_entries() {
         Ok(entries) => entries,
         Err(err) => {
             eprintln!("Failed to get boot entries: {}", err);
-            return;
+            return ExitCode::FAILURE;
         }
     };
 
@@ -73,7 +75,7 @@ pub fn run(manager: Box<dyn VarManager>, verbose: bool) {
         Ok(vars) => vars,
         Err(err) => {
             eprintln!("Failed to list EFI variable: {:?}", err);
-            return;
+            return ExitCode::FAILURE;
         }
     }
     .filter(|var| var.boot_var_id().is_some())
@@ -101,7 +103,7 @@ pub fn run(manager: Box<dyn VarManager>, verbose: bool) {
     }
 
     if vars.is_empty() {
-        return;
+        return ExitCode::SUCCESS;
     }
 
     println!();
@@ -112,4 +114,6 @@ pub fn run(manager: Box<dyn VarManager>, verbose: bool) {
             Err(err) => eprintln!("Failed to get entry from variable {}: {}", var, err),
         };
     }
+
+    ExitCode::SUCCESS
 }

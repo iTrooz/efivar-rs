@@ -2,7 +2,7 @@ mod cli;
 pub mod id;
 
 use cli::Command;
-use std::path::PathBuf;
+use std::{path::PathBuf, process::ExitCode};
 use structopt::StructOpt;
 
 #[derive(StructOpt)]
@@ -22,7 +22,7 @@ struct Opt {
     cmd: Command,
 }
 
-fn main() {
+fn main() -> ExitCode {
     let opts = Opt::from_args();
     let manager = if let Some(filename) = opts.file_store {
         efivar::file_store(filename)
@@ -30,5 +30,5 @@ fn main() {
         efivar::system()
     };
 
-    cli::run(manager, opts.cmd);
+    cli::run(manager, opts.cmd)
 }

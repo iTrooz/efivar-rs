@@ -1,3 +1,5 @@
+use std::process::ExitCode;
+
 use itertools::Itertools;
 
 use efivar::{
@@ -10,7 +12,7 @@ pub fn run(
     name: &str,
     namespace: Option<uuid::Uuid>,
     as_string: bool,
-) {
+) -> ExitCode {
     let name = Variable::new_with_vendor(
         name,
         namespace.map_or(VariableVendor::Efi, VariableVendor::Custom),
@@ -30,8 +32,12 @@ pub fn run(
                         .fold(String::new(), |acc, ref item| acc + " " + item)
                         .trim()
                 );
-            }
+            };
+            ExitCode::SUCCESS
         }
-        Err(reason) => eprintln!("Failed: {}", reason),
+        Err(reason) => {
+            eprintln!("Failed: {}", reason);
+            ExitCode::FAILURE
+        }
     }
 }

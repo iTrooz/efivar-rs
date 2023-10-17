@@ -1,3 +1,5 @@
+use std::process::ExitCode;
+
 use efivar::{efi::VariableVendor, VarManager};
 
 fn list_all(enumerator: Box<dyn VarManager>) {
@@ -22,7 +24,7 @@ fn list_namespace(enumerator: Box<dyn VarManager>, vendor: VariableVendor) {
     }
 }
 
-pub fn run(enumerator: Box<dyn VarManager>, namespace: Option<uuid::Uuid>, all: bool) {
+pub fn run(enumerator: Box<dyn VarManager>, namespace: Option<uuid::Uuid>, all: bool) -> ExitCode {
     if all {
         list_all(enumerator);
     } else {
@@ -31,4 +33,5 @@ pub fn run(enumerator: Box<dyn VarManager>, namespace: Option<uuid::Uuid>, all: 
             namespace.map_or(VariableVendor::Efi, VariableVendor::Custom),
         );
     }
+    ExitCode::SUCCESS
 }

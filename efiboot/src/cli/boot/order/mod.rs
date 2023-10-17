@@ -1,3 +1,5 @@
+use std::process::ExitCode;
+
 use efivar::VarManager;
 use itertools::Itertools;
 use structopt::StructOpt;
@@ -43,7 +45,7 @@ pub enum OrderCommand {
     },
 }
 
-pub fn run(manager: Box<dyn VarManager>, cmd: OrderCommand) {
+pub fn run(manager: Box<dyn VarManager>, cmd: OrderCommand) -> ExitCode {
     match cmd {
         OrderCommand::Get => get::run(manager),
         OrderCommand::Add { id, position } => add::run(manager, id.0, position),

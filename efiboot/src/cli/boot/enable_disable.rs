@@ -1,10 +1,12 @@
+use std::process::ExitCode;
+
 use efivar::{
     boot::{BootEntry, BootEntryAttributes, BootVarName},
     efi::Variable,
     VarManager,
 };
 
-pub fn enable(mut manager: Box<dyn VarManager>, id: u16) {
+pub fn enable(mut manager: Box<dyn VarManager>, id: u16) -> ExitCode {
     let mut boot_entry = BootEntry::parse(&*manager, &Variable::new(&id.boot_var_name())).unwrap();
 
     if boot_entry
@@ -12,7 +14,7 @@ pub fn enable(mut manager: Box<dyn VarManager>, id: u16) {
         .contains(BootEntryAttributes::LOAD_OPTION_ACTIVE)
     {
         eprintln!("Boot entry is already enabled");
-        return;
+        return ExitCode::FAILURE;
     }
 
     boot_entry
@@ -21,9 +23,11 @@ pub fn enable(mut manager: Box<dyn VarManager>, id: u16) {
 
     manager.add_boot_entry(id, boot_entry).unwrap();
     println!("Enabled boot entry with success");
+
+    ExitCode::SUCCESS
 }
 
-pub fn disable(mut manager: Box<dyn VarManager>, id: u16) {
+pub fn disable(mut manager: Box<dyn VarManager>, id: u16) -> ExitCode {
     let mut boot_entry = BootEntry::parse(&*manager, &Variable::new(&id.boot_var_name())).unwrap();
 
     if !boot_entry
@@ -31,7 +35,7 @@ pub fn disable(mut manager: Box<dyn VarManager>, id: u16) {
         .contains(BootEntryAttributes::LOAD_OPTION_ACTIVE)
     {
         eprintln!("Boot entry is already disabled");
-        return;
+        return ExitCode::FAILURE;
     }
 
     boot_entry
@@ -40,4 +44,6 @@ pub fn disable(mut manager: Box<dyn VarManager>, id: u16) {
 
     manager.add_boot_entry(id, boot_entry).unwrap();
     println!("Disabled boot entry with success");
+
+    ExitCode::SUCCESS
 }
