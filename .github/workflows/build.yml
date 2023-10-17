@@ -47,7 +47,8 @@ jobs:
           
       - name: Run cargo clippy
         run: cargo clippy --all-features
-
+      
+      # Verify broken doc links
       - name: Run cargo doc
         run: cargo doc --all-features --no-deps
 
