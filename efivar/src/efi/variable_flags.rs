@@ -19,6 +19,14 @@ bitflags! {
     }
 }
 
+impl Default for VariableFlags {
+    fn default() -> Self {
+        VariableFlags::NON_VOLATILE
+            | VariableFlags::BOOTSERVICE_ACCESS
+            | VariableFlags::RUNTIME_ACCESS
+    }
+}
+
 impl FromStr for VariableFlags {
     type Err = Error;
 
