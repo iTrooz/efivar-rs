@@ -2,6 +2,7 @@ use std::str::FromStr;
 
 /// Structure used to contain the right structure for a boot id: 4 (or less, will be zero-filled) hex characters
 /// Given to the CLI library
+#[derive(Clone)]
 pub struct BootEntryId(pub u16);
 
 impl FromStr for BootEntryId {

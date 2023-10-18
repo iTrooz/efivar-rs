@@ -1,7 +1,7 @@
 use crate::exit_code::ExitCode;
 
+use clap::Parser;
 use efivar::VarManager;
-use structopt::StructOpt;
 
 use crate::id::BootEntryId;
 
@@ -16,58 +16,60 @@ pub mod order;
 #[cfg(test)]
 pub mod tests;
 
-#[derive(StructOpt)]
+#[derive(Parser)]
 pub enum BootCommand {
     /// Get all boot entries found, both in the boot order, and outside it if the name matchs
     GetEntries {
         /// Show more information, such as optional data
-        #[structopt(short, long)]
+        #[arg(short, long)]
         verbose: bool,
     },
     Add {
         /// Partition that holds the file to boot from. Defaults to the currently active boot partition
-        #[structopt(short, long)]
+        #[arg(short, long)]
         partition: Option<String>,
 
         /// File to boot from, inside the partition
-        #[structopt(short, long)]
+        #[arg(short, long)]
         file: String,
 
         /// Set entry description
-        #[structopt(short, long)]
+        #[arg(short, long)]
         description: String,
 
         /// Skip checks to ensure data is valid
-        #[structopt(long)]
+        #[arg(long)]
         force: bool,
 
         /// ID to give to the boot entry
-        #[structopt(long)]
+        #[arg(long)]
         id: Option<BootEntryId>,
     },
     /// Delete boot entry
-    #[structopt(visible_alias = "del")]
-    #[structopt(visible_alias = "remove")]
+    #[command(alias = "del")]
+    #[command(alias = "remove")]
     Delete {
         /// ID of the boot entry to delete
-        #[structopt()]
+        #[arg()]
         id: BootEntryId,
     },
     /// Enable boot entry
     Enable {
         /// ID of the boot entry to enable
-        #[structopt()]
+        #[arg()]
         id: BootEntryId,
     },
     /// Disable boot entry
     Disable {
         /// ID of the boot entry to disable
-        #[structopt()]
+        #[arg()]
         id: BootEntryId,
     },
     /// Manage boot order
+    #[command(subcommand)]
     Order(OrderCommand),
     /// Manage BootNext variable
+    #[command(subcommand)]
     Next(BootNextCommand),
 }
 

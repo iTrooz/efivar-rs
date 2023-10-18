@@ -2,16 +2,16 @@ use crate::exit_code::ExitCode;
 use core::panic;
 
 use byteorder::{LittleEndian, ReadBytesExt};
+use clap::Parser;
 use efivar::{
     boot::{BootEntry, BootEntryAttributes, BootVarName},
     efi::{Variable, VariableFlags},
     Error, VarManager,
 };
-use structopt::StructOpt;
 
 use crate::id::BootEntryId;
 
-#[derive(StructOpt)]
+#[derive(Parser)]
 pub enum BootNextCommand {
     /// Unset the BootNext variable
     Unset,
@@ -20,7 +20,7 @@ pub enum BootNextCommand {
     /// Set BootNext
     Set {
         /// ID BootNext entry
-        #[structopt()]
+        #[arg()]
         id: BootEntryId,
     },
 }

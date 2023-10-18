@@ -17,7 +17,7 @@ fn list() {
     assert_eq!(
         ExitCode::SUCCESS,
         crate::run(
-            Command::from_iter(["efiboot", "list"]),
+            Command::parse_from(["efiboot", "list"]),
             &mut MemoryStore::new()
         )
     );
@@ -26,7 +26,7 @@ fn list() {
     assert_eq!(
         ExitCode::SUCCESS,
         crate::run(
-            Command::from_iter([
+            Command::parse_from([
                 "efiboot",
                 "list",
                 "-n",
@@ -53,7 +53,7 @@ fn import() {
     assert_eq!(
         ExitCode::SUCCESS,
         crate::run(
-            Command::from_iter([
+            Command::parse_from([
                 "efiboot",
                 "import",
                 file_path.to_str().unwrap(),
@@ -95,7 +95,7 @@ fn export() {
     assert_eq!(
         ExitCode::SUCCESS,
         crate::run(
-            Command::from_iter([
+            Command::parse_from([
                 "efiboot",
                 "export",
                 "MyVariable",
@@ -125,7 +125,7 @@ fn export_no_var() {
     assert_eq!(
         ExitCode::FAILURE,
         crate::run(
-            Command::from_iter([
+            Command::parse_from([
                 "efiboot",
                 "export",
                 "MyVariable",

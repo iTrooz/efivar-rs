@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
+use clap::Parser;
 use efivar::VarManager;
-use structopt::StructOpt;
 
 use crate::exit_code::ExitCode;
 
@@ -14,72 +14,75 @@ pub mod import;
 pub mod list;
 pub mod read;
 
-#[derive(StructOpt)]
+#[derive(Parser)]
 pub enum Command {
     /// Read the value of a variable
     Read {
         /// Name of the variable to read
-        #[structopt(value_name = "VARIABLE")]
+        #[arg(value_name = "VARIABLE")]
         name: String,
 
         /// GUID of the namespace. Default: EFI standard namespace
-        #[structopt(short, long, value_name = "NAMESPACE")]
+        #[arg(short, long, value_name = "NAMESPACE")]
         namespace: Option<uuid::Uuid>,
 
         /// Print the value as an UTF-8 string
-        #[structopt(short, long)]
+        #[arg(short, long)]
         string: bool,
     },
     /// List known EFI variables
     List {
         /// GUID of the namespace. Default: EFI standard namespace
-        #[structopt(short, long, value_name = "NAMESPACE")]
+        #[arg(short, long, value_name = "NAMESPACE")]
         namespace: Option<uuid::Uuid>,
         /// ignore --namespace and show all namespaces
-        #[structopt(short, long)]
+        #[arg(short, long)]
         all: bool,
     },
     /// Delete an EFI variabe
-    #[structopt(visible_alias = "del")]
-    #[structopt(visible_alias = "remove")]
+    // #[arg(visible_alias = "del")]
+    // #[arg(visible_alias = "remove")]
+    #[command(alias = "del")]
+    #[command(alias = "remove")]
     Delete {
         /// Name of the variable to delete
-        #[structopt(value_name = "VARIABLE")]
+        #[arg(value_name = "VARIABLE")]
         name: String,
 
         /// GUID of the namespace. Default: EFI standard namespace
-        #[structopt(short, long, value_name = "NAMESPACE")]
+        #[arg(short, long, value_name = "NAMESPACE")]
         namespace: Option<uuid::Uuid>,
     },
 
     /// Manage boot-related variables
+    #[command(subcommand)]
     Boot(BootCommand),
     /// Export a variable to file
     Export {
         /// Name of the variable to export
-        #[structopt(value_name = "VARIABLE")]
+        #[arg(value_name = "VARIABLE")]
         name: String,
 
         /// GUID of the namespace. Default: EFI standard namespace
-        #[structopt(short, long, value_name = "NAMESPACE")]
+        #[arg(short, long, value_name = "NAMESPACE")]
         namespace: Option<uuid::Uuid>,
 
         /// Output file
-        #[structopt(value_name = "OUTPUT_FILE")]
+        #[arg(value_name = "OUTPUT_FILE")]
         output_file: PathBuf,
     },
     /// Import a variable from a file
     Import {
         /// Input file
-        #[structopt(value_name = "INPUT_FILE")]
+        #[arg(value_name = "INPUT_FILE")]
         input_file: PathBuf,
 
         /// Name of the variable to create
-        #[structopt(value_name = "VARIABLE")]
+        #[arg(value_name = "VARIABLE")]
         name: String,
 
         /// GUID of the namespace. Default: EFI standard namespace
-        #[structopt(short, long, value_name = "NAMESPACE")]
+        #[arg(short, long, value_name = "NAMESPACE")]
         namespace: Option<uuid::Uuid>,
     },
 }

@@ -1,8 +1,8 @@
 use crate::exit_code::ExitCode;
 
+use clap::Parser;
 use efivar::VarManager;
 use itertools::Itertools;
-use structopt::StructOpt;
 
 use crate::id::BootEntryId;
 
@@ -11,30 +11,30 @@ pub mod get;
 pub mod remove;
 pub mod set;
 
-#[derive(StructOpt)]
+#[derive(Parser)]
 pub enum OrderCommand {
     /// Get current boot order IDs. See `efiboot boot get-entries` to get boot entries information
     Get,
     /// Adds an id to the boot order
     Add {
         /// ID of the entry to add
-        #[structopt(value_name = "ID")]
+        #[arg(value_name = "ID")]
         id: BootEntryId,
 
         /// Position to insert the ID at. 0 is the beginning of the boot order. Defaults to the end.
-        #[structopt(value_name = "POSITION")]
+        #[arg(value_name = "POSITION")]
         position: Option<usize>,
     },
     /// Remove an id from the boot order
-    #[structopt(visible_alias = "del")]
-    #[structopt(visible_alias = "delete")]
+    #[command(alias = "del")]
+    #[command(alias = "delete")]
     Remove {
         /// ID of the entry to remove
-        #[structopt(value_name = "ID")]
+        #[arg(value_name = "ID")]
         id: BootEntryId,
 
         /// whether to override warnings
-        #[structopt(long)]
+        #[arg(long)]
         force: bool,
     },
     /// Overwrite the boot order with the ids provided
