@@ -11,6 +11,23 @@ use efivar::{
 
 use crate::exit_code::ExitCode;
 
+fn read_var_from_file_or_stdin(
+    input_path: &Path,
+) -> Result<(VariableFlags, Vec<u8>), std::io::Error> {
+    if input_path.to_str().unwrap() == "-" {
+        read_var_from_stdin()
+    } else {
+        read_var_from_file(input_path)
+    }
+}
+
+fn read_var_from_stdin() -> Result<(VariableFlags, Vec<u8>), std::io::Error> {
+    let mut buf: Vec<u8> = vec![];
+    std::io::stdin().read_to_end(&mut buf).unwrap();
+
+    Ok((VariableFlags::default(), buf))
+}
+
 fn read_var_from_file(input_path: &Path) -> Result<(VariableFlags, Vec<u8>), std::io::Error> {
     let mut file = File::open(input_path)?;
 
@@ -32,7 +49,7 @@ pub fn run(
         namespace.map_or(VariableVendor::Efi, VariableVendor::Custom),
     );
 
-    let (flags, data) = match read_var_from_file(input_path) {
+    let (flags, data) = match read_var_from_file_or_stdin(input_path) {
         Ok(inner) => inner,
         Err(err) => {
             eprintln!(
