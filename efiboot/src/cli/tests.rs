@@ -216,10 +216,38 @@ fn read() {
         )
         .unwrap();
 
+    // normal read command
     assert_eq!(
         ExitCode::SUCCESS,
         crate::run(
             Command::parse_from(["efiboot", "read", "MyVariable"]),
+            &mut manager
+        )
+    );
+
+    // read as string
+    assert_eq!(
+        ExitCode::SUCCESS,
+        crate::run(
+            Command::parse_from(["efiboot", "read", "MyVariable", "--string"]),
+            &mut manager
+        )
+    );
+
+    // read raw
+    assert_eq!(
+        ExitCode::SUCCESS,
+        crate::run(
+            Command::parse_from(["efiboot", "read", "MyVariable", "--raw"]),
+            &mut manager
+        )
+    );
+
+    // read raw as string
+    assert_eq!(
+        ExitCode::SUCCESS,
+        crate::run(
+            Command::parse_from(["efiboot", "read", "MyVariable", "--raw", "--string"]),
             &mut manager
         )
     );
