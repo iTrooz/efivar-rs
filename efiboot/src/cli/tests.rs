@@ -27,10 +27,7 @@ fn list() {
     // normal list command
     assert_eq!(
         ExitCode::SUCCESS,
-        crate::run(
-            Command::parse_from(["efiboot", "list"]),
-            manager,
-        )
+        crate::run(Command::parse_from(["efiboot", "list"]), manager,)
     );
 
     // list namespace
@@ -50,10 +47,7 @@ fn list() {
     // list all namespaces
     assert_eq!(
         ExitCode::SUCCESS,
-        crate::run(
-            Command::parse_from(["efiboot", "list", "--all",]),
-            manager,
-        )
+        crate::run(Command::parse_from(["efiboot", "list", "--all",]), manager,)
     );
 }
 
