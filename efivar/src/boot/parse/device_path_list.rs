@@ -9,6 +9,7 @@ use super::{
 
 /// holds the potential fields we may get from a packed file path list
 /// TODO remove ?
+#[derive(Debug)]
 pub struct OptFilePathList {
     pub file_path: Option<FilePath>,
     pub hard_drive: Option<EFIHardDrive>,
@@ -16,6 +17,7 @@ pub struct OptFilePathList {
 
 /// Same structure as OptFilePathList, but we ensure that the file path list
 /// is a valid file path overall
+#[derive(Debug, PartialEq)]
 pub struct FilePathList {
     pub file_path: FilePath,
     pub hard_drive: EFIHardDrive,

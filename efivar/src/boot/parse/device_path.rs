@@ -14,6 +14,7 @@ pub enum DevicePath {
     HardDrive(EFIHardDrive),
 }
 
+#[derive(Debug, PartialEq)]
 pub enum EFIHardDriveType {
     Mbr,
     Gpt,
@@ -48,6 +49,7 @@ impl Display for EFIHardDriveType {
     }
 }
 
+#[derive(Debug, PartialEq)]
 pub struct EFIHardDrive {
     pub partition_number: u32,
     pub partition_start: u64,
@@ -171,6 +173,7 @@ impl EFIHardDrive {
     }
 }
 
+#[derive(Debug, PartialEq)]
 pub struct FilePath {
     pub path: PathBuf, // TODO: do not use PathBuf, because it is a OS-specific type ?
 }

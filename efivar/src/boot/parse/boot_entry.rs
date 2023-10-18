@@ -25,6 +25,7 @@ impl Display for BootEntryAttributes {
     }
 }
 
+#[derive(Debug, PartialEq)]
 pub struct BootEntry {
     pub attributes: BootEntryAttributes,
     pub description: String,
