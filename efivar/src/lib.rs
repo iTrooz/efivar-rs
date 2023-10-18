@@ -35,7 +35,7 @@ mod enumerator;
 mod error;
 mod reader;
 mod sys;
-mod utils;
+pub mod utils;
 mod writer;
 
 use boot::{BootVarReader, BootVarWriter};

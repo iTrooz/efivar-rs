@@ -10,6 +10,8 @@ pub mod add;
 pub mod get;
 pub mod remove;
 pub mod set;
+#[cfg(test)]
+mod tests;
 
 #[derive(Parser)]
 pub enum OrderCommand {
@@ -22,7 +24,7 @@ pub enum OrderCommand {
         id: BootEntryId,
 
         /// Position to insert the ID at. 0 is the beginning of the boot order. Defaults to the end.
-        #[arg(value_name = "POSITION")]
+        #[arg(short, long, value_name = "POSITION")]
         position: Option<usize>,
     },
     /// Remove an id from the boot order
@@ -59,15 +61,4 @@ pub fn run(manager: &mut dyn VarManager, cmd: OrderCommand) -> ExitCode {
 /// Generate a string version of the boot order.
 fn boot_order_str(ids: &[u16]) -> String {
     ids.iter().map(|id| format!("{id:04X}")).join(" ")
-}
-
-#[cfg(test)]
-mod tests {
-
-    pub use super::*;
-
-    #[test]
-    fn test_boot_order_str() {
-        assert_eq!(boot_order_str(&[0x0001, 0x2000, 0xBEEF]), "0001 2000 BEEF");
-    }
 }

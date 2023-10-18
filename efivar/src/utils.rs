@@ -27,6 +27,11 @@ pub fn read_nt_utf16_string(cursor: &mut &[u8]) -> Result<String, StringParseErr
     }
 }
 
+/// convert a u16 list to a u8 list (one u16 -> two u8)
+pub fn u16_to_u8(input: &[u16]) -> Vec<u8> {
+    input.iter().flat_map(|v| v.to_le_bytes()).collect()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
