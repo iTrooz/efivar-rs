@@ -243,4 +243,28 @@ mod tests {
         assert_eq!(Variable::new("Boot10000").boot_var_id(), None);
         assert_eq!(Variable::new("Boot100").boot_var_id(), None);
     }
+
+    #[test]
+    fn variable_vendor_eq() {
+        assert_eq!(VariableVendor::Efi, VariableVendor::Efi);
+
+        // idk what the right behaviour would be here
+        assert_eq!(VariableVendor::Efi, VariableVendor::Custom(*EFI_GUID));
+        assert_eq!(VariableVendor::Custom(*EFI_GUID), VariableVendor::Efi);
+
+        assert_eq!(
+            VariableVendor::Custom(Uuid::from_str("9acae909-5f29-43c8-b925-30040693bdff").unwrap()),
+            VariableVendor::Custom(Uuid::from_str("9acae909-5f29-43c8-b925-30040693bdff").unwrap())
+        );
+
+        assert_ne!(
+            VariableVendor::Custom(Uuid::from_str("9acae909-5f29-43c8-b925-30040693bdff").unwrap()),
+            VariableVendor::Custom(Uuid::from_str("d3464728-c118-4d88-a450-7ac21a85a099").unwrap())
+        );
+
+        assert_ne!(
+            VariableVendor::Efi,
+            VariableVendor::Custom(Uuid::from_str("d3464728-c118-4d88-a450-7ac21a85a099").unwrap())
+        );
+    }
 }
