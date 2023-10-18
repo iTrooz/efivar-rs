@@ -141,3 +141,49 @@ fn export_no_var() {
         panic!("Reading a non-existent variable should raise VarNotFound");
     }
 }
+
+#[test]
+fn delete() {
+    //! Run `efiboot delete`
+
+    let mut manager = MemoryStore::new();
+
+    manager
+        .write(
+            &Variable::new("MyVariable"),
+            VariableFlags::NON_VOLATILE
+                | VariableFlags::BOOTSERVICE_ACCESS
+                | VariableFlags::RUNTIME_ACCESS,
+            &[0x01, 0x02, 0x03, 0x04],
+        )
+        .unwrap();
+
+    assert_eq!(
+        ExitCode::SUCCESS,
+        crate::run(
+            Command::parse_from(["efiboot", "delete", "MyVariable",]),
+            &mut manager
+        )
+    );
+
+    if let Error::VarNotFound { name } = manager.read(&Variable::new("MyVariable")).unwrap_err() {
+        assert_eq!(name, Variable::new("MyVariable"));
+    } else {
+        panic!("Reading a non-existent variable should raise VarNotFound");
+    }
+}
+
+#[test]
+fn delete_non_existent() {
+    //! Try `efiboot delete` with a non-existent variable
+
+    let mut manager = MemoryStore::new();
+
+    assert_eq!(
+        ExitCode::FAILURE,
+        crate::run(
+            Command::parse_from(["efiboot", "delete", "MyVariable",]),
+            &mut manager
+        )
+    );
+}
