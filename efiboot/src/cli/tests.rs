@@ -13,12 +13,23 @@ use super::*;
 
 #[test]
 fn list() {
+    let manager = &mut MemoryStore::new();
+
+    // write at least one variable so code printing variables is covered
+    manager
+        .write(
+            &Variable::new("MyVariable"),
+            VariableFlags::default(),
+            &[0x01, 0x02],
+        )
+        .unwrap();
+
     // normal list command
     assert_eq!(
         ExitCode::SUCCESS,
         crate::run(
             Command::parse_from(["efiboot", "list"]),
-            &mut MemoryStore::new()
+            manager,
         )
     );
 
@@ -32,7 +43,16 @@ fn list() {
                 "-n",
                 "f2aab986-4175-47bb-890a-3cba5f6d2547"
             ]),
-            &mut MemoryStore::new()
+            manager,
+        )
+    );
+
+    // list all namespaces
+    assert_eq!(
+        ExitCode::SUCCESS,
+        crate::run(
+            Command::parse_from(["efiboot", "list", "--all",]),
+            manager,
         )
     );
 }
