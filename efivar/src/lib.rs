@@ -17,8 +17,6 @@
 #[macro_use]
 extern crate bitflags;
 #[macro_use]
-extern crate failure;
-#[macro_use]
 extern crate lazy_static;
 #[cfg(feature = "store")]
 #[macro_use]

@@ -3,35 +3,35 @@ use std::io;
 use crate::efi::Variable;
 
 /// Describes an error returned by EFI variable operations
-#[derive(Debug, Fail)]
+#[derive(Debug, thiserror::Error)]
 pub enum Error {
-    #[fail(display = "failed to parse variable name: {}", name)]
+    #[error("failed to parse variable name: {}", name)]
     InvalidVarName { name: String },
-    #[fail(display = "variable not found: {}", name)]
+    #[error("variable not found: {}", name)]
     VarNotFound { name: Variable },
-    #[fail(display = "permission denied for variable: {}", name)]
+    #[error("permission denied for variable: {}", name)]
     PermissionDenied { name: Variable },
-    #[fail(display = "unknown i/o error for variable: {}", name)]
+    #[error("unknown i/o error for variable: {}", name)]
     VarUnknownError { name: Variable, error: io::Error },
-    #[fail(display = "base64 decoding error: {}", error)]
+    #[error("base64 decoding error: {}", error)]
     #[cfg(feature = "store")]
     Base64DecodeError { error: base64::DecodeError },
-    #[fail(display = "base64 decoding error: {}", error)]
+    #[error("base64 decoding error: {}", error)]
     #[cfg(feature = "store")]
     Base64DecodeSliceError { error: base64::DecodeSliceError },
-    #[fail(display = "unknown i/o error")]
+    #[error("unknown i/o error")]
     UnknownIoError { error: io::Error },
-    #[fail(display = "unknown EFI variable flag: '{}'", flag)]
+    #[error("unknown EFI variable flag: '{}'", flag)]
     UnknownFlag { flag: String },
-    #[fail(display = "failed to decode name as valid UTF-8")]
+    #[error("failed to decode name as valid UTF-8")]
     InvalidUTF8,
-    #[fail(display = "buffer too small for variable: {}", name)]
+    #[error("buffer too small for variable: {}", name)]
     BufferTooSmall { name: Variable },
-    #[fail(display = "failed to decode uuid: {}", error)]
+    #[error("failed to decode uuid: {}", error)]
     UuidError { error: uuid::Error },
-    #[fail(display = "failed to parse variable content (invalid content)")]
+    #[error("failed to parse variable content (invalid content)")]
     VarParseError,
-    #[fail(display = "failed to parse string: {}", 0)]
+    #[error("failed to parse string: {}", 0)]
     StringParseError(crate::utils::StringParseError),
 }
 

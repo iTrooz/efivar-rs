@@ -1,12 +1,12 @@
 use byteorder::{LittleEndian, ReadBytesExt};
 
-#[derive(Debug, Fail)]
+#[derive(Debug, thiserror::Error)]
 pub enum StringParseError {
     /// occurs when you get an error while reading the data
-    #[fail(display = "Buffer read error: {}", 0)]
+    #[error("Buffer read error: {}", 0)]
     Read(std::io::Error),
     /// occurs when the bytes are not a valid UTF-16 string
-    #[fail(display = "Buffer parse error: {}", 0)]
+    #[error("Buffer parse error: {}", 0)]
     Parse(std::string::FromUtf16Error),
 }
 
