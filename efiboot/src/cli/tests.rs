@@ -201,3 +201,39 @@ fn delete_non_existent() {
         )
     );
 }
+
+#[test]
+fn read() {
+    //! Run `efiboot read`
+
+    let mut manager = MemoryStore::new();
+
+    manager
+        .write(
+            &Variable::new("MyVariable"),
+            VariableFlags::default(),
+            &[0x01, 0x02, 0x03, 0x04],
+        )
+        .unwrap();
+
+    assert_eq!(
+        ExitCode::SUCCESS,
+        crate::run(
+            Command::parse_from(["efiboot", "read", "MyVariable"]),
+            &mut manager
+        )
+    );
+}
+
+#[test]
+fn read_non_existent() {
+    //! Try `efiboot read` with a non-existent variable
+
+    assert_eq!(
+        ExitCode::FAILURE,
+        crate::run(
+            Command::parse_from(["efiboot", "read", "MyVariable"]),
+            &mut MemoryStore::new()
+        )
+    );
+}
