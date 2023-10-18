@@ -188,6 +188,8 @@ impl fmt::Display for Variable {
 
 #[cfg(test)]
 mod tests {
+    use uuid::Uuid;
+
     use super::*;
 
     #[test]
@@ -216,5 +218,29 @@ mod tests {
             Variable::new("BootOrder").to_string(),
             "BootOrder-8be4df61-93ca-11d2-aa0d-00e098032b8c"
         );
+    }
+
+    #[test]
+    fn short_name() {
+        assert_eq!(Variable::new("BootOrder").short_name(), "BootOrder");
+        assert_eq!(
+            Variable::new_with_vendor(
+                "BootOrder",
+                Uuid::from_str("32e3b3d6-a5e6-47a8-980d-d9d37a104c56").unwrap()
+            )
+            .short_name(),
+            "BootOrder-32e3b3d6-a5e6-47a8-980d-d9d37a104c56"
+        );
+    }
+
+    #[test]
+    fn boot_var_id() {
+        assert_eq!(Variable::new("Boot0001").boot_var_id(), Some(0x0001));
+        assert_eq!(Variable::new("Boot1000").boot_var_id(), Some(0x1000));
+
+        assert_eq!(Variable::new("BootOrder").boot_var_id(), None);
+
+        assert_eq!(Variable::new("Boot10000").boot_var_id(), None);
+        assert_eq!(Variable::new("Boot100").boot_var_id(), None);
     }
 }
