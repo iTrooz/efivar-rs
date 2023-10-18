@@ -23,3 +23,15 @@ impl From<ExitCode> for std::process::ExitCode {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::exit_code::ExitCode;
+
+    #[test]
+    fn compare() {
+        assert_eq!(ExitCode::SUCCESS, ExitCode::SUCCESS);
+        assert_eq!(ExitCode::FAILURE, ExitCode::FAILURE);
+        assert_eq!(ExitCode::FAILURE1(5), ExitCode::FAILURE1(5));
+    }
+}
