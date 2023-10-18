@@ -191,8 +191,23 @@ mod tests {
     use super::*;
 
     #[test]
+    fn parse_valid() {
+        let var = Variable::from_str("BootOrder-c9c4c263-cb10-45ea-bdb6-cabdb201d0f5").unwrap();
+        assert_eq!(var.name(), "BootOrder");
+        assert_eq!(
+            var.vendor().to_string(),
+            "c9c4c263-cb10-45ea-bdb6-cabdb201d0f5"
+        );
+    }
+
+    #[test]
     fn parse_name_invalid() {
         assert!(Variable::from_str("BootOrder_Invalid").is_err());
+    }
+
+    #[test]
+    fn parse_name_invalid_2() {
+        assert!(Variable::from_str("BootOrder-Invalid").is_err());
     }
 
     #[test]
