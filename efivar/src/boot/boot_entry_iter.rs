@@ -28,6 +28,6 @@ impl<'a> Iterator for BootEntriesIterator<'a> {
         self.ids
             .pop()
             .map(|id| Variable::new(&id.boot_var_name()))
-            .map(|var| (BootEntry::parse(self.var_reader, &var), var))
+            .map(|var| (BootEntry::read(self.var_reader, &var), var))
     }
 }

@@ -72,7 +72,7 @@ pub fn run(
                 .unwrap();
 
             let boot_entry =
-                BootEntry::parse(&*manager, &Variable::new(&active_id.boot_var_name())).unwrap();
+                BootEntry::read(&*manager, &Variable::new(&active_id.boot_var_name())).unwrap();
 
             boot_entry.file_path_list.unwrap().hard_drive
         }

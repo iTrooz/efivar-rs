@@ -109,7 +109,7 @@ pub fn run(manager: &dyn VarManager, verbose: bool) -> ExitCode {
     println!();
     println!("Found boot entries not in boot sequence:");
     for var in vars {
-        match BootEntry::parse(manager, &var) {
+        match BootEntry::read(manager, &var) {
             Ok(entry) => print_var(&var, entry, verbose, active_id),
             Err(err) => eprintln!("Failed to get entry from variable {}: {}", var, err),
         };

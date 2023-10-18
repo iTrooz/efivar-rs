@@ -34,12 +34,12 @@ pub struct BootEntry {
 }
 
 impl BootEntry {
-    pub fn parse(manager: &(impl ?Sized + VarReader), variable: &Variable) -> crate::Result<Self> {
+    pub fn read(manager: &(impl ?Sized + VarReader), variable: &Variable) -> crate::Result<Self> {
         let (value, _flags) = manager.read(variable)?;
-        Self::parse_from_bytes(value)
+        Self::parse(value)
     }
 
-    pub fn parse_from_bytes(value: Vec<u8>) -> crate::Result<Self> {
+    pub fn parse(value: Vec<u8>) -> crate::Result<Self> {
         // slice of the buffer
         // Used so we can move the offset in it with ReadBytesExt functions
         let mut buf = &value[..];

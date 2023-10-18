@@ -49,8 +49,7 @@ pub fn run(manager: &mut dyn VarManager, cmd: BootNextCommand) -> ExitCode {
         BootNextCommand::Set { id } => {
             let id = id.0;
 
-            let boot_entry = match BootEntry::parse(&*manager, &Variable::new(&id.boot_var_name()))
-            {
+            let boot_entry = match BootEntry::read(&*manager, &Variable::new(&id.boot_var_name())) {
                 Ok(boot_entry) => boot_entry,
                 Err(Error::VarNotFound { var: _ }) => {
                     println!("No boot entry with id {id:04X} found");
