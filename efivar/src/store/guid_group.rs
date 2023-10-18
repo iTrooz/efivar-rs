@@ -17,9 +17,7 @@ impl GuidGroup {
     }
 
     pub fn variable_mut(&mut self, name: &str) -> &mut StoreValue {
-        self.values
-            .entry(String::from(name))
-            .or_insert_with(StoreValue::new)
+        self.values.entry(String::from(name)).or_default()
     }
 
     /// Delete a variable from this GUID group.

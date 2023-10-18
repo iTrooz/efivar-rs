@@ -18,8 +18,6 @@ impl VendorGroup {
     }
 
     pub fn vendor_mut(&mut self, vendor: &VariableVendor) -> &mut GuidGroup {
-        self.vendors
-            .entry(*vendor.as_ref())
-            .or_insert_with(GuidGroup::new)
+        self.vendors.entry(*vendor.as_ref()).or_default()
     }
 }
