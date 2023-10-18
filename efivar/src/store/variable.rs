@@ -48,10 +48,15 @@ impl<T: VariableStore> VarWriter for T {
     }
 
     fn delete(&mut self, var: &Variable) -> crate::Result<()> {
-        self.get_vendor_group_mut()
+        if self
+            .get_vendor_group_mut()
             .vendor_mut(var.vendor())
-            .delete_variable(var.name());
-        Ok(())
+            .delete_variable(var.name())
+        {
+            Ok(())
+        } else {
+            Err(Error::VarNotFound { name: var.clone() })
+        }
     }
 }
 

@@ -21,7 +21,7 @@ impl GuidGroup {
     }
 
     /// Delete a variable from this GUID group.
-    pub fn delete_variable(&mut self, name: &str) {
-        self.values.remove(name);
+    pub fn delete_variable(&mut self, name: &str) -> bool {
+        self.values.remove(name).is_some()
     }
 }
