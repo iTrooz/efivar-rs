@@ -149,8 +149,8 @@ fn export_no_var() {
         )
     );
 
-    if let Error::VarNotFound { name } = manager.read(&Variable::new("MyVariable")).unwrap_err() {
-        assert_eq!(name, Variable::new("MyVariable"));
+    if let Error::VarNotFound { var } = manager.read(&Variable::new("MyVariable")).unwrap_err() {
+        assert_eq!(var, Variable::new("MyVariable"));
     } else {
         panic!("Reading a non-existent variable should raise VarNotFound");
     }
@@ -180,8 +180,8 @@ fn delete() {
         )
     );
 
-    if let Error::VarNotFound { name } = manager.read(&Variable::new("MyVariable")).unwrap_err() {
-        assert_eq!(name, Variable::new("MyVariable"));
+    if let Error::VarNotFound { var } = manager.read(&Variable::new("MyVariable")).unwrap_err() {
+        assert_eq!(var, Variable::new("MyVariable"));
     } else {
         panic!("Reading a non-existent variable should raise VarNotFound");
     }

@@ -26,7 +26,7 @@ impl<T: VariableStore> VarReader for T {
         self.get_vendor_group()
             .vendor(var.vendor())
             .and_then(|guid_group| guid_group.variable(var.name()))
-            .ok_or_else(|| Error::VarNotFound { name: var.clone() })
+            .ok_or_else(|| Error::VarNotFound { var: var.clone() })
             .and_then(|val| val.to_tuple())
     }
 }
@@ -55,7 +55,7 @@ impl<T: VariableStore> VarWriter for T {
         {
             Ok(())
         } else {
-            Err(Error::VarNotFound { name: var.clone() })
+            Err(Error::VarNotFound { var: var.clone() })
         }
     }
 }

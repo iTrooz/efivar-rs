@@ -72,14 +72,14 @@ impl fmt::Display for VariableVendor {
 ///
 /// # Examples
 ///
-/// Parsing a valid name into succeeds:
+/// Parsing a valid variable into succeeds:
 ///
 /// ```
 /// # use std::str::FromStr;
 /// # use efivar::efi::Variable;
-/// let name = Variable::from_str("BootOrder-8be4df61-93ca-11d2-aa0d-00e098032b8c").unwrap();
-/// assert_eq!(*name.vendor().as_ref(), uuid::Uuid::from_str("8be4df61-93ca-11d2-aa0d-00e098032b8c").unwrap());
-/// assert_eq!(name.name(), "BootOrder");
+/// let var = Variable::from_str("BootOrder-8be4df61-93ca-11d2-aa0d-00e098032b8c").unwrap();
+/// assert_eq!(*var.vendor().as_ref(), uuid::Uuid::from_str("8be4df61-93ca-11d2-aa0d-00e098032b8c").unwrap());
+/// assert_eq!(var.name(), "BootOrder");
 /// ```
 ///
 /// Parsing an invalid name fails:
@@ -87,7 +87,7 @@ impl fmt::Display for VariableVendor {
 /// ```
 /// # use std::str::FromStr;
 /// # use efivar::efi::Variable;
-/// let result = Variable::from_str("invalid name");
+/// let result = Variable::from_str("invalid variable");
 /// assert!(result.is_err());
 /// ```
 ///
@@ -95,8 +95,8 @@ impl fmt::Display for VariableVendor {
 ///
 /// ```
 /// # use efivar::efi::Variable;
-/// let name = Variable::new("BootOrder");
-/// assert_eq!(name.to_string(), "BootOrder-8be4df61-93ca-11d2-aa0d-00e098032b8c");
+/// let var = Variable::new("BootOrder");
+/// assert_eq!(var.to_string(), "BootOrder-8be4df61-93ca-11d2-aa0d-00e098032b8c");
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Variable {
@@ -191,7 +191,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn parse_valid() {
+    fn parse_valid_var() {
         let var = Variable::from_str("BootOrder-c9c4c263-cb10-45ea-bdb6-cabdb201d0f5").unwrap();
         assert_eq!(var.name(), "BootOrder");
         assert_eq!(
@@ -201,12 +201,12 @@ mod tests {
     }
 
     #[test]
-    fn parse_name_invalid() {
+    fn parse_invalid_var() {
         assert!(Variable::from_str("BootOrder_Invalid").is_err());
     }
 
     #[test]
-    fn parse_name_invalid_2() {
+    fn parse_invalid_var_2() {
         assert!(Variable::from_str("BootOrder-Invalid").is_err());
     }
 

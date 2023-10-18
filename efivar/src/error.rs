@@ -7,12 +7,12 @@ use crate::efi::Variable;
 pub enum Error {
     #[error("failed to parse variable name: {}", name)]
     InvalidVarName { name: String },
-    #[error("variable not found: {}", name)]
-    VarNotFound { name: Variable },
-    #[error("permission denied for variable: {}", name)]
-    PermissionDenied { name: Variable },
-    #[error("unknown i/o error for variable: {}", name)]
-    VarUnknownError { name: Variable, error: io::Error },
+    #[error("variable not found: {}", var)]
+    VarNotFound { var: Variable },
+    #[error("permission denied for variable: {}", var)]
+    PermissionDenied { var: Variable },
+    #[error("unknown i/o error for variable: {}", var)]
+    VarUnknownError { var: Variable, error: io::Error },
     #[error("base64 decoding error: {}", error)]
     #[cfg(feature = "store")]
     Base64DecodeError { error: base64::DecodeError },
@@ -58,14 +58,14 @@ impl Error {
         let var = var.clone();
 
         if is_variable_not_found_error(&error) {
-            return Error::VarNotFound { name: var };
+            return Error::VarNotFound { var };
         }
 
         if is_permission_denied_error(&error) {
-            return Error::PermissionDenied { name: var };
+            return Error::PermissionDenied { var };
         }
 
-        Error::VarUnknownError { name: var, error }
+        Error::VarUnknownError { var, error }
     }
 
     #[cfg(target_os = "windows")]

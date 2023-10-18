@@ -37,7 +37,7 @@ pub fn run(manager: &mut dyn VarManager, cmd: BootNextCommand) -> ExitCode {
                     );
                     ExitCode::SUCCESS
                 }
-                Err(Error::VarNotFound { name: _ }) => {
+                Err(Error::VarNotFound { var: _ }) => {
                     println!("BootNext is not set");
                     ExitCode::FAILURE
                 }
@@ -52,7 +52,7 @@ pub fn run(manager: &mut dyn VarManager, cmd: BootNextCommand) -> ExitCode {
             let boot_entry = match BootEntry::parse(&*manager, &Variable::new(&id.boot_var_name()))
             {
                 Ok(boot_entry) => boot_entry,
-                Err(Error::VarNotFound { name: _ }) => {
+                Err(Error::VarNotFound { var: _ }) => {
                     println!("No boot entry with id {id:04X} found");
                     return ExitCode::FAILURE;
                 }
@@ -90,7 +90,7 @@ pub fn run(manager: &mut dyn VarManager, cmd: BootNextCommand) -> ExitCode {
                 println!("BootNext unset with success");
                 ExitCode::SUCCESS
             }
-            Err(Error::VarNotFound { name: _ }) => {
+            Err(Error::VarNotFound { var: _ }) => {
                 println!("BootNext not set");
                 ExitCode::FAILURE
             }
