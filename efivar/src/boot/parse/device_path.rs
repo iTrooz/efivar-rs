@@ -105,7 +105,7 @@ impl DevicePath {
                             .map_err(|_| Error::VarParseError)?,
                         partition_sig: Uuid::from_u128(
                             device_path_data
-                                .read_u128::<LittleEndian>()
+                                .read_u128::<BigEndian>()
                                 .map_err(|_| Error::VarParseError)?,
                         ),
                         format: device_path_data
@@ -156,7 +156,7 @@ impl EFIHardDrive {
         bytes
             .write_u64::<LittleEndian>(self.partition_size)
             .unwrap();
-        bytes.write_all(&self.partition_sig.to_bytes_le()).unwrap();
+        bytes.write_all(self.partition_sig.as_bytes()).unwrap();
         bytes.write_u8(self.format).unwrap();
         bytes.write_u8(self.sig_type.as_u8()).unwrap();
 
