@@ -19,6 +19,7 @@ pub mod tests;
 #[derive(Parser)]
 pub enum Command {
     /// Read the value of a variable
+    #[command(alias = "info")]
     Read {
         /// Name of the variable to read
         #[arg(value_name = "VARIABLE")]
