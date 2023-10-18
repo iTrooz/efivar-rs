@@ -19,9 +19,7 @@ impl<T: VarWriter> BootVarWriter for T {
 
         self.write(
             &Variable::new("BootOrder"),
-            VariableFlags::NON_VOLATILE
-                | VariableFlags::BOOTSERVICE_ACCESS
-                | VariableFlags::RUNTIME_ACCESS,
+            VariableFlags::default(),
             &bytes,
         )
         .unwrap();
@@ -34,9 +32,7 @@ impl<T: VarWriter> BootVarWriter for T {
 
         self.write(
             &Variable::new(&id.boot_var_name()),
-            VariableFlags::NON_VOLATILE
-                | VariableFlags::BOOTSERVICE_ACCESS
-                | VariableFlags::RUNTIME_ACCESS,
+            VariableFlags::default(),
             &bytes,
         )
         .unwrap();
