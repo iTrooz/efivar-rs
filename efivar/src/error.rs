@@ -25,8 +25,6 @@ pub enum Error {
     UnknownFlag { flag: String },
     #[error("failed to decode name as valid UTF-8")]
     InvalidUTF8,
-    #[error("buffer too small for variable: {}", name)]
-    BufferTooSmall { name: Variable },
     #[error("failed to decode uuid: {}", error)]
     UuidError { error: uuid::Error },
     #[error("failed to parse variable content (invalid content)")]
@@ -46,17 +44,6 @@ fn is_variable_not_found_error(err: &io::Error) -> bool {
 }
 
 #[cfg(not(target_os = "windows"))]
-fn is_buffer_too_small_error(_err: &io::Error) -> bool {
-    // TODO: Can this error actually be raised on Linux?
-    false
-}
-
-#[cfg(target_os = "windows")]
-fn is_buffer_too_small_error(err: &io::Error) -> bool {
-    err.raw_os_error() == Some(122)
-}
-
-#[cfg(not(target_os = "windows"))]
 fn is_permission_denied_error(err: &io::Error) -> bool {
     err.kind() == io::ErrorKind::PermissionDenied
 }
@@ -72,10 +59,6 @@ impl Error {
 
         if is_variable_not_found_error(&error) {
             return Error::VarNotFound { name: var };
-        }
-
-        if is_buffer_too_small_error(&error) {
-            return Error::BufferTooSmall { name: var };
         }
 
         if is_permission_denied_error(&error) {
