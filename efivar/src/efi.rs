@@ -1,10 +1,13 @@
 use std::str::FromStr;
 
 mod variable_flags;
-pub use variable_flags::*;
+pub use variable_flags::VariableFlags;
 
 mod variable;
-pub use variable::*;
+pub use variable::Variable;
+
+mod variable_vendor;
+pub use variable_vendor::VariableVendor;
 
 lazy_static! {
     /// Vendor GUID of the EFI variables according to the specification
