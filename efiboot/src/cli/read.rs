@@ -12,6 +12,7 @@ pub fn run(
     name: &str,
     namespace: Option<uuid::Uuid>,
     as_string: bool,
+    raw: bool,
 ) -> ExitCode {
     let name = Variable::new_with_vendor(
         name,
@@ -20,18 +21,28 @@ pub fn run(
 
     match reader.read(&name) {
         Ok((buf, attr)) => {
-            println!("Attributes: {}", attr.to_string());
+            if !raw {
+                println!("Attributes: {}", attr.to_string());
+            }
             if as_string {
-                println!("Value (as UTF8 string): {}", String::from_utf8_lossy(&buf));
+                if raw {
+                    println!("{}", String::from_utf8_lossy(&buf));
+                } else {
+                    println!("Value (as UTF8 string): {}", String::from_utf8_lossy(&buf));
+                }
             } else {
-                println!(
-                    "Value: {}",
-                    buf.iter()
-                        .tuples()
-                        .map(|(a, b)| format!("{:02X}{:02X}", a, b))
-                        .fold(String::new(), |acc, ref item| acc + " " + item)
-                        .trim()
-                );
+                let value = buf
+                    .iter()
+                    .tuples()
+                    .map(|(a, b)| format!("{:02X}{:02X}", a, b))
+                    .fold(String::new(), |acc, ref item| acc + " " + item)
+                    .trim()
+                    .to_owned();
+                if raw {
+                    println!("{}", value);
+                } else {
+                    println!("Value: {}", value);
+                }
             };
             ExitCode::SUCCESS
         }

@@ -31,6 +31,10 @@ pub enum Command {
         /// Print the value as an UTF-8 string
         #[arg(short, long)]
         string: bool,
+
+        /// Skip the header and print the raw variable value
+        #[arg(short, long)]
+        raw: bool,
     },
     /// List known EFI variables
     List {
@@ -95,7 +99,8 @@ pub fn run(manager: &mut dyn VarManager, cmd: Command) -> ExitCode {
             name,
             namespace,
             string,
-        } => read::run(manager, &name, namespace, string),
+            raw,
+        } => read::run(manager, &name, namespace, string, raw),
         Command::List { namespace, all } => list::run(manager, namespace, all),
         Command::Delete { name, namespace } => delete::run(manager, &name, namespace),
         Command::Boot(arg) => boot::run(manager, arg),
