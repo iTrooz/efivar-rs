@@ -78,7 +78,8 @@ pub enum Command {
         #[arg(value_name = "OUTPUT_FILE")]
         output_file: PathBuf,
     },
-    /// Import a variable from a file
+    /// Import a variable from a file.
+    /// Putting `-` as a file will read from stdin instead
     Import {
         /// Input file
         #[arg(value_name = "INPUT_FILE")]
