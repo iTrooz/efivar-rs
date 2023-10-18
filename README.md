@@ -1,7 +1,7 @@
 # efiboot-rs
 
 [![Build Status](https://github.com/iTrooz/efiboot-rs/actions/workflows/build.yml/badge.svg)](https://github.com/iTrooz/efiboot-rs/actions/workflows/build.yml)
-[![Documentation](https://img.shields.io/badge/docs-master-blue.svg)](https://docs.rs/efivar/)
+[![Documentation](https://img.shields.io/badge/docs-main-blue.svg)](https://docs.rs/efivar/)
 [![codecov](https://codecov.io/gh/iTrooz/efiboot-rs/branch/main/graph/badge.svg)](https://codecov.io/gh/iTrooz/efiboot-rs)
 [![libraries.io](https://img.shields.io/librariesio/github/iTrooz/efiboot-rs.svg)](https://libraries.io/github/iTrooz/efiboot-rs)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
