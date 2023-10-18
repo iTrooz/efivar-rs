@@ -14,6 +14,9 @@ pub mod get_entries;
 pub mod next;
 pub mod order;
 
+#[cfg(test)]
+mod tests;
+
 #[derive(Parser)]
 pub enum BootCommand {
     /// Get all boot entries found, both in the boot order, and outside it if the name matchs

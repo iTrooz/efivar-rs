@@ -2,7 +2,7 @@
 
 use std::{convert::TryInto, fmt::Display, io::Write, path::PathBuf};
 
-use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
+use byteorder::{BigEndian, LittleEndian, ReadBytesExt, WriteBytesExt};
 use uuid::Uuid;
 
 use crate::{utils::read_nt_utf16_string, Error};
@@ -14,7 +14,7 @@ pub enum DevicePath {
     HardDrive(EFIHardDrive),
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum EFIHardDriveType {
     Mbr,
     Gpt,
@@ -49,7 +49,7 @@ impl Display for EFIHardDriveType {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct EFIHardDrive {
     pub partition_number: u32,
     pub partition_start: u64,
