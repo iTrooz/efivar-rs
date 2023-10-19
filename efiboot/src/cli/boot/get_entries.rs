@@ -74,7 +74,7 @@ pub fn run(manager: &dyn VarManager, verbose: bool) -> ExitCode {
     let mut vars: Vec<Variable> = match manager.get_all_vars() {
         Ok(vars) => vars,
         Err(err) => {
-            eprintln!("Failed to list EFI variable: {:?}", err);
+            eprintln!("Failed to list EFI variables: {:?}", err);
             return ExitCode::FAILURE;
         }
     }
