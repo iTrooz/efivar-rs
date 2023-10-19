@@ -6,7 +6,7 @@ use itertools::Itertools;
 
 /// get the partition UUID from its name
 /// * `name`: the name of the partition, e.g. '/dev/sda1'
-fn get_partition_uuid(name: &str) -> uuid::Uuid {
+fn get_partition_uuid(name: &str) -> Option<uuid::Uuid> {
     let output = Command::new("blkid").output().unwrap().stdout;
 
     if output.is_empty() {
@@ -27,18 +27,18 @@ fn get_partition_uuid(name: &str) -> uuid::Uuid {
             let (key, value) = pair.split_once('=').unwrap();
             if key == "PARTUUID" {
                 let value = value.trim_matches('"');
-                return uuid::Uuid::parse_str(value).unwrap();
+                return Some(uuid::Uuid::parse_str(value).unwrap());
             }
         }
 
         break;
     }
 
-    panic!("No partition found");
+    None
 }
 
 /// Partition names are in the form '/dev/sda1', so just take the number at the end
-fn get_partition_number(name: &str) -> u32 {
+fn get_partition_number(name: &str) -> Option<u32> {
     name.chars()
         .rev()
         .take_while(|c| c.is_ascii_digit())
@@ -47,7 +47,7 @@ fn get_partition_number(name: &str) -> u32 {
         .rev()
         .collect::<String>()
         .parse::<u32>()
-        .unwrap()
+        .ok()
 }
 
 /// get partitition start and size
@@ -69,8 +69,8 @@ fn get_partition_location(name: &str) -> (u64, u64) {
 
 /// retrieve data needed to generate a EFIHardDrive from the system, from a friendly name of the partition
 pub fn retrieve_efi_partition_data(name: &str) -> EFIHardDrive {
-    let partition_sig = get_partition_uuid(name);
-    let partition_number = get_partition_number(name);
+    let partition_sig = get_partition_uuid(name).unwrap();
+    let partition_number = get_partition_number(name).unwrap();
     let (partition_start, partition_size) = get_partition_location(name);
 
     EFIHardDrive {
@@ -95,4 +95,49 @@ pub fn get_mount_point(name: &str) -> Option<PathBuf> {
     }
 
     None
+}
+
+#[cfg(test)]
+mod tests {
+    use std::path::PathBuf;
+
+    use super::*;
+
+    fn get_real_partition() -> (String, String) {
+        //! Returns an actual partition existing on the system that runs it
+        //! Used for tests because we can't easily simulate partitions externally
+        for line in std::fs::read_to_string("/proc/mounts").unwrap().lines() {
+            let mut iter = line.splitn(3, ' ');
+            let partition_name = iter.next().unwrap();
+            let mount_point = iter.next().unwrap();
+            if partition_name.starts_with("/dev/")
+                && partition_name.ends_with(|c: char| char::is_ascii_digit(&c))
+            {
+                println!("found partition {partition_name} with mount point {mount_point} in system. It will be used for this test");
+                return (partition_name.to_owned(), mount_point.to_owned());
+            }
+        }
+        core::panic!("Could not find a valid partition in system. Some tests will fail");
+    }
+
+    #[test]
+    fn real_mount_point() {
+        let (part_name, mount_point) = get_real_partition();
+        assert_eq!(
+            get_mount_point(&part_name).unwrap(),
+            PathBuf::from(mount_point)
+        );
+    }
+
+    #[test]
+    fn inexistent_mount_point() {
+        assert_eq!(get_mount_point("heythere"), None);
+    }
+
+    #[test]
+    fn partition_number() {
+        assert_eq!(get_partition_number("/dev/sda1"), Some(1));
+        assert_eq!(get_partition_number("/dev/sda13"), Some(13));
+        assert_eq!(get_partition_number("/dev/sda"), None);
+    }
 }
