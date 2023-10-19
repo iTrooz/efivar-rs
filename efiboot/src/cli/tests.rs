@@ -80,12 +80,7 @@ fn import() {
     // Verify variable content
     let (output_data, flags) = manager.read(&Variable::new("MyVariable")).unwrap();
     assert_eq!(vec![0x01, 0x02, 0x03, 0x04], output_data);
-    assert_eq!(
-        flags,
-        VariableFlags::NON_VOLATILE
-            | VariableFlags::BOOTSERVICE_ACCESS
-            | VariableFlags::RUNTIME_ACCESS
-    );
+    assert_eq!(flags, VariableFlags::default());
 }
 
 #[test]
@@ -118,9 +113,7 @@ fn export() {
     manager
         .write(
             &Variable::new("MyVariable"),
-            VariableFlags::NON_VOLATILE
-                | VariableFlags::BOOTSERVICE_ACCESS
-                | VariableFlags::RUNTIME_ACCESS,
+            VariableFlags::default(),
             &[0x01, 0x02, 0x03, 0x04],
         )
         .unwrap();
@@ -188,9 +181,7 @@ fn delete() {
     manager
         .write(
             &Variable::new("MyVariable"),
-            VariableFlags::NON_VOLATILE
-                | VariableFlags::BOOTSERVICE_ACCESS
-                | VariableFlags::RUNTIME_ACCESS,
+            VariableFlags::default(),
             &[0x01, 0x02, 0x03, 0x04],
         )
         .unwrap();

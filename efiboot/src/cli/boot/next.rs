@@ -70,9 +70,7 @@ pub fn run(manager: &mut dyn VarManager, cmd: BootNextCommand) -> ExitCode {
             manager
                 .write(
                     &Variable::new("BootNext"),
-                    VariableFlags::NON_VOLATILE
-                        | VariableFlags::BOOTSERVICE_ACCESS
-                        | VariableFlags::RUNTIME_ACCESS,
+                    VariableFlags::default(),
                     &id.to_le_bytes(),
                 )
                 .unwrap();
