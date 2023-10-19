@@ -210,3 +210,57 @@ pub fn get_end_device_path_bytes() -> Vec<u8> {
         vec![],
     )
 }
+
+#[cfg(test)]
+mod tests {
+    use std::str::FromStr;
+
+    use uuid::Uuid;
+
+    use super::{EFIHardDrive, EFIHardDriveType};
+
+    #[test]
+    fn efi_hard_drive_type_parse() {
+        assert_eq!(EFIHardDriveType::parse(0x01), EFIHardDriveType::Mbr);
+        assert_eq!(EFIHardDriveType::parse(0x02), EFIHardDriveType::Gpt);
+        assert_eq!(EFIHardDriveType::parse(0x03), EFIHardDriveType::Unknown);
+        assert_eq!(EFIHardDriveType::parse(0xFF), EFIHardDriveType::Unknown);
+    }
+
+    #[test]
+    fn efi_hard_drive_type_dump() {
+        assert_eq!(EFIHardDriveType::Mbr.as_u8(), 0x01);
+        assert_eq!(EFIHardDriveType::Gpt.as_u8(), 0x02);
+    }
+
+    #[test]
+    fn efi_hard_drive_type_print() {
+        assert_eq!(format!("{}", EFIHardDriveType::Mbr), "MBR");
+        assert_eq!(format!("{}", EFIHardDriveType::Gpt), "GPT");
+        assert_eq!(format!("{}", EFIHardDriveType::Unknown), "Unknown");
+    }
+
+    #[test]
+    #[should_panic]
+    fn efi_hard_drive_type_dump_invalid() {
+        EFIHardDriveType::Unknown.as_u8();
+    }
+
+    #[test]
+    fn print_hard_drive() {
+        assert_eq!(
+            "HD(1,GPT,90364bbd-1000-47fc-8c05-8707e01b4593)",
+            format!(
+                "{}",
+                EFIHardDrive {
+                    partition_number: 1,
+                    partition_start: 2,
+                    partition_size: 3,
+                    partition_sig: Uuid::from_str("90364bbd-1000-47fc-8c05-8707e01b4593").unwrap(),
+                    format: 5,
+                    sig_type: EFIHardDriveType::Gpt,
+                }
+            )
+        );
+    }
+}
