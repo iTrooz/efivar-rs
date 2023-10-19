@@ -179,3 +179,22 @@ fn set_next() {
     let (data, _) = manager.read(&Variable::new("BootNext")).unwrap();
     assert_eq!(data, utils::u16_to_u8(&[0x0001]));
 }
+
+#[test]
+fn set_inexistent_next() {
+    let manager = &mut MemoryStore::new();
+
+    assert_eq!(
+        ExitCode::FAILURE,
+        crate::run(
+            Command::parse_from(["efiboot", "boot", "next", "set", "0001",]),
+            manager,
+        )
+    );
+
+    let bootnext = Variable::new("BootNext");
+    assert!(matches!(
+        manager.read(&bootnext).unwrap_err(),
+        efivar::Error::VarNotFound { var } if var == bootnext
+    ));
+}
