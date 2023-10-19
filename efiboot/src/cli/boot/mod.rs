@@ -13,6 +13,7 @@ pub mod enable_disable;
 pub mod get_entries;
 pub mod next;
 pub mod order;
+pub mod partition;
 
 #[cfg(test)]
 mod tests;

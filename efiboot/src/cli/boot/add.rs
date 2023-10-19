@@ -1,7 +1,5 @@
 //! This module hands everything related to the 'boot add' subcommand
 
-mod disk;
-
 use crate::exit_code::ExitCode;
 
 use byteorder::{LittleEndian, ReadBytesExt};
@@ -11,6 +9,8 @@ use efivar::{
     VarManager,
 };
 use itertools::Itertools;
+
+use super::partition;
 
 /// get a boot entry ID that isnt used
 pub fn get_used_ids(manager: &dyn VarManager) -> Vec<u16> {
@@ -24,7 +24,7 @@ pub fn get_used_ids(manager: &dyn VarManager) -> Vec<u16> {
 
 /// check if a partition+file is valid (exists), if the partition is mounted
 fn check(partition: &str, file: &str) -> bool {
-    if let Some(mount_point) = disk::get_mount_point(partition) {
+    if let Some(mount_point) = partition::get_mount_point(partition) {
         eprintln!(
             "Partition {} is mounted on {}. Verifying file location {file} is valid",
             partition,
@@ -60,7 +60,7 @@ pub fn run(
             if !force && !check(&partition, &file_path) {
                 return ExitCode::FAILURE;
             }
-            disk::retrieve_efi_partition_data(&partition)
+            partition::retrieve_efi_partition_data(&partition)
         } else {
             eprintln!("No partition selected. Using active boot partition");
             let active_id = manager
