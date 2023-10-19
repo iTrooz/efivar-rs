@@ -52,11 +52,7 @@ pub fn run(
     let (flags, data) = match read_var_from_file_or_stdin(input_path) {
         Ok(inner) => inner,
         Err(err) => {
-            eprintln!(
-                "Failed to read variable {}: {}",
-                input_path.display(),
-                err
-            );
+            eprintln!("Failed to read variable {}: {}", input_path.display(), err);
             return ExitCode::FAILURE;
         }
     };

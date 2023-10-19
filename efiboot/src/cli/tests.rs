@@ -89,6 +89,29 @@ fn import() {
 }
 
 #[test]
+fn import_non_existent() {
+    let mut manager = MemoryStore::new();
+
+    let tmpdir = tempfile::tempdir().unwrap();
+    let file_path = tmpdir.path().join("non_existent_file.bin");
+
+    assert_eq!(
+        ExitCode::FAILURE,
+        crate::run(
+            Command::parse_from([
+                "efiboot",
+                "import",
+                file_path.to_str().unwrap(),
+                "MyVariable",
+            ]),
+            &mut manager
+        )
+    );
+
+    assert!(!manager.exists(&Variable::new("MyVariable")).unwrap());
+}
+
+#[test]
 fn export() {
     let mut manager = MemoryStore::new();
 
