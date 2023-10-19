@@ -13,7 +13,7 @@ use efivar::{
 use itertools::Itertools;
 
 /// get a boot entry ID that isnt used
-fn get_used_ids(manager: &dyn VarManager) -> Vec<u16> {
+pub fn get_used_ids(manager: &dyn VarManager) -> Vec<u16> {
     manager
         .get_all_vars()
         .unwrap()

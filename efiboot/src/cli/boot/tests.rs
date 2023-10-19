@@ -14,6 +14,8 @@ use uuid::Uuid;
 
 use crate::{cli::Command, exit_code::ExitCode};
 
+use super::add::get_used_ids;
+
 #[test]
 fn add_on_current_partition() {
     //! Test that the basic `efiboot boot add` subcommand works.
@@ -110,4 +112,27 @@ fn add_on_current_partition() {
     // verify new boot order is right
     let (data, _) = manager.read(&Variable::new("BootOrder")).unwrap();
     assert_eq!(data, utils::u16_to_u8(&[0x0000, 0x0001, 0x0002]));
+}
+
+#[test]
+fn get_used_boot_ids() {
+    let manager = &mut MemoryStore::new();
+
+    manager
+        .write(&Variable::new("Boot0001"), VariableFlags::default(), &[])
+        .unwrap();
+    manager
+        .write(&Variable::new("Boot1000"), VariableFlags::default(), &[])
+        .unwrap();
+    manager
+        .write(&Variable::new("Boot0500"), VariableFlags::default(), &[])
+        .unwrap();
+    manager
+        .write(&Variable::new("BootFFFF"), VariableFlags::default(), &[])
+        .unwrap();
+
+    let mut used_ids = get_used_ids(manager);
+    used_ids.sort();
+
+    assert_eq!(used_ids, vec![0x0001, 0x0500, 0x1000, 0xFFFF]);
 }
