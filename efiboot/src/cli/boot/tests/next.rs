@@ -1,5 +1,9 @@
 use clap::Parser;
-use efivar::{efi::Variable, store::MemoryStore, utils, VarReader};
+use efivar::{
+    efi::{Variable, VariableFlags},
+    store::MemoryStore,
+    utils, VarReader, VarWriter,
+};
 
 use crate::{
     cli::{boot::tests::add_entry, Command},
@@ -37,4 +41,76 @@ fn set_inexistent_next() {
     );
 
     assert!(!manager.exists(&Variable::new("BootNext")).unwrap());
+}
+
+#[test]
+fn unset_next() {
+    let manager = &mut MemoryStore::new();
+
+    manager
+        .write(
+            &Variable::new("BootNext"),
+            VariableFlags::default(),
+            &utils::u16_to_u8(&[0x0001]),
+        )
+        .unwrap();
+
+    assert_eq!(
+        ExitCode::SUCCESS,
+        crate::run(
+            Command::parse_from(["efiboot", "boot", "next", "unset"]),
+            manager,
+        )
+    );
+
+    assert!(!manager.exists(&Variable::new("BootNext")).unwrap());
+}
+
+#[test]
+fn unset_inexistent_next() {
+    let manager = &mut MemoryStore::new();
+
+    assert_eq!(
+        ExitCode::FAILURE,
+        crate::run(
+            Command::parse_from(["efiboot", "boot", "next", "unset"]),
+            manager,
+        )
+    );
+
+    assert!(!manager.exists(&Variable::new("BootNext")).unwrap());
+}
+
+#[test]
+fn get_next() {
+    let manager = &mut MemoryStore::new();
+
+    manager
+        .write(
+            &Variable::new("BootNext"),
+            VariableFlags::default(),
+            &utils::u16_to_u8(&[0x0001]),
+        )
+        .unwrap();
+
+    assert_eq!(
+        ExitCode::SUCCESS,
+        crate::run(
+            Command::parse_from(["efiboot", "boot", "next", "get"]),
+            manager,
+        )
+    );
+}
+
+#[test]
+fn get_inexistent_next() {
+    let manager = &mut MemoryStore::new();
+
+    assert_eq!(
+        ExitCode::FAILURE,
+        crate::run(
+            Command::parse_from(["efiboot", "boot", "next", "get"]),
+            manager,
+        )
+    );
 }
