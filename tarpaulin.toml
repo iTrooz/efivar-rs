@@ -1,0 +1,3 @@
+[test_config]
+skip-clean = true
+target-dir = "target/tarpaulin-build"
