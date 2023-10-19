@@ -1,8 +1,16 @@
+use clap::Parser;
+use efivar::{efi::Variable, store::MemoryStore, utils, VarReader};
+
+use crate::{
+    cli::{boot::tests::add_entry, Command},
+    exit_code::ExitCode,
+};
+
 #[test]
 fn set_next() {
     let manager = &mut MemoryStore::new();
 
-    add_entry(manager, 0x0001);
+    add_entry(manager, 0x0001, true);
 
     assert_eq!(
         ExitCode::SUCCESS,
