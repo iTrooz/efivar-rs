@@ -114,4 +114,50 @@ mod tests {
         assert!(s.contains("APPEND_WRITE"));
         assert!(s.contains("ENHANCED_AUTHENTICATED_ACCESS"));
     }
+
+    #[test]
+    fn variable_flags_from_string_all() {
+        assert_eq!(
+            VariableFlags::from_str("EFI_VARIABLE_NON_VOLATILE").unwrap(),
+            VariableFlags::NON_VOLATILE
+        );
+        assert_eq!(
+            VariableFlags::from_str("EFI_VARIABLE_BOOTSERVICE_ACCESS").unwrap(),
+            VariableFlags::BOOTSERVICE_ACCESS
+        );
+        assert_eq!(
+            VariableFlags::from_str("EFI_VARIABLE_RUNTIME_ACCESS").unwrap(),
+            VariableFlags::RUNTIME_ACCESS
+        );
+        assert_eq!(
+            VariableFlags::from_str("EFI_VARIABLE_HARDWARE_ERROR_RECORD").unwrap(),
+            VariableFlags::HARDWARE_ERROR_RECORD
+        );
+        assert_eq!(
+            VariableFlags::from_str("EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS").unwrap(),
+            VariableFlags::AUTHENTICATED_WRITE_ACCESS
+        );
+        assert_eq!(
+            VariableFlags::from_str("EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS").unwrap(),
+            VariableFlags::TIME_BASED_AUTHENTICATED_WRITE_ACCESS
+        );
+        assert_eq!(
+            VariableFlags::from_str("EFI_VARIABLE_APPEND_WRITE").unwrap(),
+            VariableFlags::APPEND_WRITE
+        );
+        assert_eq!(
+            VariableFlags::from_str("EFI_VARIABLE_ENHANCED_AUTHENTICATED_ACCESS").unwrap(),
+            VariableFlags::ENHANCED_AUTHENTICATED_ACCESS
+        );
+    }
+
+    #[test]
+    fn variable_flags_from_string_invalid() {
+        assert!(matches!(
+            VariableFlags::from_str("UNKNOWN_FLAG").unwrap_err(),
+            Error::UnknownFlag {
+                flag
+            } if flag == "UNKNOWN_FLAG"
+        ));
+    }
 }
