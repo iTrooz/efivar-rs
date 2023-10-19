@@ -173,7 +173,7 @@ impl EFIHardDrive {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct FilePath {
     pub path: PathBuf, // TODO: do not use PathBuf, because it is a OS-specific type ?
 }

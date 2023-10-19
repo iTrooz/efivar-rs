@@ -17,7 +17,7 @@ fn add_on_current_partition() {
 
     let manager = &mut MemoryStore::new();
 
-    let hard_drive = standard_setup(manager, 0x0001);
+    let setup_entry = standard_setup(manager, 0x0001);
 
     let current_exe = std::env::current_exe()
         .unwrap()
@@ -54,7 +54,7 @@ fn add_on_current_partition() {
                 file_path: FilePath {
                     path: current_exe.into()
                 },
-                hard_drive // use partition defined earlier
+                hard_drive: setup_entry.file_path_list.unwrap().hard_drive // use partition defined earlier
             }),
             optional_data: vec![]
         }

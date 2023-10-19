@@ -17,7 +17,7 @@ pub struct OptFilePathList {
 
 /// Same structure as OptFilePathList, but we ensure that the file path list
 /// is a valid file path overall
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct FilePathList {
     pub file_path: FilePath,
     pub hard_drive: EFIHardDrive,

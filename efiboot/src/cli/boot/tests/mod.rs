@@ -14,8 +14,9 @@ use crate::cli::boot::add::get_used_ids;
 
 mod add;
 mod delete;
+mod enable_disable;
 
-fn add_entry(manager: &mut dyn VarManager, id: u16) -> EFIHardDrive {
+fn add_entry(manager: &mut dyn VarManager, id: u16, enabled: bool) -> BootEntry {
     // define partition
     let hard_drive = EFIHardDrive {
         partition_number: 1,
@@ -26,29 +27,30 @@ fn add_entry(manager: &mut dyn VarManager, id: u16) -> EFIHardDrive {
         sig_type: EFIHardDriveType::Gpt,
     };
 
-    manager
-        .add_boot_entry(
-            id,
-            BootEntry {
-                attributes: BootEntryAttributes::LOAD_OPTION_ACTIVE,
-                description: "".to_owned(),
-                file_path_list: Some(FilePathList {
-                    file_path: FilePath {
-                        path: "somefile".into(),
-                    },
-                    hard_drive: hard_drive.clone(),
-                }),
-                optional_data: vec![],
+    let entry = BootEntry {
+        attributes: if enabled {
+            BootEntryAttributes::LOAD_OPTION_ACTIVE
+        } else {
+            BootEntryAttributes::empty()
+        },
+        description: "".to_owned(),
+        file_path_list: Some(FilePathList {
+            file_path: FilePath {
+                path: "somefile".into(),
             },
-        )
-        .unwrap();
+            hard_drive: hard_drive.clone(),
+        }),
+        optional_data: vec![],
+    };
 
-    hard_drive
+    manager.add_boot_entry(id, entry.clone()).unwrap();
+
+    entry
 }
 
-fn standard_setup(manager: &mut dyn VarManager, id: u16) -> EFIHardDrive {
+fn standard_setup(manager: &mut dyn VarManager, id: u16) -> BootEntry {
     // add entry
-    let hard_drive = add_entry(manager, id);
+    let entry = add_entry(manager, id, true);
 
     // set it as BootCurrent
     manager
@@ -68,7 +70,7 @@ fn standard_setup(manager: &mut dyn VarManager, id: u16) -> EFIHardDrive {
         )
         .unwrap();
 
-    hard_drive
+    entry
 }
 
 #[test]
