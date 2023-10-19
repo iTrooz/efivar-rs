@@ -136,3 +136,46 @@ fn get_used_boot_ids() {
 
     assert_eq!(used_ids, vec![0x0001, 0x0500, 0x1000, 0xFFFF]);
 }
+
+#[test]
+fn set_next() {
+    let manager = &mut MemoryStore::new();
+
+    // define partition
+    let hard_drive = EFIHardDrive {
+        partition_number: 1,
+        partition_start: 2,
+        partition_size: 3,
+        partition_sig: Uuid::from_str("62ca22b7-b071-4bc5-be1d-136a745e7c50").unwrap(),
+        format: 5,
+        sig_type: EFIHardDriveType::Gpt,
+    };
+
+    manager
+        .add_boot_entry(
+            0x0001,
+            BootEntry {
+                attributes: BootEntryAttributes::LOAD_OPTION_ACTIVE,
+                description: "".to_owned(),
+                file_path_list: Some(FilePathList {
+                    file_path: FilePath {
+                        path: "somefile".into(),
+                    },
+                    hard_drive: hard_drive.clone(),
+                }),
+                optional_data: vec![],
+            },
+        )
+        .unwrap();
+
+    assert_eq!(
+        ExitCode::SUCCESS,
+        crate::run(
+            Command::parse_from(["efiboot", "boot", "next", "set", "0001",]),
+            manager,
+        )
+    );
+
+    let (data, _) = manager.read(&Variable::new("BootNext")).unwrap();
+    assert_eq!(data, utils::u16_to_u8(&[0x0001]));
+}
