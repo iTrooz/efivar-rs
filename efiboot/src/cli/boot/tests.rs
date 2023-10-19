@@ -192,9 +192,5 @@ fn set_inexistent_next() {
         )
     );
 
-    let bootnext = Variable::new("BootNext");
-    assert!(matches!(
-        manager.read(&bootnext).unwrap_err(),
-        efivar::Error::VarNotFound { var } if var == bootnext
-    ));
+    assert!(!manager.exists(&Variable::new("BootNext")).unwrap());
 }

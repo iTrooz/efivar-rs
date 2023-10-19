@@ -1,3 +1,5 @@
+use crate::Error;
+
 use super::efi::{Variable, VariableFlags};
 
 /// Represents the capability of reading EFI variables
@@ -17,4 +19,11 @@ pub trait VarReader {
     ///
     /// On success, number of bytes read and associated EFI variable flags.
     fn read(&self, var: &Variable) -> crate::Result<(Vec<u8>, VariableFlags)>;
+    fn exists(&self, var: &Variable) -> crate::Result<bool> {
+        match self.read(var) {
+            Ok(_) => Ok(true),
+            Err(Error::VarNotFound { var: _ }) => Ok(false),
+            Err(err) => Err(err),
+        }
+    }
 }
