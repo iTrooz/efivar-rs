@@ -35,6 +35,7 @@ mod enumerator;
 mod error;
 mod reader;
 mod sys;
+pub mod test_utils;
 pub mod utils;
 mod writer;
 

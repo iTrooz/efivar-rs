@@ -1,10 +1,10 @@
-use core::panic;
 use std::{fs::File, io::Write};
 
 use efivar::{
     efi::{Variable, VariableFlags},
     store::MemoryStore,
-    Error, VarReader, VarWriter,
+    test_utils::assert_var_not_found,
+    VarReader, VarWriter,
 };
 
 use crate::{cli::Command, exit_code::ExitCode};
@@ -103,7 +103,7 @@ fn import_non_existent() {
         )
     );
 
-    assert!(!manager.exists(&Variable::new("MyVariable")).unwrap());
+    assert_var_not_found(&mut manager, &Variable::new("MyVariable"));
 }
 
 #[test]
@@ -165,11 +165,7 @@ fn export_no_var() {
         )
     );
 
-    if let Error::VarNotFound { var } = manager.read(&Variable::new("MyVariable")).unwrap_err() {
-        assert_eq!(var, Variable::new("MyVariable"));
-    } else {
-        panic!("Reading a non-existent variable should raise VarNotFound");
-    }
+    assert_var_not_found(&mut manager, &Variable::new("MyVariable"));
 }
 
 #[test]
@@ -194,11 +190,7 @@ fn delete() {
         )
     );
 
-    if let Error::VarNotFound { var } = manager.read(&Variable::new("MyVariable")).unwrap_err() {
-        assert_eq!(var, Variable::new("MyVariable"));
-    } else {
-        panic!("Reading a non-existent variable should raise VarNotFound");
-    }
+    assert_var_not_found(&mut manager, &Variable::new("MyVariable"));
 }
 
 #[test]

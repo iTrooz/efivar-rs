@@ -2,6 +2,7 @@ use clap::Parser;
 use efivar::{
     efi::{Variable, VariableFlags},
     store::MemoryStore,
+    test_utils::assert_var_not_found,
     utils, VarReader, VarWriter,
 };
 
@@ -40,7 +41,7 @@ fn set_inexistent_next() {
         )
     );
 
-    assert!(!manager.exists(&Variable::new("BootNext")).unwrap());
+    assert_var_not_found(manager, &Variable::new("BootNext"));
 }
 
 #[test]
@@ -63,7 +64,7 @@ fn unset_next() {
         )
     );
 
-    assert!(!manager.exists(&Variable::new("BootNext")).unwrap());
+    assert_var_not_found(manager, &Variable::new("BootNext"));
 }
 
 #[test]
@@ -78,7 +79,7 @@ fn unset_inexistent_next() {
         )
     );
 
-    assert!(!manager.exists(&Variable::new("BootNext")).unwrap());
+    assert_var_not_found(manager, &Variable::new("BootNext"));
 }
 
 #[test]

@@ -3,6 +3,7 @@ use efivar::{
     boot::{BootEntry, BootEntryAttributes, FilePath, FilePathList},
     efi::Variable,
     store::MemoryStore,
+    test_utils::assert_var_not_found,
     utils, VarReader,
 };
 
@@ -100,7 +101,7 @@ fn add_set_id() {
     );
 
     // verify Boot0000 did not get inserted
-    assert!(!manager.exists(&Variable::new("Boot0000")).unwrap());
+    assert_var_not_found(manager, &Variable::new("Boot0000"));
 
     // verify inserted entry is right
     let (data, _) = manager.read(&Variable::new("Boot1000")).unwrap();

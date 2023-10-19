@@ -1,5 +1,5 @@
 use clap::Parser;
-use efivar::{efi::Variable, store::MemoryStore, VarReader};
+use efivar::{efi::Variable, store::MemoryStore, test_utils::assert_var_not_found};
 
 use crate::{
     cli::{boot::tests::standard_setup, Command},
@@ -20,5 +20,5 @@ fn delete() {
         )
     );
 
-    assert!(!manager.exists(&Variable::new("Boot0001")).unwrap());
+    assert_var_not_found(manager, &Variable::new("Boot0001"));
 }
