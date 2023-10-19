@@ -53,7 +53,7 @@ pub fn run(
         Ok(inner) => inner,
         Err(err) => {
             eprintln!(
-                "Failed to read variable from file {}: {}",
+                "Failed to read variable {}: {}",
                 input_path.display(),
                 err
             );
