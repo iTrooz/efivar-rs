@@ -15,6 +15,7 @@ use crate::cli::boot::add::get_used_ids;
 mod add;
 mod delete;
 mod enable_disable;
+mod get_entries;
 mod next;
 
 fn add_entry(manager: &mut dyn VarManager, id: u16, enabled: bool) -> BootEntry {
