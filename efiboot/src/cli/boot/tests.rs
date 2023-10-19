@@ -8,13 +8,64 @@ use efivar::{
     },
     efi::{Variable, VariableFlags},
     store::MemoryStore,
-    utils, VarReader, VarWriter,
+    utils, VarManager, VarReader, VarWriter,
 };
 use uuid::Uuid;
 
 use crate::{cli::Command, exit_code::ExitCode};
 
 use super::add::get_used_ids;
+
+fn add_entry(manager: &mut dyn VarManager, id: u16) {
+    // define partition
+    let hard_drive = EFIHardDrive {
+        partition_number: 1,
+        partition_start: 2,
+        partition_size: 3,
+        partition_sig: Uuid::from_str("62ca22b7-b071-4bc5-be1d-136a745e7c50").unwrap(),
+        format: 5,
+        sig_type: EFIHardDriveType::Gpt,
+    };
+
+    manager
+        .add_boot_entry(
+            id,
+            BootEntry {
+                attributes: BootEntryAttributes::LOAD_OPTION_ACTIVE,
+                description: "".to_owned(),
+                file_path_list: Some(FilePathList {
+                    file_path: FilePath {
+                        path: "somefile".into(),
+                    },
+                    hard_drive: hard_drive.clone(),
+                }),
+                optional_data: vec![],
+            },
+        )
+        .unwrap();
+}
+
+fn standard_setup(manager: &mut dyn VarManager, id: u16) {
+    add_entry(manager, id);
+
+    // set it as BootCurrent
+    manager
+        .write(
+            &Variable::new("BootCurrent"),
+            VariableFlags::default(),
+            &utils::u16_to_u8(&[id]),
+        )
+        .unwrap();
+
+    // define BootOrder
+    manager
+        .write(
+            &Variable::new("BootOrder"),
+            VariableFlags::default(),
+            &utils::u16_to_u8(&[id, 0x0002]),
+        )
+        .unwrap();
+}
 
 #[test]
 fn add_on_current_partition() {
@@ -193,4 +244,21 @@ fn set_inexistent_next() {
     );
 
     assert!(!manager.exists(&Variable::new("BootNext")).unwrap());
+}
+
+#[test]
+fn delete() {
+    let manager = &mut MemoryStore::new();
+
+    standard_setup(manager, 0x0001);
+
+    assert_eq!(
+        ExitCode::SUCCESS,
+        crate::run(
+            Command::parse_from(["efiboot", "boot", "delete", "1"]),
+            manager,
+        )
+    );
+
+    assert!(!manager.exists(&Variable::new("Boot0001")).unwrap());
 }
