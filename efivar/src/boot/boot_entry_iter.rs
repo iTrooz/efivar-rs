@@ -2,7 +2,7 @@
 
 use crate::{efi::Variable, VarReader};
 
-use super::{BootEntry, BootVarName, BootVarReader};
+use super::{BootEntry, BootVarName, BootVarReader, BootVariable};
 
 /// Loop over boot entries. On each iteration, a variable data will be queried from the OS
 pub struct BootEntriesIterator<'a> {
@@ -22,12 +22,19 @@ impl<'a> BootEntriesIterator<'a> {
 }
 
 impl<'a> Iterator for BootEntriesIterator<'a> {
-    type Item = (Result<BootEntry, crate::Error>, Variable);
+    type Item = (Result<BootVariable, crate::Error>, Variable);
 
     fn next(&mut self) -> Option<Self::Item> {
-        self.ids
-            .pop()
-            .map(|id| Variable::new(&id.boot_var_name()))
-            .map(|var| (BootEntry::read(self.var_reader, &var), var))
+        let id = self.ids.pop();
+        let id = match id {
+            Some(id) => id,
+            None => return None,
+        };
+
+        let var = Variable::new(&id.boot_var_name());
+        let boot_var_res =
+            BootEntry::read(self.var_reader, &var).map(|entry| BootVariable { entry, id });
+
+        Some((boot_var_res, var))
     }
 }

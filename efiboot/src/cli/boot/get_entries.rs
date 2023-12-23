@@ -2,32 +2,31 @@ use crate::exit_code::ExitCode;
 
 use byteorder::{LittleEndian, ReadBytesExt};
 use efivar::{
-    boot::{BootEntry, BootEntryAttributes},
+    boot::{BootEntry, BootEntryAttributes, BootVariable},
     efi::Variable,
     VarManager,
 };
 
 /// prints a boot entry to the console, and consume it
-fn print_var(var: &Variable, entry: BootEntry, verbose: bool, active_boot_id: u16) {
+fn print_var(boot_var: &BootVariable, verbose: bool, active_boot_id: u16) {
     println!();
 
-    let id = var
-        .boot_var_id()
-        .expect("No entry ID for variable that should be a boot variable");
-
-    println!("ID: {:04X}", id);
-    println!("Description: {}", entry.description);
+    println!("ID: {:04X}", boot_var.id);
+    println!("Description: {}", boot_var.entry.description);
     println!(
         "Enabled: {}",
-        entry
+        boot_var
+            .entry
             .attributes
             .contains(BootEntryAttributes::LOAD_OPTION_ACTIVE)
     );
 
     println!(
         "Boot file: {}",
-        entry
+        boot_var
+            .entry
             .file_path_list
+            .as_ref()
             .map(|fpl| fpl.to_string())
             .unwrap_or_else(|| "None/Invalid".to_owned())
     );
@@ -35,10 +34,11 @@ fn print_var(var: &Variable, entry: BootEntry, verbose: bool, active_boot_id: u1
     if verbose {
         println!(
             "Optional data: {}",
-            if entry.optional_data.is_empty() {
+            if boot_var.entry.optional_data.is_empty() {
                 "None".to_owned()
             } else {
-                entry
+                boot_var
+                    .entry
                     .optional_data
                     .iter()
                     .map(|b| format!("{:02x}", b))
@@ -49,15 +49,15 @@ fn print_var(var: &Variable, entry: BootEntry, verbose: bool, active_boot_id: u1
 
         println!(
             "Attributes: {}",
-            if entry.attributes.is_empty() {
+            if boot_var.entry.attributes.is_empty() {
                 "None".to_owned()
             } else {
-                entry.attributes.to_string()
+                boot_var.entry.attributes.to_string()
             }
         );
     }
 
-    if active_boot_id == id {
+    if active_boot_id == boot_var.id {
         println!("Active boot entry: true")
     }
 }
@@ -78,7 +78,6 @@ pub fn run(manager: &dyn VarManager, verbose: bool) -> ExitCode {
             return ExitCode::FAILURE;
         }
     }
-    .filter(|var| var.boot_var_id().is_some())
     .filter(|var| var.vendor().is_efi())
     .collect();
 
@@ -97,7 +96,7 @@ pub fn run(manager: &dyn VarManager, verbose: bool) -> ExitCode {
         vars.retain(|loop_var| loop_var.name() != var.name());
 
         match entry {
-            Ok(entry) => print_var(&var, entry, verbose, active_id),
+            Ok(entry) => print_var(&entry, verbose, active_id),
             Err(err) => eprintln!("Failed to get entry from variable {}: {}", var, err),
         }
     }
@@ -109,8 +108,12 @@ pub fn run(manager: &dyn VarManager, verbose: bool) -> ExitCode {
     println!();
     println!("Found boot entries not in boot sequence:");
     for var in vars {
+        let boot_id = match var.boot_var_id() {
+            Some(id) => id,
+            None => continue,
+        };
         match BootEntry::read(manager, &var) {
-            Ok(entry) => print_var(&var, entry, verbose, active_id),
+            Ok(entry) => print_var(&BootVariable { entry, id: boot_id }, verbose, active_id),
             Err(err) => eprintln!("Failed to get entry from variable {}: {}", var, err),
         };
     }
