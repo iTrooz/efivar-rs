@@ -36,7 +36,7 @@ pub enum BootCommand {
         file: String,
 
         /// Set entry description
-        #[arg(short, long)]
+        #[arg(short, long, alias = "desc")]
         description: String,
 
         /// Skip checks to ensure data is valid
