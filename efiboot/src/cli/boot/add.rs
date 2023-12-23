@@ -1,10 +1,10 @@
 //! This module hands everything related to the 'boot add' subcommand
 
-use crate::exit_code::ExitCode;
+use crate::{cli::boot::get_entries::print_var, exit_code::ExitCode};
 
 use byteorder::{LittleEndian, ReadBytesExt};
 use efivar::{
-    boot::{BootEntry, BootEntryAttributes, BootVarName, FilePath, FilePathList},
+    boot::{BootEntry, BootEntryAttributes, BootVarName, BootVariable, FilePath, FilePathList},
     efi::Variable,
     VarManager,
 };
@@ -112,7 +112,7 @@ pub fn run(
     };
 
     // create the entry
-    manager.add_boot_entry(id, entry).unwrap();
+    manager.add_boot_entry(id, entry.clone()).unwrap();
 
     // add it to boot order
     let mut ids = manager.get_boot_order().unwrap();
@@ -120,6 +120,7 @@ pub fn run(
     manager.set_boot_order(ids).unwrap();
 
     println!("Added entry with success");
+    print_var(&BootVariable { entry, id }, true, 0x0000);
 
     ExitCode::SUCCESS
 }

@@ -8,7 +8,7 @@ use efivar::{
 };
 
 /// prints a boot entry to the console, and consume it
-fn print_var(boot_var: &BootVariable, verbose: bool, active_boot_id: u16) {
+pub fn print_var(boot_var: &BootVariable, verbose: bool, active_boot_id: u16) {
     println!();
 
     println!("ID: {:04X}", boot_var.id);
