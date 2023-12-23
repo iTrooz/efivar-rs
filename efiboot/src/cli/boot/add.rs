@@ -112,7 +112,7 @@ pub fn run(
             }
             id
         } else {
-            let id = (0x0000..0xFFFF)
+            let id = (0x0001..0xFFFF)
                 .find(|&i| !used_boot_ids.contains(&i))
                 .unwrap();
             println!("Chose id {id:04X} for boot entry");

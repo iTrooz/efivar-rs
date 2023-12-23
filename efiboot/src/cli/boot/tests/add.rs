@@ -39,7 +39,7 @@ fn add() {
     );
 
     // verify inserted entry is right
-    let (data, _) = manager.read(&Variable::new("Boot0000")).unwrap();
+    let (data, _) = manager.read(&Variable::new("Boot0002")).unwrap();
     let entry = BootEntry::parse(data).unwrap();
     assert_eq!(
         entry,
@@ -58,7 +58,7 @@ fn add() {
 
     // verify new boot order is right
     let (data, _) = manager.read(&Variable::new("BootOrder")).unwrap();
-    assert_eq!(data, utils::u16_to_u8(&[0x0000, 0x0001]));
+    assert_eq!(data, utils::u16_to_u8(&[0x0002, 0x0001]));
 }
 
 #[test]
