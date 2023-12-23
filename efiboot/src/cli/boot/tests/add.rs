@@ -21,12 +21,6 @@ fn add() {
 
     let setup_entry = standard_setup(manager, 0x0001);
 
-    let current_exe = std::env::current_exe()
-        .unwrap()
-        .to_str()
-        .unwrap()
-        .to_owned();
-
     // execute `efiboot boot add`
     assert_eq!(
         ExitCode::SUCCESS,
@@ -36,7 +30,7 @@ fn add() {
                 "boot",
                 "add",
                 "--file",
-                &current_exe,
+                "\\a\\b\\c",
                 "--description",
                 "Some entry"
             ]),
@@ -54,7 +48,7 @@ fn add() {
             description: "Some entry".to_owned(),
             file_path_list: Some(FilePathList {
                 file_path: FilePath {
-                    path: current_exe.into()
+                    path: "\\a\\b\\c".into()
                 },
                 hard_drive: setup_entry.file_path_list.unwrap().hard_drive // use partition defined earlier
             }),
@@ -75,12 +69,6 @@ fn add_set_id() {
 
     let setup_entry = standard_setup(manager, 0x0001);
 
-    let current_exe = std::env::current_exe()
-        .unwrap()
-        .to_str()
-        .unwrap()
-        .to_owned();
-
     // execute `efiboot boot add`
     assert_eq!(
         ExitCode::SUCCESS,
@@ -90,7 +78,7 @@ fn add_set_id() {
                 "boot",
                 "add",
                 "--file",
-                &current_exe,
+                "\\a\\b\\c",
                 "--description",
                 "Some entry",
                 "--id",
@@ -113,7 +101,7 @@ fn add_set_id() {
             description: "Some entry".to_owned(),
             file_path_list: Some(FilePathList {
                 file_path: FilePath {
-                    path: current_exe.into()
+                    path: "\\a\\b\\c".into()
                 },
                 hard_drive: setup_entry.file_path_list.unwrap().hard_drive // use partition defined earlier
             }),

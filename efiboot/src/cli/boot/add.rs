@@ -44,6 +44,15 @@ fn check(partition: &str, file: &str) -> bool {
     }
 }
 
+/// try to fix common user errors with the file path
+fn fix_file_path(mut file_path: String) -> String {
+    file_path = file_path.replace('/', "\\");
+    if !file_path.starts_with('\\') {
+        file_path.insert(0, '\\');
+    }
+    file_path
+}
+
 pub fn run(
     manager: &mut dyn VarManager,
     partition: Option<String>,
@@ -81,7 +90,7 @@ pub fn run(
     let file_path_list = FilePathList {
         hard_drive: efi_partition,
         file_path: FilePath {
-            path: file_path.into(),
+            path: fix_file_path(file_path).into(),
         },
     };
 
