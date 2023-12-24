@@ -1,6 +1,6 @@
 //! This module contains parsing code for a device path, part of a device path list
 
-use std::{convert::TryInto, fmt::Display, io::Write, mem::transmute, path::PathBuf};
+use std::{convert::TryInto, fmt::Display, io::Write, path::PathBuf};
 
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
 use uuid::Uuid;
@@ -78,12 +78,9 @@ impl EFIHardDrive {
                     .map_err(|_| Error::VarParseError)?,
                 buf.read_u16::<LittleEndian>()
                     .map_err(|_| Error::VarParseError)?,
-                unsafe {
-                    &transmute::<u64, [u8; 8]>(
-                        buf.read_u64::<LittleEndian>()
-                            .map_err(|_| Error::VarParseError)?,
-                    )
-                },
+                &buf.read_u64::<LittleEndian>()
+                    .map_err(|_| Error::VarParseError)?
+                    .to_le_bytes(),
             ),
             format: buf.read_u8().map_err(|_| Error::VarParseError)?,
             sig_type: EFIHardDriveType::parse(buf.read_u8().map_err(|_| Error::VarParseError)?),
