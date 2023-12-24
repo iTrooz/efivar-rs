@@ -125,7 +125,9 @@ impl DevicePath {
                     })));
                 }
                 consts::MEDIA_DEVICE_PATH_SUBTYPE::HARD_DRIVE => {
-                    return Ok(Some(DevicePath::HardDrive(EFIHardDrive::parse(&mut device_path_data)?)));
+                    return Ok(Some(DevicePath::HardDrive(EFIHardDrive::parse(
+                        &mut device_path_data,
+                    )?)));
                 }
                 _ => {}
             },
