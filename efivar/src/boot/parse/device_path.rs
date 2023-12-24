@@ -2,7 +2,7 @@
 
 use std::{convert::TryInto, fmt::Display, io::Write, path::PathBuf};
 
-use byteorder::{BigEndian, LittleEndian, ReadBytesExt, WriteBytesExt};
+use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
 use uuid::Uuid;
 
 use crate::{utils::read_nt_utf16_string, Error};
@@ -59,6 +59,35 @@ pub struct EFIHardDrive {
     pub sig_type: EFIHardDriveType,
 }
 
+impl EFIHardDrive {
+    pub fn parse(buf: &mut &[u8]) -> crate::Result<EFIHardDrive> {
+        Ok(EFIHardDrive {
+            partition_number: buf
+                .read_u32::<LittleEndian>()
+                .map_err(|_| Error::VarParseError)?,
+            partition_start: buf
+                .read_u64::<LittleEndian>()
+                .map_err(|_| Error::VarParseError)?,
+            partition_size: buf
+                .read_u64::<LittleEndian>()
+                .map_err(|_| Error::VarParseError)?,
+            partition_sig: Uuid::from_fields(
+                buf.read_u32::<LittleEndian>()
+                    .map_err(|_| Error::VarParseError)?,
+                buf.read_u16::<LittleEndian>()
+                    .map_err(|_| Error::VarParseError)?,
+                buf.read_u16::<LittleEndian>()
+                    .map_err(|_| Error::VarParseError)?,
+                &buf.read_u64::<LittleEndian>()
+                    .map_err(|_| Error::VarParseError)?
+                    .to_le_bytes(),
+            ),
+            format: buf.read_u8().map_err(|_| Error::VarParseError)?,
+            sig_type: EFIHardDriveType::parse(buf.read_u8().map_err(|_| Error::VarParseError)?),
+        })
+    }
+}
+
 impl Display for EFIHardDrive {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
@@ -93,30 +122,9 @@ impl DevicePath {
                     })));
                 }
                 consts::MEDIA_DEVICE_PATH_SUBTYPE::HARD_DRIVE => {
-                    return Ok(Some(DevicePath::HardDrive(EFIHardDrive {
-                        partition_number: device_path_data
-                            .read_u32::<LittleEndian>()
-                            .map_err(|_| Error::VarParseError)?,
-                        partition_start: device_path_data
-                            .read_u64::<LittleEndian>()
-                            .map_err(|_| Error::VarParseError)?,
-                        partition_size: device_path_data
-                            .read_u64::<LittleEndian>()
-                            .map_err(|_| Error::VarParseError)?,
-                        partition_sig: Uuid::from_u128(
-                            device_path_data
-                                .read_u128::<BigEndian>()
-                                .map_err(|_| Error::VarParseError)?,
-                        ),
-                        format: device_path_data
-                            .read_u8()
-                            .map_err(|_| Error::VarParseError)?,
-                        sig_type: EFIHardDriveType::parse(
-                            device_path_data
-                                .read_u8()
-                                .map_err(|_| Error::VarParseError)?,
-                        ),
-                    })));
+                    return Ok(Some(DevicePath::HardDrive(EFIHardDrive::parse(
+                        &mut device_path_data,
+                    )?)));
                 }
                 _ => {}
             },
@@ -156,7 +164,12 @@ impl EFIHardDrive {
         bytes
             .write_u64::<LittleEndian>(self.partition_size)
             .unwrap();
-        bytes.write_all(self.partition_sig.as_bytes()).unwrap();
+
+        let (f1, f2, f3, f4) = self.partition_sig.as_fields();
+        bytes.write_u32::<LittleEndian>(f1).unwrap();
+        bytes.write_u16::<LittleEndian>(f2).unwrap();
+        bytes.write_u16::<LittleEndian>(f3).unwrap();
+        bytes.write_all(f4).unwrap();
         bytes.write_u8(self.format).unwrap();
         bytes.write_u8(self.sig_type.as_u8()).unwrap();
 
@@ -262,5 +275,21 @@ mod tests {
                 }
             )
         );
+    }
+
+    #[test]
+    fn to_from_bytes() {
+        let drive = EFIHardDrive {
+            partition_number: 1,
+            partition_start: 2,
+            partition_size: 3,
+            partition_sig: Uuid::from_str("90364bbd-1000-47fc-8c05-8707e01b4593").unwrap(),
+            format: 5,
+            sig_type: EFIHardDriveType::Gpt,
+        };
+        let bytes = drive.to_bytes_raw();
+        let mut x = bytes.as_slice();
+        let test_parse = EFIHardDrive::parse(&mut x).unwrap();
+        assert_eq!(drive, test_parse)
     }
 }

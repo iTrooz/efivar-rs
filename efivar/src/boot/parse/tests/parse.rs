@@ -31,7 +31,7 @@ fn parse() {
                     partition_number: 1,
                     partition_start: 10240,
                     partition_size: 991232,
-                    partition_sig: Uuid::from_str("e3dc7c83-f03e-4349-a8f2-35a3f586c90a").unwrap(),
+                    partition_sig: Uuid::from_str("837cdce3-3ef0-4943-a8f2-35a3f586c90a").unwrap(),
                     format: 2,
                     sig_type: crate::boot::EFIHardDriveType::Gpt,
                 }

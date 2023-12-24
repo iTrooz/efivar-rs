@@ -19,7 +19,7 @@ fn dump() {
                 partition_number: 1,
                 partition_start: 10240,
                 partition_size: 991232,
-                partition_sig: Uuid::from_str("0ac986f5-a335-f2a8-4943-3ef0837cdce3").unwrap(),
+                partition_sig: Uuid::from_str("f586c90a-35a3-a8f2-4943-3ef0837cdce3").unwrap(),
                 format: 2,
                 sig_type: crate::boot::EFIHardDriveType::Gpt,
             },
