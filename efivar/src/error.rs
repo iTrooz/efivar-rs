@@ -19,8 +19,8 @@ pub enum Error {
     #[error("base64 decoding error: {}", error)]
     #[cfg(feature = "store")]
     Base64DecodeSliceError { error: base64::DecodeSliceError },
-    #[error("unknown i/o error")]
-    UnknownIoError { error: io::Error },
+    #[error("unknown i/o error: {}", .0)]
+    UnknownIoError(std::io::Error),
     #[error("unknown EFI variable flag: '{}'", flag)]
     UnknownFlag { flag: String },
     #[error("failed to decode name as valid UTF-8")]

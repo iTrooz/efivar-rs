@@ -45,7 +45,7 @@ impl SystemManager {
 fn parse_efi_variable(buf: &mut &[u8]) -> crate::Result<Variable> {
     let uuid_u128 = buf
         .read_u128::<LittleEndian>()
-        .map_err(|err| crate::Error::UnknownIoError { error: err })?;
+        .map_err(crate::Error::UnknownIoError)?;
 
     let guid = uuid::Uuid::from_bytes_le(uuid_u128.to_le_bytes());
     let name = read_nt_utf16_string(buf).map_err(crate::Error::StringParseError)?;
@@ -58,7 +58,7 @@ fn parse_efi_variables(buf: &mut &[u8]) -> crate::Result<Vec<Variable>> {
     while buf.len() > 0 {
         let struct_size = buf
             .read_u32::<LittleEndian>()
-            .map_err(|err| crate::Error::UnknownIoError { error: err })?;
+            .map_err(crate::Error::UnknownIoError)?;
 
         if struct_size == 0 {
             break;
@@ -93,9 +93,9 @@ impl VarEnumerator for SystemManager {
 
             // handle error
             if status != STATUS_BUFFER_TOO_SMALL {
-                return Err(crate::Error::UnknownIoError {
-                    error: std::io::Error::from_raw_os_error(status),
-                });
+                return Err(crate::Error::UnknownIoError(
+                    std::io::Error::from_raw_os_error(status),
+                ));
             }
         }
 
@@ -117,9 +117,9 @@ impl VarEnumerator for SystemManager {
 
             // handle error
             if status != 0 {
-                return Err(crate::Error::UnknownIoError {
-                    error: std::io::Error::from_raw_os_error(status),
-                });
+                return Err(crate::Error::UnknownIoError(
+                    std::io::Error::from_raw_os_error(status),
+                ));
             }
         }
 

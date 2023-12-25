@@ -34,7 +34,7 @@ impl VarEnumerator for SystemManager {
             .map(|list| {
                 list.filter_map(|result| {
                     result
-                        .map_err(|error| Error::UnknownIoError { error })
+                        .map_err(Error::UnknownIoError)
                         .and_then(|entry| {
                             entry
                                 .file_name()
@@ -46,10 +46,7 @@ impl VarEnumerator for SystemManager {
                 })
             })
             .map(|it| -> Box<dyn Iterator<Item = Variable>> { Box::new(it) })
-            .map_err(|error| {
-                // TODO: check for specific error types
-                Error::UnknownIoError { error }
-            })
+            .map_err(Error::UnknownIoError) // TODO: check for specific error types
     }
 }
 
