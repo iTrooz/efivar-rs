@@ -33,6 +33,7 @@ pub mod store;
 pub mod boot;
 mod enumerator;
 mod error;
+pub mod push;
 mod reader;
 mod sys;
 pub mod test_utils;

@@ -1,11 +1,11 @@
 //! This module contains parsing code for a device path, part of a device path list
 
-use std::{convert::TryInto, fmt::Display, io::Write, path::PathBuf};
+use std::{convert::TryInto, fmt::Display, path::PathBuf};
 
-use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
+use byteorder::{LittleEndian, ReadBytesExt};
 use uuid::Uuid;
 
-use crate::{utils::read_nt_utf16_string, Error};
+use crate::{push::PushVecU8, utils::read_nt_utf16_string, Error};
 
 use super::consts;
 
@@ -138,8 +138,8 @@ impl DevicePath {
 fn encap_as_device_path(r#type: u8, r#subtype: u8, mut raw_data: Vec<u8>) -> Vec<u8> {
     let mut bytes: Vec<u8> = vec![];
 
-    bytes.push(r#type);
-    bytes.push(r#subtype);
+    bytes.push_u8(r#type);
+    bytes.push_u8(r#subtype);
 
     let raw_data_size: u16 = raw_data.len().try_into().unwrap();
     bytes.append(&mut (raw_data_size + 1 + 1 + 2).to_le_bytes().to_vec());
@@ -153,23 +153,17 @@ impl EFIHardDrive {
     /// get bytes representation for a EFIHardDrive, without encapsulating them in a DevicePath structure
     fn to_bytes_raw(&self) -> Vec<u8> {
         let mut bytes: Vec<u8> = vec![];
-        bytes
-            .write_u32::<LittleEndian>(self.partition_number)
-            .unwrap();
-        bytes
-            .write_u64::<LittleEndian>(self.partition_start)
-            .unwrap();
-        bytes
-            .write_u64::<LittleEndian>(self.partition_size)
-            .unwrap();
+        bytes.push_u32(self.partition_number);
+        bytes.push_u64(self.partition_start);
+        bytes.push_u64(self.partition_size);
 
         let (f1, f2, f3, f4) = self.partition_sig.as_fields();
-        bytes.write_u32::<LittleEndian>(f1).unwrap();
-        bytes.write_u16::<LittleEndian>(f2).unwrap();
-        bytes.write_u16::<LittleEndian>(f3).unwrap();
-        bytes.write_all(f4).unwrap();
-        bytes.write_u8(self.format).unwrap();
-        bytes.write_u8(self.sig_type.as_u8()).unwrap();
+        bytes.push_u32(f1);
+        bytes.push_u16(f2);
+        bytes.push_u16(f3);
+        bytes.append(&mut f4.to_vec());
+        bytes.push_u8(self.format);
+        bytes.push_u8(self.sig_type.as_u8());
 
         bytes
     }
@@ -199,7 +193,7 @@ impl FilePath {
             .collect();
 
         // write null termination
-        utf8_bytes.write_u16::<LittleEndian>(0x0000).unwrap();
+        utf8_bytes.push_u16(0x0000);
 
         utf8_bytes
     }

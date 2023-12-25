@@ -7,9 +7,10 @@ use std::str::FromStr;
 
 use super::LinuxSystemManager;
 use crate::efi::{Variable, VariableFlags};
+use crate::push::PushVecU8;
 use crate::{Error, VarEnumerator, VarManager, VarReader, VarWriter};
 
-use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
+use byteorder::{LittleEndian, ReadBytesExt};
 
 pub const EFIVARFS_ROOT: &str = "/sys/firmware/efi/efivars";
 
@@ -86,12 +87,10 @@ impl VarWriter for SystemManager {
         let mut buf = Vec::with_capacity(std::mem::size_of_val(&attribute_bits));
 
         // Write attributes
-        buf.write_u32::<LittleEndian>(attribute_bits)
-            .map_err(|error| Error::for_variable(error, var))?;
+        buf.push_u32(attribute_bits);
 
         // Write variable contents
-        buf.write(value)
-            .map_err(|error| Error::for_variable(error, var))?;
+        buf.append(&mut value.to_vec());
 
         // Filename to the matching efivarfs file for this variable
         let filename = format!("{}/{}", EFIVARFS_ROOT, var);
