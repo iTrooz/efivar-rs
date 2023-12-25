@@ -142,7 +142,7 @@ fn encap_as_device_path(r#type: u8, r#subtype: u8, mut raw_data: Vec<u8>) -> Vec
     bytes.push_u8(r#subtype);
 
     let raw_data_size: u16 = raw_data.len().try_into().unwrap();
-    bytes.append(&mut (raw_data_size + 1 + 1 + 2).to_le_bytes().to_vec());
+    bytes.push_u16(raw_data_size + 1 + 1 + 2);
 
     bytes.append(&mut raw_data);
 

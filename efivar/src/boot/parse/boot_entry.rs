@@ -5,7 +5,7 @@ use std::{fmt::Display, io::Read};
 use byteorder::{LittleEndian, ReadBytesExt};
 
 use super::FilePathList;
-use crate::{efi::Variable, utils::read_nt_utf16_string, Error, VarReader};
+use crate::{efi::Variable, push::PushVecU8, utils::read_nt_utf16_string, Error, VarReader};
 use std::convert::TryFrom;
 
 bitflags! {
@@ -72,7 +72,7 @@ impl BootEntry {
         let mut bytes: Vec<u8> = vec![];
 
         // append attribute bytes
-        bytes.append(&mut self.attributes.bits().to_le_bytes().to_vec());
+        bytes.push_u32(self.attributes.bits());
 
         // append file path list length
         let mut fpl_bytes: Vec<u8> = if let Some(fpl) = &self.file_path_list {
