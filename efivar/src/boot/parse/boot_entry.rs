@@ -1,12 +1,12 @@
 //! This module contains parsing code for a boot entry
 
-use std::{convert::TryInto, fmt::Display, io::Read};
+use std::{fmt::Display, io::Read};
 
-use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
-
-use crate::{efi::Variable, utils::read_nt_utf16_string, Error, VarReader};
+use byteorder::{LittleEndian, ReadBytesExt};
 
 use super::FilePathList;
+use crate::{efi::Variable, utils::read_nt_utf16_string, Error, VarReader};
+use std::convert::TryFrom;
 
 bitflags! {
     /// Possible attributes of a boot entry as a bitfield
@@ -80,9 +80,12 @@ impl BootEntry {
         } else {
             vec![]
         };
-        bytes
-            .write_u16::<LittleEndian>(fpl_bytes.len().try_into().unwrap())
-            .unwrap();
+        bytes.append(
+            &mut u16::try_from(fpl_bytes.len())
+                .unwrap()
+                .to_le_bytes()
+                .to_vec(),
+        );
 
         // append description bytes
         let mut desc_bytes = self
@@ -92,7 +95,7 @@ impl BootEntry {
             .collect();
         bytes.append(&mut desc_bytes);
         // write description null termination
-        bytes.write_u16::<LittleEndian>(0x0000).unwrap();
+        bytes.append(&mut vec![0x00, 0x00]);
 
         // append file path list bytes
         bytes.append(&mut fpl_bytes);
