@@ -138,13 +138,11 @@ impl DevicePath {
 fn encap_as_device_path(r#type: u8, r#subtype: u8, mut raw_data: Vec<u8>) -> Vec<u8> {
     let mut bytes: Vec<u8> = vec![];
 
-    bytes.write_u8(r#type).unwrap();
-    bytes.write_u8(r#subtype).unwrap();
+    bytes.push(r#type);
+    bytes.push(r#subtype);
 
     let raw_data_size: u16 = raw_data.len().try_into().unwrap();
-    bytes
-        .write_u16::<LittleEndian>(raw_data_size + 1 + 1 + 2)
-        .unwrap();
+    bytes.append(&mut (raw_data_size + 1 + 1 + 2).to_le_bytes().to_vec());
 
     bytes.append(&mut raw_data);
 
