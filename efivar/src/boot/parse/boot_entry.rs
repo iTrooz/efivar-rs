@@ -82,7 +82,7 @@ impl BootEntry {
         };
         bytes.append(
             &mut u16::try_from(fpl_bytes.len())
-                .unwrap()
+                .expect("length should fit in u16")
                 .to_le_bytes()
                 .to_vec(),
         );
