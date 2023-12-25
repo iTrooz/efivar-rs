@@ -90,7 +90,7 @@ pub fn run(
     let file_path_list = FilePathList {
         hard_drive: efi_partition,
         file_path: FilePath {
-            path: fix_file_path(file_path).into(),
+            path: fix_file_path(file_path),
         },
     };
 

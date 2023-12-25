@@ -1,6 +1,6 @@
 //! This module contains parsing code for a device path, part of a device path list
 
-use std::{convert::TryInto, fmt::Display, path::PathBuf};
+use std::{convert::TryInto, fmt::Display};
 
 use byteorder::{LittleEndian, ReadBytesExt};
 use uuid::Uuid;
@@ -117,8 +117,7 @@ impl DevicePath {
                 consts::MEDIA_DEVICE_PATH_SUBTYPE::FILE_PATH => {
                     return Ok(Some(DevicePath::FilePath(FilePath {
                         path: read_nt_utf16_string(&mut device_path_data)
-                            .map_err(crate::Error::StringParseError)?
-                            .into(),
+                            .map_err(crate::Error::StringParseError)?,
                     })));
                 }
                 consts::MEDIA_DEVICE_PATH_SUBTYPE::HARD_DRIVE => {
@@ -180,13 +179,14 @@ impl EFIHardDrive {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct FilePath {
-    pub path: PathBuf, // TODO: do not use PathBuf, because it is a OS-specific type ?
+    /// the UEFI standard seem to use UCS-2 strings (a subset of UTF-16), so Rust UTF8 strings should be able to represent them
+    pub path: String,
 }
 
 impl FilePath {
     /// get bytes representation for a FilePath, without encapsulating them in a DevicePath structure
     fn to_bytes_raw(&self) -> Vec<u8> {
-        let utf16_bytes = self.path.to_str().unwrap().encode_utf16();
+        let utf16_bytes = self.path.encode_utf16();
         let mut utf8_bytes: Vec<u8> = utf16_bytes
             .into_iter()
             .flat_map(|var| var.to_le_bytes())
