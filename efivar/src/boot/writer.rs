@@ -21,8 +21,7 @@ impl<T: VarWriter> BootVarWriter for T {
             &Variable::new("BootOrder"),
             VariableFlags::default(),
             &bytes,
-        )
-        .unwrap();
+        )?;
 
         Ok(())
     }
@@ -34,8 +33,7 @@ impl<T: VarWriter> BootVarWriter for T {
             &Variable::new(&id.boot_var_name()),
             VariableFlags::default(),
             &bytes,
-        )
-        .unwrap();
+        )?;
 
         Ok(())
     }

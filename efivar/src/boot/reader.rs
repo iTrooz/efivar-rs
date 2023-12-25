@@ -2,7 +2,7 @@
 
 use byteorder::{LittleEndian, ReadBytesExt};
 
-use crate::{efi::Variable, VarReader};
+use crate::{efi::Variable, Error, VarReader};
 
 use super::boot_entry_iter::BootEntriesIterator;
 
@@ -20,7 +20,7 @@ impl<T: VarReader> BootVarReader for T {
         let mut ids = vec![0u16; data.len() / 2];
         data.as_slice()
             .read_u16_into::<LittleEndian>(&mut ids)
-            .unwrap();
+            .map_err(Error::UnknownIoError)?;
         Ok(ids)
     }
 
