@@ -1,3 +1,4 @@
+# Command I use to generate lcov: cargo tarpaulin -o lcov --output-dir coverage
 [test_config]
 skip-clean = true
 target-dir = "target/tarpaulin-build"
