@@ -9,7 +9,7 @@
 This repository contains the source code for:
 
 * [![crates.io](https://img.shields.io/crates/v/efivar.svg)](https://crates.io/crates/efivar) [efivar](efivar) - A Rust crate to read and write EFI variables
-* [![crates.io](https://img.shields.io/crates/v/efiboot.svg)](https://crates.io/crates/efiboot) [efiboot](efiboot) - A command-line tool to manage the UEFI boot manager
+* [![crates.io](https://img.shields.io/crates/v/efivarcli.svg)](https://crates.io/crates/efivarcli) [efivarcli](efivarcli) - A command-line tool to manage the UEFI boot manager
 
 The efivarcli tool supports both Windows and Linux:
 
