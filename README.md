@@ -1,8 +1,8 @@
-# efiboot-rs
+# efivar-rs
 
-[![Build Status](https://github.com/iTrooz/efiboot-rs/actions/workflows/build.yml/badge.svg)](https://github.com/iTrooz/efiboot-rs/actions/workflows/build.yml)
+[![Build Status](https://github.com/iTrooz/efivar-rs/actions/workflows/build.yml/badge.svg)](https://github.com/iTrooz/efivar-rs/actions/workflows/build.yml)
 [![Documentation](https://img.shields.io/badge/docs-main-blue.svg)](https://docs.rs/efivar/)
-[![codecov](https://codecov.io/gh/iTrooz/efiboot-rs/branch/main/graph/badge.svg)](https://codecov.io/gh/iTrooz/efiboot-rs)
+[![codecov](https://codecov.io/gh/iTrooz/efivar-rs/branch/main/graph/badge.svg)](https://codecov.io/gh/iTrooz/efivar-rs)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Built with cargo-make](https://sagiegurari.github.io/cargo-make/assets/badges/cargo-make.svg)](https://sagiegurari.github.io/cargo-make)
 

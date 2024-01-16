@@ -117,7 +117,7 @@ impl VarWriter for SystemManager {
 
     fn delete(&mut self, _var: &Variable) -> crate::Result<()> {
         // Unimplemented because I wasn't able to enable efivars sysfs on my system
-        unimplemented!("Variable deletion not supported on efivars sysfs. See https://github.com/iTrooz/efiboot-rs/issues/55");
+        unimplemented!("Variable deletion not supported on efivars sysfs. See https://github.com/iTrooz/efivar-rs/issues/55");
     }
 }
 
