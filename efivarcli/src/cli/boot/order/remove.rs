@@ -14,7 +14,7 @@ pub fn run(manager: &mut dyn VarManager, id: u16, force: bool) -> ExitCode {
 
     if manager.read(&Variable::new(&id.boot_var_name())).is_ok() && !force {
         eprintln!("Warning: A variable with the name {} exists. Deleting its id from the boot order won't delete it.\n\
-            Use `efiboot boot del {id:04X}` instead.\n\
+            Use `efivarcli boot del {id:04X}` instead.\n\
             Pass argument --force to skip this warning", id.boot_var_name());
         return ExitCode::FAILURE;
     }

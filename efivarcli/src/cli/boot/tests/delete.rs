@@ -15,7 +15,7 @@ fn delete() {
     assert_eq!(
         ExitCode::SUCCESS,
         crate::run(
-            Command::parse_from(["efiboot", "boot", "delete", "1"]),
+            Command::parse_from(["efivarcli", "boot", "delete", "1"]),
             manager,
         )
     );

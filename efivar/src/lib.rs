@@ -1,5 +1,5 @@
 //! efivar is a crate for manipulating EFI variables using the OS interface. This crate is mainly
-//! used by `efiboot` to implement its functionality.
+//! used by `efivarcli` to implement its functionality.
 //!
 //! On Linux, it is assumed that efivarfs is mounted and available at /sys/firmware/efi/efivars,
 //! which should be the default nowadays on all major distros.

@@ -64,7 +64,7 @@ pub fn run(manager: &mut dyn VarManager, cmd: BootNextCommand) -> ExitCode {
                 .attributes
                 .contains(BootEntryAttributes::LOAD_OPTION_ACTIVE)
             {
-                eprintln!("Warning: boot entry is not active, and may not boot. Enable it with `efiboot boot enable {id:04X}`");
+                eprintln!("Warning: boot entry is not active, and may not boot. Enable it with `efivarcli boot enable {id:04X}`");
             }
 
             manager

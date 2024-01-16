@@ -20,7 +20,7 @@ fn set_next() {
     assert_eq!(
         ExitCode::SUCCESS,
         crate::run(
-            Command::parse_from(["efiboot", "boot", "next", "set", "0001",]),
+            Command::parse_from(["efivarcli", "boot", "next", "set", "0001",]),
             manager,
         )
     );
@@ -36,7 +36,7 @@ fn set_inexistent_next() {
     assert_eq!(
         ExitCode::FAILURE,
         crate::run(
-            Command::parse_from(["efiboot", "boot", "next", "set", "0001",]),
+            Command::parse_from(["efivarcli", "boot", "next", "set", "0001",]),
             manager,
         )
     );
@@ -59,7 +59,7 @@ fn unset_next() {
     assert_eq!(
         ExitCode::SUCCESS,
         crate::run(
-            Command::parse_from(["efiboot", "boot", "next", "unset"]),
+            Command::parse_from(["efivarcli", "boot", "next", "unset"]),
             manager,
         )
     );
@@ -74,7 +74,7 @@ fn unset_inexistent_next() {
     assert_eq!(
         ExitCode::FAILURE,
         crate::run(
-            Command::parse_from(["efiboot", "boot", "next", "unset"]),
+            Command::parse_from(["efivarcli", "boot", "next", "unset"]),
             manager,
         )
     );
@@ -97,7 +97,7 @@ fn get_next() {
     assert_eq!(
         ExitCode::SUCCESS,
         crate::run(
-            Command::parse_from(["efiboot", "boot", "next", "get"]),
+            Command::parse_from(["efivarcli", "boot", "next", "get"]),
             manager,
         )
     );
@@ -110,7 +110,7 @@ fn get_inexistent_next() {
     assert_eq!(
         ExitCode::FAILURE,
         crate::run(
-            Command::parse_from(["efiboot", "boot", "next", "get"]),
+            Command::parse_from(["efivarcli", "boot", "next", "get"]),
             manager,
         )
     );

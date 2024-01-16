@@ -27,7 +27,7 @@ fn list() {
     // normal list command
     assert_eq!(
         ExitCode::SUCCESS,
-        crate::run(Command::parse_from(["efiboot", "list"]), manager,)
+        crate::run(Command::parse_from(["efivarcli", "list"]), manager,)
     );
 
     // list namespace
@@ -35,7 +35,7 @@ fn list() {
         ExitCode::SUCCESS,
         crate::run(
             Command::parse_from([
-                "efiboot",
+                "efivarcli",
                 "list",
                 "-n",
                 "f2aab986-4175-47bb-890a-3cba5f6d2547"
@@ -47,7 +47,10 @@ fn list() {
     // list all namespaces
     assert_eq!(
         ExitCode::SUCCESS,
-        crate::run(Command::parse_from(["efiboot", "list", "--all",]), manager,)
+        crate::run(
+            Command::parse_from(["efivarcli", "list", "--all",]),
+            manager,
+        )
     );
 }
 
@@ -68,7 +71,7 @@ fn import() {
         ExitCode::SUCCESS,
         crate::run(
             Command::parse_from([
-                "efiboot",
+                "efivarcli",
                 "import",
                 file_path.to_str().unwrap(),
                 "MyVariable",
@@ -94,7 +97,7 @@ fn import_non_existent() {
         ExitCode::FAILURE,
         crate::run(
             Command::parse_from([
-                "efiboot",
+                "efivarcli",
                 "import",
                 file_path.to_str().unwrap(),
                 "MyVariable",
@@ -126,7 +129,7 @@ fn export() {
         ExitCode::SUCCESS,
         crate::run(
             Command::parse_from([
-                "efiboot",
+                "efivarcli",
                 "export",
                 "MyVariable",
                 file_path.to_str().unwrap(),
@@ -145,7 +148,7 @@ fn export() {
 
 #[test]
 fn export_no_var() {
-    //! Try `efiboot export` with a variable that doesn't exist
+    //! Try `efivarcli export` with a variable that doesn't exist
 
     let mut manager = MemoryStore::new();
 
@@ -156,7 +159,7 @@ fn export_no_var() {
         ExitCode::FAILURE,
         crate::run(
             Command::parse_from([
-                "efiboot",
+                "efivarcli",
                 "export",
                 "MyVariable",
                 file_path.to_str().unwrap(),
@@ -170,7 +173,7 @@ fn export_no_var() {
 
 #[test]
 fn delete() {
-    //! Run `efiboot delete`
+    //! Run `efivarcli delete`
 
     let mut manager = MemoryStore::new();
 
@@ -185,7 +188,7 @@ fn delete() {
     assert_eq!(
         ExitCode::SUCCESS,
         crate::run(
-            Command::parse_from(["efiboot", "delete", "MyVariable",]),
+            Command::parse_from(["efivarcli", "delete", "MyVariable",]),
             &mut manager
         )
     );
@@ -195,14 +198,14 @@ fn delete() {
 
 #[test]
 fn delete_non_existent() {
-    //! Try `efiboot delete` with a non-existent variable
+    //! Try `efivarcli delete` with a non-existent variable
 
     let mut manager = MemoryStore::new();
 
     assert_eq!(
         ExitCode::FAILURE,
         crate::run(
-            Command::parse_from(["efiboot", "delete", "MyVariable",]),
+            Command::parse_from(["efivarcli", "delete", "MyVariable",]),
             &mut manager
         )
     );
@@ -210,7 +213,7 @@ fn delete_non_existent() {
 
 #[test]
 fn read() {
-    //! Run `efiboot read`
+    //! Run `efivarcli read`
 
     let mut manager = MemoryStore::new();
 
@@ -226,7 +229,7 @@ fn read() {
     assert_eq!(
         ExitCode::SUCCESS,
         crate::run(
-            Command::parse_from(["efiboot", "read", "MyVariable"]),
+            Command::parse_from(["efivarcli", "read", "MyVariable"]),
             &mut manager
         )
     );
@@ -235,7 +238,7 @@ fn read() {
     assert_eq!(
         ExitCode::SUCCESS,
         crate::run(
-            Command::parse_from(["efiboot", "read", "MyVariable", "--string"]),
+            Command::parse_from(["efivarcli", "read", "MyVariable", "--string"]),
             &mut manager
         )
     );
@@ -244,7 +247,7 @@ fn read() {
     assert_eq!(
         ExitCode::SUCCESS,
         crate::run(
-            Command::parse_from(["efiboot", "read", "MyVariable", "--raw"]),
+            Command::parse_from(["efivarcli", "read", "MyVariable", "--raw"]),
             &mut manager
         )
     );
@@ -253,7 +256,7 @@ fn read() {
     assert_eq!(
         ExitCode::SUCCESS,
         crate::run(
-            Command::parse_from(["efiboot", "read", "MyVariable", "--raw", "--string"]),
+            Command::parse_from(["efivarcli", "read", "MyVariable", "--raw", "--string"]),
             &mut manager
         )
     );
@@ -261,12 +264,12 @@ fn read() {
 
 #[test]
 fn read_non_existent() {
-    //! Try `efiboot read` with a non-existent variable
+    //! Try `efivarcli read` with a non-existent variable
 
     assert_eq!(
         ExitCode::FAILURE,
         crate::run(
-            Command::parse_from(["efiboot", "read", "MyVariable"]),
+            Command::parse_from(["efivarcli", "read", "MyVariable"]),
             &mut MemoryStore::new()
         )
     );

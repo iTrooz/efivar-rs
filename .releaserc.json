@@ -15,7 +15,7 @@
                 "assets": [
                     "CHANGELOG.md",
                     "Cargo.lock",
-                    "efiboot/Cargo.toml",
+                    "efivarcli/Cargo.toml",
                     "efivar/Cargo.toml",
                     "efivar/src/lib.rs"
                 ],

@@ -18,7 +18,7 @@ fn get_entries() {
     assert_eq!(
         ExitCode::SUCCESS,
         crate::run(
-            Command::parse_from(["efiboot", "boot", "get-entries"]),
+            Command::parse_from(["efivarcli", "boot", "get-entries"]),
             manager,
         )
     );
@@ -33,7 +33,7 @@ fn get_entries_verbose() {
     assert_eq!(
         ExitCode::SUCCESS,
         crate::run(
-            Command::parse_from(["efiboot", "boot", "get-entries", "-v"]),
+            Command::parse_from(["efivarcli", "boot", "get-entries", "-v"]),
             manager,
         )
     );
@@ -49,7 +49,7 @@ fn get_entries_not_in_bootorder() {
     assert_eq!(
         ExitCode::SUCCESS,
         crate::run(
-            Command::parse_from(["efiboot", "boot", "get-entries"]),
+            Command::parse_from(["efivarcli", "boot", "get-entries"]),
             manager,
         )
     );

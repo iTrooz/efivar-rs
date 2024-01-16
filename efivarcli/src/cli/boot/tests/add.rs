@@ -14,19 +14,19 @@ use crate::{
 
 #[test]
 fn add() {
-    //! Test that the basic `efiboot boot add` subcommand works.
+    //! Test that the basic `efivarcli boot add` subcommand works.
     //! Note: we are using the current partition, not specifying one
 
     let manager = &mut MemoryStore::new();
 
     let setup_entry = standard_setup(manager, 0x0001);
 
-    // execute `efiboot boot add`
+    // execute `efivarcli boot add`
     assert_eq!(
         ExitCode::SUCCESS,
         crate::run(
             Command::parse_from([
-                "efiboot",
+                "efivarcli",
                 "boot",
                 "add",
                 "--file",
@@ -63,18 +63,18 @@ fn add() {
 
 #[test]
 fn add_set_id() {
-    //! Use `efiboot boot add` with a given entry ID.
+    //! Use `efivarcli boot add` with a given entry ID.
 
     let manager = &mut MemoryStore::new();
 
     let setup_entry = standard_setup(manager, 0x0001);
 
-    // execute `efiboot boot add`
+    // execute `efivarcli boot add`
     assert_eq!(
         ExitCode::SUCCESS,
         crate::run(
             Command::parse_from([
-                "efiboot",
+                "efivarcli",
                 "boot",
                 "add",
                 "--file",
@@ -116,18 +116,18 @@ fn add_set_id() {
 
 #[test]
 fn add_verify_file_path_fix() {
-    //! Use `efiboot boot add` with a given entry ID.
+    //! Use `efivarcli boot add` with a given entry ID.
 
     let manager = &mut MemoryStore::new();
 
     let setup_entry = standard_setup(manager, 0x0001);
 
-    // execute `efiboot boot add`
+    // execute `efivarcli boot add`
     assert_eq!(
         ExitCode::SUCCESS,
         crate::run(
             Command::parse_from([
-                "efiboot",
+                "efivarcli",
                 "boot",
                 "add",
                 "--file",
@@ -181,12 +181,12 @@ fn add_on_existing() {
         .unwrap()
         .to_owned();
 
-    // execute `efiboot boot add`
+    // execute `efivarcli boot add`
     assert_eq!(
         ExitCode::FAILURE,
         crate::run(
             Command::parse_from([
-                "efiboot",
+                "efivarcli",
                 "boot",
                 "add",
                 "--file",

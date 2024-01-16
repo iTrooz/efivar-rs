@@ -136,18 +136,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "acbf1af155f9b9ef647e42cdc158db4b64a1b61f743629225fde6f3e0be2a7c7"
 
 [[package]]
-name = "efiboot"
-version = "1.4.0"
-dependencies = [
- "byteorder",
- "clap",
- "efivar",
- "itertools",
- "tempfile",
- "uuid",
-]
-
-[[package]]
 name = "efivar"
 version = "1.4.0"
 dependencies = [
@@ -163,6 +151,18 @@ dependencies = [
  "uuid",
  "version-sync",
  "winapi",
+]
+
+[[package]]
+name = "efivarcli"
+version = "1.4.0"
+dependencies = [
+ "byteorder",
+ "clap",
+ "efivar",
+ "itertools",
+ "tempfile",
+ "uuid",
 ]
 
 [[package]]

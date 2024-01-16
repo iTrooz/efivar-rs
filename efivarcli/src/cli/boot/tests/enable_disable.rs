@@ -19,7 +19,7 @@ fn enable() {
     assert_eq!(
         ExitCode::SUCCESS,
         crate::run(
-            Command::parse_from(["efiboot", "boot", "enable", "0001",]),
+            Command::parse_from(["efivarcli", "boot", "enable", "0001",]),
             manager,
         )
     );
@@ -40,7 +40,7 @@ fn enable_enabled() {
     assert_eq!(
         ExitCode::FAILURE,
         crate::run(
-            Command::parse_from(["efiboot", "boot", "enable", "0001",]),
+            Command::parse_from(["efivarcli", "boot", "enable", "0001",]),
             manager,
         )
     );
@@ -61,7 +61,7 @@ fn disable() {
     assert_eq!(
         ExitCode::SUCCESS,
         crate::run(
-            Command::parse_from(["efiboot", "boot", "disable", "0001",]),
+            Command::parse_from(["efivarcli", "boot", "disable", "0001",]),
             manager,
         )
     );
@@ -82,7 +82,7 @@ fn disable_disabled() {
     assert_eq!(
         ExitCode::FAILURE,
         crate::run(
-            Command::parse_from(["efiboot", "boot", "disable", "0001",]),
+            Command::parse_from(["efivarcli", "boot", "disable", "0001",]),
             manager,
         )
     );

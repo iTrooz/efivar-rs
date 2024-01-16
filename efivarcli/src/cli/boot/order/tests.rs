@@ -28,7 +28,7 @@ fn get_order() {
     assert_eq!(
         ExitCode::SUCCESS,
         crate::run(
-            Command::parse_from(["efiboot", "boot", "order", "get"]),
+            Command::parse_from(["efivarcli", "boot", "order", "get"]),
             manager,
         )
     );
@@ -41,7 +41,16 @@ fn set_order() {
     assert_eq!(
         ExitCode::SUCCESS,
         crate::run(
-            Command::parse_from(["efiboot", "boot", "order", "set", "0001", "2", "1000", "500"]),
+            Command::parse_from([
+                "efivarcli",
+                "boot",
+                "order",
+                "set",
+                "0001",
+                "2",
+                "1000",
+                "500"
+            ]),
             manager,
         )
     );
@@ -66,7 +75,7 @@ fn add_to_order() {
     assert_eq!(
         ExitCode::SUCCESS,
         crate::run(
-            Command::parse_from(["efiboot", "boot", "order", "add", "1", "--position", "0"]),
+            Command::parse_from(["efivarcli", "boot", "order", "add", "1", "--position", "0"]),
             manager,
         )
     );
@@ -74,7 +83,7 @@ fn add_to_order() {
     assert_eq!(
         ExitCode::SUCCESS,
         crate::run(
-            Command::parse_from(["efiboot", "boot", "order", "add", "500"]),
+            Command::parse_from(["efivarcli", "boot", "order", "add", "500"]),
             manager,
         )
     );
@@ -99,7 +108,7 @@ fn remove_from_order() {
     assert_eq!(
         ExitCode::SUCCESS,
         crate::run(
-            Command::parse_from(["efiboot", "boot", "order", "remove", "1000"]),
+            Command::parse_from(["efivarcli", "boot", "order", "remove", "1000"]),
             manager,
         )
     );
@@ -124,7 +133,7 @@ fn remove_inexistent_from_order() {
     assert_eq!(
         ExitCode::FAILURE,
         crate::run(
-            Command::parse_from(["efiboot", "boot", "order", "remove", "2000"]),
+            Command::parse_from(["efivarcli", "boot", "order", "remove", "2000"]),
             manager,
         )
     );

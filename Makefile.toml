@@ -27,7 +27,7 @@ if is_windows
     suffix = set ".exe"
 end
 
-target_binary_name = set efiboot
+target_binary_name = set efivarcli
 target_binary = set "target/release/${target_binary_name}${suffix}"
 
 mkdir ${output_dir}

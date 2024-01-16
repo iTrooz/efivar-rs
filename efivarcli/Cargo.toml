@@ -1,5 +1,5 @@
 [package]
-name = "efiboot"
+name = "efivarcli"
 version = "1.4.0"
 authors = ["Vincent Tavernier <v.tavernier@pm.me>", "iTrooz <cratesio@itrooz.fr>"]
 license = "MIT"
