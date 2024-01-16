@@ -1,6 +1,6 @@
 [package]
 name = "efivarcli"
-version = "1.4.0"
+version = "2.0.0"
 authors = ["Vincent Tavernier <v.tavernier@pm.me>", "iTrooz <cratesio@itrooz.fr>"]
 license = "MIT"
 readme = "README.md"
@@ -15,7 +15,7 @@ edition = "2018"
 [dependencies]
 byteorder = "1.4.3"
 clap = { version = "4.4.6", features = ["derive", "env"] }
-efivar = { version = "1.4.0", path = "../efivar", features = ["store"] }
+efivar = { version = "2.0.0", path = "../efivar", features = ["store"] }
 itertools = "0.11.0"
 uuid = { version = "1.4.1" }
 

@@ -137,7 +137,7 @@ checksum = "acbf1af155f9b9ef647e42cdc158db4b64a1b61f743629225fde6f3e0be2a7c7"
 
 [[package]]
 name = "efivar"
-version = "1.4.0"
+version = "2.0.0"
 dependencies = [
  "base64",
  "bitflags 2.4.1",
@@ -155,7 +155,7 @@ dependencies = [
 
 [[package]]
 name = "efivarcli"
-version = "1.4.0"
+version = "2.0.0"
 dependencies = [
  "byteorder",
  "clap",
