@@ -1,7 +1,7 @@
 //! efivarfs is the new interface to access EFI variables
 
 use std::fs;
-use std::fs::{File, OpenOptions};
+use std::fs::File;
 use std::io::prelude::*;
 use std::str::FromStr;
 
@@ -95,8 +95,32 @@ impl VarWriter for SystemManager {
         // Filename to the matching efivarfs file for this variable
         let filename = format!("{}/{}", EFIVARFS_ROOT, var);
 
+        // Open file read only to get FD for flags operations.
+        let f = File::open(&filename).map_err(|error| Error::for_variable(error, var))?;
+
+        // Read original flags.
+        let orig_flags = rustix::fs::ioctl_getflags(&f)
+            .map_err(|error| Error::for_variable(error.into(), var))?;
+
+        // If Immutable flag is present, remove it.
+        let immut_flag_removed = if orig_flags.contains(rustix::fs::IFlags::IMMUTABLE) {
+            // IFlags doesn't implement Clone, so cycle through bits.
+            let mut flags = rustix::fs::IFlags::from_bits(orig_flags.bits()).unwrap();
+
+            flags.remove(rustix::fs::IFlags::IMMUTABLE);
+            rustix::fs::ioctl_setflags(&f, flags)
+                .map_err(|error| Error::for_variable(error.into(), var))?;
+
+            true
+        } else {
+            false
+        };
+
+        // Close file before re-opening for write.
+        drop(f);
+
         // Open file.
-        let mut f = OpenOptions::new()
+        let mut f = File::options()
             .write(true)
             .truncate(true)
             .create(true)
@@ -106,6 +130,12 @@ impl VarWriter for SystemManager {
         // Write the value using a single write.
         f.write(&buf)
             .map_err(|error| Error::for_variable(error, var))?;
+
+        if immut_flag_removed {
+            // Add back the Immutable flag.
+            rustix::fs::ioctl_setflags(&f, orig_flags)
+                .map_err(|error| Error::for_variable(error.into(), var))?;
+        }
 
         Ok(())
     }
