@@ -37,15 +37,15 @@ jobs:
         id: rustup
         run: rustup show
 
+      # Important: run a command with the --locked flag first, so other commands can't modify Cargo.lock first. See https://github.com/iTrooz/efivar-rs/issues/81
       - name: Fetch dependencies
-        run: cargo fetch
+        run: cargo fetch --locked
 
       - name: Run cargo fmt
         run: cargo fmt -- --check
 
       - name: Run cargo check
-        run: cargo check --all-features --frozen
-          
+        run: cargo check --all-features
       - name: Run cargo clippy
         run: cargo clippy --all-features
       
