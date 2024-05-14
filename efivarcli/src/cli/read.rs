@@ -22,7 +22,7 @@ pub fn run(
     match reader.read(&name) {
         Ok((buf, attr)) => {
             if !raw {
-                println!("Attributes: {}", attr.to_string());
+                println!("Attributes: {}", attr);
             }
             if as_string {
                 if raw {

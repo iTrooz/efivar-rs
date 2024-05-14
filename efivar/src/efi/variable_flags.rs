@@ -1,6 +1,6 @@
 //! Definition of the VariableFlags type
 
-use std::str::FromStr;
+use std::{fmt::Display, str::FromStr};
 
 use crate::Error;
 
@@ -51,8 +51,8 @@ impl FromStr for VariableFlags {
     }
 }
 
-impl ToString for VariableFlags {
-    fn to_string(&self) -> String {
+impl Display for VariableFlags {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut flag_strings = Vec::new();
 
         if self.contains(VariableFlags::NON_VOLATILE) {
@@ -80,7 +80,7 @@ impl ToString for VariableFlags {
             flag_strings.push("EFI_VARIABLE_ENHANCED_AUTHENTICATED_ACCESS");
         }
 
-        flag_strings.join("\n")
+        f.write_str(&flag_strings.join("\n"))
     }
 }
 
