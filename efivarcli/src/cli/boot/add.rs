@@ -23,7 +23,7 @@ pub fn get_used_ids(manager: &dyn VarManager) -> Vec<u16> {
 }
 
 /// check if a partition+file is valid (exists), if the partition is mounted
-fn check(partition: &str, file: &str) -> bool {
+fn try_check_if_valid(partition: &str, file: &str) -> Option<bool> {
     if let Some(mount_point) = partition::get_mount_point(partition) {
         eprintln!(
             "Partition {} is mounted on {}. Verifying file location {file} is valid",
@@ -34,13 +34,13 @@ fn check(partition: &str, file: &str) -> bool {
         if let Ok(md) = std::fs::metadata(&full_path) {
             if md.is_file() {
                 eprintln!("File location is valid");
-                return true;
+                return Some(true);
             }
         }
         eprintln!("{} is not a valid file", full_path.display());
-        false
+        Some(false)
     } else {
-        true
+        None
     }
 }
 
@@ -64,9 +64,9 @@ pub fn run(
     // get necessary information from the partition to create an entry
     let efi_partition = {
         if let Some(partition) = partition {
-            // do not continue is the file has been identified as non-existant
+            // do not continue is the file has been identified as non-existent
             // ( check() has already printed the error message to the user )
-            if !force && !check(&partition, &file_path) {
+            if !force && try_check_if_valid(&partition, &file_path) != Some(false) {
                 return ExitCode::FAILURE;
             }
             partition::retrieve_efi_partition_data(&partition)
