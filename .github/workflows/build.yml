@@ -28,10 +28,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Cargo cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.cargo/bin/
@@ -74,10 +74,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Cargo cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.cargo/bin/
@@ -112,7 +112,7 @@ jobs:
           fi
 
       - name: Upload coverage to codecov.io
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
           files: coverage/info.lcov
           fail_ci_if_error: false # upload can randomly fail, see https://github.com/codecov/codecov-action/issues/557
@@ -133,10 +133,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Cargo cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.cargo/bin/
@@ -147,7 +147,7 @@ jobs:
           restore-keys: build-${{ runner.os }}-cargo
 
       - name: Setup Rust cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             target/
@@ -174,7 +174,7 @@ jobs:
 
       # Upload artifacts
       - name: Upload binaries from dist/
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.name }}
           path: dist/
