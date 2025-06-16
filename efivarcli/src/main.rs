@@ -25,7 +25,7 @@ fn main() -> std::process::ExitCode {
     let manager = &mut *if let Some(filename) = opts.file_store {
         efivar::file_store(filename)
     } else {
-        efivar::system()
+        efivar::system().expect("Failed to instanciate variable manager")
     };
 
     run(opts.cmd, manager).into()

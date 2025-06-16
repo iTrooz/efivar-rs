@@ -57,6 +57,13 @@ pub trait VarManager:
 {
 }
 
+#[derive(Debug, thiserror::Error)]
+pub enum VarManagerInitError {
+    /// System has booted in MBR mode
+    #[error("EFI variables not available (did you boot in BIOS/MBR mode ?)")]
+    EFIVariablesNotAvailable,
+}
+
 use crate::sys::SystemManager;
 /// Returns a `VarManager` that represents the firmware variables of the running system
 ///
@@ -64,8 +71,13 @@ use crate::sys::SystemManager;
 ///
 /// ***The returned object will change the values stored in the system's NVRAM. Please be cautious
 /// when using its methods.***
-pub fn system() -> Box<dyn VarManager> {
-    Box::new(SystemManager::new())
+pub fn system() -> std::result::Result<Box<dyn VarManager>, VarManagerInitError> {
+    match SystemManager::new() {
+        Ok(manager) => Ok(Box::new(manager)),
+        Err(VarManagerInitError::EFIVariablesNotAvailable) => {
+            panic!("EFI variables are not available on this system.")
+        }
+    }
 }
 
 /// Returns a `VarManager` which loads and stores variables to a TOML file. The variable file will
@@ -137,6 +149,6 @@ mod tests {
 
     #[test]
     fn system_instantiate() {
-        system();
+        system().expect("Failed to instantiate system variables manager");
     }
 }

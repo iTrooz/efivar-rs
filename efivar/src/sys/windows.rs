@@ -21,10 +21,14 @@ use crate::{Error, VarEnumerator, VarManager, VarReader, VarWriter};
 mod security;
 
 impl SystemManager {
-    pub fn new() -> SystemManager {
+    pub fn new() -> Result<SystemManager, crate::VarManagerInitError> {
         // Update current thread token with the right privileges
-        security::update_privileges().unwrap();
-        SystemManager {}
+        security::update_privileges()
+            .map_err(|_| crate::VarManagerInitError::EFIVariablesNotAvailable)?;
+        if !Self::efi_variables_available() {
+            return Err(crate::VarManagerInitError::EFIVariablesNotAvailable);
+        }
+        Ok(SystemManager {})
     }
 
     fn parse_name(var: &Variable) -> crate::Result<(Vec<u16>, Vec<u16>)> {
@@ -39,6 +43,24 @@ impl SystemManager {
             .collect();
 
         Ok((guid_wide, name_wide))
+    }
+
+    /// Returns true if EFI variables are available on this system (Windows).
+    fn efi_variables_available() -> bool {
+        // Try to enumerate EFI variables, return true if successful
+        use ntapi::ntexapi::NtEnumerateSystemEnvironmentValuesEx;
+        use winapi::ctypes::c_void;
+        use winapi::shared::minwindef::DWORD;
+        let mut size: u32 = 0;
+        const STATUS_BUFFER_TOO_SMALL: i32 = 0xc0000023_u32 as i32;
+        let status: i32 = unsafe {
+            NtEnumerateSystemEnvironmentValuesEx(
+                1, // 1 means system variables, so EFI variables
+                std::ptr::null_mut() as *mut c_void,
+                &mut size as *mut u32,
+            )
+        };
+        status == STATUS_BUFFER_TOO_SMALL
     }
 }
 

@@ -22,18 +22,15 @@ impl SystemManager {
             .unwrap_or(false)
     }
 
-    pub fn new() -> SystemManager {
+    pub fn new() -> Result<SystemManager, crate::VarManagerInitError> {
         if !Self::is_empty(efivarfs::EFIVARFS_ROOT) {
-            Self::efivars()
+            Ok(Self::efivars())
         } else if !Self::is_empty(efivars::EFIVARS_ROOT) {
-            Self::efivarfs()
+            Ok(Self::efivarfs())
         } else if cfg!(test) {
-            // CI environments do not have efivarfs mounted,
-            // so the resulting object will have no variables
-            // defined. This allows testing however.
-            Self::efivars()
+            Ok(Self::efivars())
         } else {
-            panic!("Failed to determine if efivars or efivarfs should be used. Please check permissions to /sys/firmware/efi");
+            Err(crate::VarManagerInitError::EFIVariablesNotAvailable)
         }
     }
 
