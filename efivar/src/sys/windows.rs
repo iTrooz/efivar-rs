@@ -50,7 +50,6 @@ impl SystemManager {
         // Try to enumerate EFI variables, return true if successful
         use ntapi::ntexapi::NtEnumerateSystemEnvironmentValuesEx;
         use winapi::ctypes::c_void;
-        use winapi::shared::minwindef::DWORD;
         let mut size: u32 = 0;
         const STATUS_BUFFER_TOO_SMALL: i32 = 0xc0000023_u32 as i32;
         let status: i32 = unsafe {
