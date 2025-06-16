@@ -6,7 +6,6 @@ use byteorder::{LittleEndian, ReadBytesExt};
 use ntapi::ntexapi::NtEnumerateSystemEnvironmentValuesEx;
 use std::ffi::OsStr;
 use std::iter::once;
-use std::mem;
 use std::os::windows::ffi::OsStrExt;
 use winapi::ctypes::{c_ulong, c_void};
 use winapi::shared::minwindef::DWORD;
@@ -49,13 +48,12 @@ impl SystemManager {
     fn efi_variables_available() -> bool {
         // Try to enumerate EFI variables, return true if successful
         use ntapi::ntexapi::NtEnumerateSystemEnvironmentValuesEx;
-        use winapi::ctypes::c_void;
         let mut size: u32 = 0;
         const STATUS_BUFFER_TOO_SMALL: i32 = 0xc0000023_u32 as i32;
         let status: i32 = unsafe {
             NtEnumerateSystemEnvironmentValuesEx(
                 1, // 1 means system variables, so EFI variables
-                std::ptr::null_mut() as *mut c_void,
+                std::ptr::null_mut(),
                 &mut size as *mut u32,
             )
         };
@@ -76,7 +74,7 @@ fn parse_efi_variable(buf: &mut &[u8]) -> crate::Result<Variable> {
 
 fn parse_efi_variables(buf: &mut &[u8]) -> crate::Result<Vec<Variable>> {
     let mut vars: Vec<Variable> = vec![];
-    while buf.len() > 0 {
+    while !buf.is_empty() {
         let struct_size = buf
             .read_u32::<LittleEndian>()
             .map_err(crate::Error::UnknownIoError)?;
@@ -109,7 +107,7 @@ impl VarEnumerator for SystemManager {
                 // https://github.com/iTrooz/firmware-variables/blob/9a54da5aca38eaf345c24a3ac1935063f94ab9d8/src/firmware_variables/platform/win32.py#L73
                 NtEnumerateSystemEnvironmentValuesEx(
                     1, // 1 means system variables, so EFI variables
-                    std::ptr::null_mut() as *mut c_void,
+                    std::ptr::null_mut(),
                     &mut size as *mut c_ulong,
                 )
             };
@@ -204,9 +202,7 @@ impl VarWriter for SystemManager {
             SetFirmwareEnvironmentVariableExW(
                 name_wide.as_ptr(),
                 guid_wide.as_ptr(),
-                // SetFirmwareEnvironmentVariableExW is not supposed to modify the contents
-                // of the buffer for the value.
-                mem::transmute::<*const u8, *mut c_void>(value.as_ptr()),
+                value.as_ptr() as *mut c_void,
                 value.len() as u32,
                 attributes.bits(),
             )
@@ -225,7 +221,7 @@ impl VarWriter for SystemManager {
             SetFirmwareEnvironmentVariableExW(
                 name_wide.as_ptr(),
                 guid_wide.as_ptr(),
-                mem::transmute::<*const u8, *mut c_void>(std::ptr::null()),
+                std::ptr::null_mut(),
                 0,
                 VariableFlags::NON_VOLATILE.bits(),
             )
