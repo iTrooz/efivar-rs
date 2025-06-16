@@ -26,10 +26,7 @@ impl<'a> Iterator for BootEntriesIterator<'a> {
 
     fn next(&mut self) -> Option<Self::Item> {
         let id = self.ids.pop();
-        let id = match id {
-            Some(id) => id,
-            None => return None,
-        };
+        let id = id?;
 
         let var = Variable::new(&id.boot_var_name());
         let boot_var_res =

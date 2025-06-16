@@ -4,7 +4,7 @@ use std::io;
 
 use std::fs::File;
 use std::io::prelude::*;
-use std::io::{Error, ErrorKind};
+use std::io::Error;
 use std::path::{Path, PathBuf};
 
 /// Implements support for storing and loading EFI variables from a TOML file
@@ -26,13 +26,13 @@ fn load_vendors(filename: &Path) -> io::Result<VendorGroup> {
 
     match doc {
         Ok(vendor_group) => Ok(vendor_group),
-        Err(reason) => Err(Error::new(ErrorKind::Other, reason)),
+        Err(reason) => Err(Error::other(reason)),
     }
 }
 
 fn save_vendors(filename: &Path, vendor_group: &VendorGroup) -> io::Result<()> {
     let mut file = File::create(filename)?;
-    let data = toml::to_string(vendor_group).map_err(|e| Error::new(ErrorKind::Other, e))?;
+    let data = toml::to_string(vendor_group).map_err(Error::other)?;
     file.write_all(data.as_bytes())?;
     Ok(())
 }
