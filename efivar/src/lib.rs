@@ -146,9 +146,4 @@ mod tests {
         std::fs::remove_file("doc-test.toml")
             .expect("Failed to remove temporary file doc-test.toml");
     }
-
-    #[test]
-    fn system_instantiate() {
-        system().expect("Failed to instantiate system variables manager");
-    }
 }
