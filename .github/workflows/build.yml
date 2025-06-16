@@ -11,7 +11,16 @@ on:
 
 jobs:
   check:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.runs-on }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Linux
+            runs-on: ubuntu-latest
+          - name: Windows
+            runs-on: windows-latest
 
     env:
       RUSTFLAGS: "-D warnings"
