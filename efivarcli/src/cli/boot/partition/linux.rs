@@ -16,6 +16,7 @@ pub fn query_partition(disk: Option<String>, partition: String) -> Result<Partit
         (true, None) => Ok(partition),
         (false, Some(disk)) => {
             if disk.starts_with("/dev/") {
+                let disk = disk.trim_end_matches('/');
                 // if the disk is absolute, append the partition to it
                 Ok(format!("{disk}{partition}"))
             } else {
