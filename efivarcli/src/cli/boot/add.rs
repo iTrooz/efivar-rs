@@ -66,7 +66,7 @@ pub fn run(
         if let Some(partition) = partition {
             // do not continue is the file has been identified as non-existent
             // ( check() has already printed the error message to the user )
-            if !force && try_check_if_valid(&partition, &file_path) != Some(false) {
+            if !force && try_check_if_valid(&partition, &file_path) == Some(false) {
                 return ExitCode::FAILURE;
             }
             partition::retrieve_efi_partition_data(&partition)
