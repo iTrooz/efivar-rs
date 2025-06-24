@@ -11,6 +11,7 @@ use crate::push::PushVecU8;
 use crate::{Error, VarEnumerator, VarManager, VarReader, VarWriter};
 
 use byteorder::{LittleEndian, ReadBytesExt};
+use rustix::fs::IFlags;
 
 pub const EFIVARFS_ROOT: &str = "/sys/firmware/efi/efivars";
 
@@ -80,46 +81,35 @@ impl VarWriter for SystemManager {
         attributes: VariableFlags,
         value: &[u8],
     ) -> crate::Result<()> {
-        // Prepare attributes
-        let attribute_bits = attributes.bits();
-
-        // Prepare buffer (we must only write once)
-        let mut buf = Vec::with_capacity(std::mem::size_of_val(&attribute_bits));
-
-        // Write attributes
-        buf.push_u32(attribute_bits);
-
-        // Write variable contents
-        buf.append(&mut value.to_vec());
 
         // Filename to the matching efivarfs file for this variable
         let filename = format!("{}/{}", EFIVARFS_ROOT, var);
 
-        // Open file read only to get FD for flags operations.
-        let f = File::open(&filename).map_err(|error| Error::for_variable(error, var))?;
+        // handle immutable file attribute. file_flags is some if the flag was removed and need to be set again
+        let file_flags: Option<IFlags> = {
+            // Open file read only to get FD for flags operations.
+            let f = File::open(&filename).map_err(|error| Error::for_variable(error, var))?;
 
-        // Read original flags.
-        let orig_flags = rustix::fs::ioctl_getflags(&f)
-            .map_err(|error| Error::for_variable(error.into(), var))?;
-
-        // If Immutable flag is present, remove it.
-        let immut_flag_removed = if orig_flags.contains(rustix::fs::IFlags::IMMUTABLE) {
-            // IFlags doesn't implement Clone, so cycle through bits.
-            let mut flags = rustix::fs::IFlags::from_bits(orig_flags.bits()).unwrap();
-
-            flags.remove(rustix::fs::IFlags::IMMUTABLE);
-            rustix::fs::ioctl_setflags(&f, flags)
+            // Read original flags.
+            let orig_flags = rustix::fs::ioctl_getflags(&f)
                 .map_err(|error| Error::for_variable(error.into(), var))?;
 
-            true
-        } else {
-            false
+            // If Immutable flag is present, remove it.
+            if orig_flags.contains(rustix::fs::IFlags::IMMUTABLE) {
+                // IFlags doesn't implement Clone, so cycle through bits.
+                let mut modif_flags = rustix::fs::IFlags::from_bits(orig_flags.bits()).unwrap();
+
+                modif_flags.remove(rustix::fs::IFlags::IMMUTABLE);
+                rustix::fs::ioctl_setflags(&f, modif_flags)
+                    .map_err(|error| Error::for_variable(error.into(), var))?;
+
+                Some(orig_flags)
+            } else {
+                None
+            }
         };
 
-        // Close file before re-opening for write.
-        drop(f);
-
-        // Open file.
+        // Open file for write
         let mut f = File::options()
             .write(true)
             .truncate(true)
@@ -127,12 +117,18 @@ impl VarWriter for SystemManager {
             .open(filename)
             .map_err(|error| Error::for_variable(error, var))?;
 
+        // Prepare data (attributes + variable data)
+        let attribute_bits = attributes.bits();
+        let mut buf = Vec::with_capacity(std::mem::size_of_val(&attribute_bits));
+        buf.push_u32(attribute_bits);
+        buf.append(&mut value.to_vec());
+
         // Write the value using a single write.
         f.write(&buf)
             .map_err(|error| Error::for_variable(error, var))?;
 
-        if immut_flag_removed {
-            // Add back the Immutable flag.
+        // Potentially add back the Immutable flag.
+        if let Some(orig_flags) = file_flags {
             rustix::fs::ioctl_setflags(&f, orig_flags)
                 .map_err(|error| Error::for_variable(error.into(), var))?;
         }
