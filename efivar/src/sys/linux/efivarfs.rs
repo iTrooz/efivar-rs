@@ -81,14 +81,26 @@ impl VarWriter for SystemManager {
         attributes: VariableFlags,
         value: &[u8],
     ) -> crate::Result<()> {
-
         // Filename to the matching efivarfs file for this variable
         let filename = format!("{}/{}", EFIVARFS_ROOT, var);
 
         // handle immutable file attribute. file_flags is some if the flag was removed and need to be set again
-        let file_flags: Option<IFlags> = {
+        let file_flags: Option<IFlags> = 'outer: {
             // Open file read only to get FD for flags operations.
-            let f = File::open(&filename).map_err(|error| Error::for_variable(error, var))?;
+            let f_res = File::open(&filename);
+            let f = match f_res {
+                Ok(f) => f,
+                Err(err) => {
+                    // If the file does not exist, we cannot get flags (so skip the flag reading part),
+                    // but should still proceed with writing the variable
+                    if err.kind() == std::io::ErrorKind::NotFound {
+                        break 'outer None;
+                    } else {
+                        // Otherwise, return an error.
+                        return Err(Error::for_variable(err, var));
+                    }
+                }
+            };
 
             // Read original flags.
             let orig_flags = rustix::fs::ioctl_getflags(&f)
