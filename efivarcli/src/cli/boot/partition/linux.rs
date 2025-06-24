@@ -4,6 +4,30 @@ use std::{io::BufRead, path::PathBuf, process::Command};
 use efivar::boot::{EFIHardDrive, EFIHardDriveType};
 use itertools::Itertools;
 
+/// Absolute name of a partition, should be enough to uniquely identify it
+/// e.g. '/dev/sda1' on Linux
+pub type Partition = String;
+
+pub fn query_partition(disk: Option<String>, partition: String) -> Result<Partition, ()> {
+    let abs_partition = partition.starts_with("/dev/"); // check if partition is absolute
+    match (abs_partition, disk) {
+        // if the partition is absolute, it should not have a disk specified
+        (true, Some(_)) => Err(()),
+        (true, None) => Ok(partition),
+        (false, Some(disk)) => {
+            if disk.starts_with("/dev/") {
+                // if the disk is absolute, append the partition to it
+                Ok(format!("{disk}{partition}"))
+            } else {
+                // Invalid disk
+                Err(())
+            }
+        }
+        // if the partition is relative, it should have a disk specified
+        (false, None) => Err(()),
+    }
+}
+
 /// get the partition UUID from its name
 /// * `name`: the name of the partition, e.g. '/dev/sda1'
 fn get_partition_uuid(name: &str) -> Option<uuid::Uuid> {

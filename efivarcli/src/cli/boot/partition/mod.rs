@@ -4,10 +4,10 @@
 mod linux;
 
 #[cfg(target_os = "linux")]
-pub use self::linux::{get_mount_point, retrieve_efi_partition_data};
+pub use self::linux::{query_partition, get_mount_point, retrieve_efi_partition_data};
 
 #[cfg(target_os = "windows")]
 mod windows;
 
 #[cfg(target_os = "windows")]
-pub use self::windows::{get_mount_point, retrieve_efi_partition_data};
+pub use self::windows::{query_partition, get_mount_point, retrieve_efi_partition_data};

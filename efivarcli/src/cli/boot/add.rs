@@ -1,6 +1,9 @@
 //! This module hands everything related to the 'boot add' subcommand
 
-use crate::{cli::boot::get_entries::print_var, exit_code::ExitCode};
+use crate::{
+    cli::boot::{get_entries::print_var, partition::query_partition},
+    exit_code::ExitCode,
+};
 
 use byteorder::{LittleEndian, ReadBytesExt};
 use efivar::{
@@ -55,22 +58,29 @@ fn fix_file_path(mut file_path: String) -> String {
 
 pub fn run(
     manager: &mut dyn VarManager,
+    disk: Option<String>,
     partition: Option<String>,
     file_path: String,
     description: String,
     force: bool,
     id: Option<u16>,
 ) -> ExitCode {
-    // get necessary information from the partition to create an entry
     let efi_partition = {
         if let Some(partition) = partition {
-            // do not continue is the file has been identified as non-existent
-            // ( check() has already printed the error message to the user )
-            if !force && try_check_if_valid(&partition, &file_path) == Some(false) {
+            // query absolute partition
+            let abs_partition = query_partition(disk, partition).unwrap();
+
+            // if possible, check if file is valid
+            if !force && try_check_if_valid(&abs_partition, &file_path) == Some(false) {
+                // do not continue is the file has been identified as non-existent
+                // ( check() has already printed the error message to the user )
                 return ExitCode::FAILURE;
             }
-            partition::retrieve_efi_partition_data(&partition)
+
+            // retrieve the partition EFI struct
+            partition::retrieve_efi_partition_data(&abs_partition)
         } else {
+            // default to currently booted partition
             eprintln!("No partition selected. Using active boot partition");
             let active_id = manager
                 .read(&Variable::new("BootCurrent"))
@@ -87,6 +97,7 @@ pub fn run(
         }
     };
 
+    // Construct EFI boot file path
     let file_path_list = FilePathList {
         hard_drive: efi_partition,
         file_path: FilePath {
