@@ -50,6 +50,7 @@ impl Display for EFIHardDriveType {
 }
 
 #[derive(Debug, PartialEq, Clone)]
+// See spec, 10.3.6.1
 pub struct EFIHardDrive {
     pub partition_number: u32,
     pub partition_start: u64,
