@@ -3,7 +3,7 @@ use std::path::PathBuf;
 
 pub type Partition = String;
 
-pub fn query_partition(disk: Option<String>, partition: String) -> anyhow::Result<Partition> {
+pub fn query_partition(_disk: Option<String>, _partition: String) -> anyhow::Result<Partition> {
     todo!();
 }
 
