@@ -121,7 +121,6 @@ fn get_partition_location(name: &str) -> (u64, u64) {
 
 /// retrieve data needed to generate a EFIHardDrive from the system, from a friendly name of the partition
 pub fn retrieve_efi_partition_data(name: &str) -> EFIHardDrive {
-    println!("{}", name);
     let partition_sig = get_partition_uuid(name).unwrap();
     let partition_number = get_partition_number(name).unwrap();
     let (partition_start, partition_size) = get_partition_location(name);
