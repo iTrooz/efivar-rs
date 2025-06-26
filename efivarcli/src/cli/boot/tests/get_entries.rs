@@ -17,10 +17,7 @@ fn get_entries() {
 
     assert_eq!(
         ExitCode::SUCCESS,
-        crate::run(
-            Command::parse_from(["efivarcli", "boot", "list"]),
-            manager,
-        )
+        crate::run(Command::parse_from(["efivarcli", "boot", "list"]), manager,)
     );
 }
 
@@ -48,9 +45,6 @@ fn get_entries_not_in_bootorder() {
 
     assert_eq!(
         ExitCode::SUCCESS,
-        crate::run(
-            Command::parse_from(["efivarcli", "boot", "list"]),
-            manager,
-        )
+        crate::run(Command::parse_from(["efivarcli", "boot", "list"]), manager,)
     );
 }
