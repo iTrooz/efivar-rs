@@ -1,7 +1,10 @@
 //! This module hands everything related to the 'boot add' subcommand
 
 use crate::{
-    cli::boot::{get_entries::print_var, partition::query_partition},
+    cli::boot::{
+        get_entries::print_var,
+        partition::{query_partition, Partition},
+    },
     exit_code::ExitCode,
 };
 
@@ -26,7 +29,7 @@ pub fn get_used_ids(manager: &dyn VarManager) -> Vec<u16> {
 }
 
 /// check if a partition+file is valid (exists), if the partition is mounted
-fn try_check_if_valid(partition: &str, file: &str) -> Option<bool> {
+fn try_check_if_valid(partition: &Partition, file: &str) -> Option<bool> {
     if let Some(mount_point) = partition::get_mount_point(partition) {
         eprintln!(
             "Partition {} is mounted on {}. Verifying file location {file} is valid",

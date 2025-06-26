@@ -7,10 +7,10 @@ pub fn query_partition(_disk: Option<String>, _partition: String) -> anyhow::Res
     todo!();
 }
 
-pub fn retrieve_efi_partition_data(_name: &str) -> EFIHardDrive {
+pub fn retrieve_efi_partition_data(_name: &Partition) -> EFIHardDrive {
     todo!();
 }
 
-pub fn get_mount_point(_name: &str) -> Option<PathBuf> {
-    todo!();
+pub fn get_mount_point(_name: &Partition) -> Option<PathBuf> {
+    None
 }
