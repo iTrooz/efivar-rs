@@ -11,6 +11,7 @@ on:
 
 jobs:
   check:
+    name: Check
     runs-on: ${{ matrix.runs-on }}
 
     strategy:
@@ -64,7 +65,7 @@ jobs:
 
   test:
     runs-on: ${{ matrix.runs-on }}
-
+    name: Test
     strategy:
       fail-fast: false
       matrix:
@@ -121,7 +122,7 @@ jobs:
 
   build:
     runs-on: ${{ matrix.runs-on }}
-
+    name: Build
     strategy:
       fail-fast: false
       matrix:
