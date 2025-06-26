@@ -21,7 +21,8 @@ mod tests;
 #[derive(Parser)]
 pub enum BootCommand {
     /// Get all boot entries found, both in the boot order, and outside it if the name matchs
-    GetEntries {
+    #[command(alias = "get-entries")]
+    List {
         /// Show more information, such as optional data
         #[arg(short, long)]
         verbose: bool,
@@ -83,7 +84,7 @@ pub enum BootCommand {
 
 pub fn run(manager: &mut dyn VarManager, cmd: BootCommand) -> ExitCode {
     match cmd {
-        BootCommand::GetEntries { verbose } => get_entries::run(manager, verbose),
+        BootCommand::List { verbose } => get_entries::run(manager, verbose),
         BootCommand::Add {
             disk,
             partition,
