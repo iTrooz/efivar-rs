@@ -1,6 +1,10 @@
 use efivar::boot::EFIHardDrive;
 use std::path::PathBuf;
 
+pub fn query_partition(disk: Option<String>, partition: String) -> anyhow::Result<Partition> {
+    todo!();
+}
+
 pub fn retrieve_efi_partition_data(_name: &str) -> EFIHardDrive {
     todo!();
 }
