@@ -21,13 +21,20 @@ mod tests;
 #[derive(Parser)]
 pub enum BootCommand {
     /// Get all boot entries found, both in the boot order, and outside it if the name matchs
-    GetEntries {
+    #[command(alias = "get-entries")]
+    List {
         /// Show more information, such as optional data
         #[arg(short, long)]
         verbose: bool,
     },
     Add {
-        /// Partition that holds the file to boot from. Defaults to the currently active boot partition
+        /// Disk device to use (e.g. /dev/sda)
+        #[arg(long, requires = "partition")]
+        disk: Option<String>,
+
+        /// Partition that holds the file to boot from.
+        /// May be a partition number (1) or a full partition name on linux (/dev/sda1)
+        /// Defaults to the currently active boot partition
         #[arg(short, long)]
         partition: Option<String>,
 
@@ -77,8 +84,9 @@ pub enum BootCommand {
 
 pub fn run(manager: &mut dyn VarManager, cmd: BootCommand) -> ExitCode {
     match cmd {
-        BootCommand::GetEntries { verbose } => get_entries::run(manager, verbose),
+        BootCommand::List { verbose } => get_entries::run(manager, verbose),
         BootCommand::Add {
+            disk,
             partition,
             file,
             description,
@@ -86,6 +94,7 @@ pub fn run(manager: &mut dyn VarManager, cmd: BootCommand) -> ExitCode {
             id,
         } => add::run(
             manager,
+            disk,
             partition,
             file,
             description,

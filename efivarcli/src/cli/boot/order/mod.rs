@@ -15,7 +15,7 @@ mod tests;
 
 #[derive(Parser)]
 pub enum OrderCommand {
-    /// Get current boot order IDs. See `efivarcli boot get-entries` to get boot entries information
+    /// Get current boot order IDs. See `efivarcli boot list` to get boot entries information
     Get,
     /// Adds an id to the boot order
     Add {

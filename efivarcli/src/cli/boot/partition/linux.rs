@@ -1,8 +1,60 @@
 use core::panic;
 use std::{io::BufRead, path::PathBuf, process::Command};
 
+use anyhow::Context;
 use efivar::boot::{EFIHardDrive, EFIHardDriveType};
 use itertools::Itertools;
+
+/// Absolute name of a partition, should be enough to uniquely identify it
+/// e.g. '/dev/sda1' on Linux
+pub type Partition = String;
+
+/// Retreive a partition device name (e.g. nvme0n1p3) from the disk device name and partition index (e.g. nvme0n1 and 3)
+/// This function does not want/return the /dev/ prefix on disk device name
+fn query_partition_sysfs(disk_name: &str, partition_idx: String) -> anyhow::Result<String> {
+    let sys_block_path = format!("/sys/block/{disk_name}");
+
+    // Loop over potential partitions
+    for entry in std::fs::read_dir(&sys_block_path)? {
+        let dir_path = entry?.path();
+        if dir_path.is_dir() {
+            let partition_file = dir_path.join("partition");
+            if let Ok(content) = std::fs::read_to_string(&partition_file) {
+                if content.trim() == partition_idx {
+                    let device = dir_path
+                        .file_name()
+                        .context("No device file name")?
+                        .to_str()
+                        .context("Cannot convert device file name")?;
+                    return Ok(device.to_string());
+                }
+            }
+        }
+    }
+    anyhow::bail!("No partition found for disk {disk_name} with index {partition_idx}")
+}
+
+pub fn query_partition(disk: Option<String>, partition: String) -> anyhow::Result<Partition> {
+    let abs_partition = partition.starts_with("/dev/"); // check if partition is absolute
+    match (abs_partition, disk) {
+        // if the partition is absolute, it should not have a disk specified
+        (true, Some(disk)) => {
+            anyhow::bail!("Partition {partition} is absolute but a disk {disk} is specified")
+        }
+        (true, None) => Ok(partition),
+        (false, Some(disk)) => {
+            let disk_name = match disk.strip_prefix("/dev/") {
+                Some(disk) => disk,
+                None => &disk,
+            };
+            query_partition_sysfs(disk_name, partition).map(|dev_name| format!("/dev/{}", dev_name))
+        }
+        // if the partition is relative, it should have a disk specified
+        (false, None) => {
+            anyhow::bail!("Partition {partition} is relative but no disk is specified")
+        }
+    }
+}
 
 /// get the partition UUID from its name
 /// * `name`: the name of the partition, e.g. '/dev/sda1'
