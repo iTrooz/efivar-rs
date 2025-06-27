@@ -55,7 +55,7 @@ impl VarEnumerator for SystemManager {
 impl VarReader for SystemManager {
     fn read(&self, var: &Variable) -> crate::Result<(Vec<u8>, VariableFlags)> {
         // Filename to the matching efivarfs file for this variable
-        let filename = format!("{}/{}", EFIVARFS_ROOT, var);
+        let filename = format!("{EFIVARFS_ROOT}/{var}");
 
         let mut f = File::open(filename).map_err(|error| Error::for_variable(error, var))?;
 
@@ -82,7 +82,7 @@ impl VarWriter for SystemManager {
         value: &[u8],
     ) -> crate::Result<()> {
         // Filename to the matching efivarfs file for this variable
-        let filename = format!("{}/{}", EFIVARFS_ROOT, var);
+        let filename = format!("{EFIVARFS_ROOT}/{var}");
 
         // handle immutable file attribute. file_flags is some if the flag was removed and need to be set again
         let file_flags: Option<IFlags> = 'outer: {
@@ -149,7 +149,7 @@ impl VarWriter for SystemManager {
     }
 
     fn delete(&mut self, var: &Variable) -> crate::Result<()> {
-        std::fs::remove_file(format!("{}/{}", EFIVARFS_ROOT, var))
+        std::fs::remove_file(format!("{EFIVARFS_ROOT}/{var}"))
             .map_err(|error| Error::for_variable(error, var))
     }
 }

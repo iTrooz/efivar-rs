@@ -47,7 +47,7 @@ pub fn query_partition(disk: Option<String>, partition: String) -> anyhow::Resul
                 Some(disk) => disk,
                 None => &disk,
             };
-            query_partition_sysfs(disk_name, partition).map(|dev_name| format!("/dev/{}", dev_name))
+            query_partition_sysfs(disk_name, partition).map(|dev_name| format!("/dev/{dev_name}"))
         }
         // if the partition is relative, it should have a disk specified
         (false, None) => {

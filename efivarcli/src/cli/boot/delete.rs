@@ -15,7 +15,7 @@ pub fn run(manager: &mut dyn VarManager, id: u16) -> ExitCode {
             result = ExitCode::SUCCESS;
         }
         Err(efivar::Error::VarNotFound { var: _ }) => eprintln!("Boot entry not found"),
-        Err(err) => eprintln!("Failed to delete entry: {}", err),
+        Err(err) => eprintln!("Failed to delete entry: {err}"),
     }
 
     // remove it from boot order

@@ -6,7 +6,7 @@ pub fn run(manager: &dyn VarManager) -> ExitCode {
     let ids = match manager.get_boot_order() {
         Ok(ids) => ids,
         Err(err) => {
-            eprintln!("Failed to get boot order IDs: {}", err);
+            eprintln!("Failed to get boot order IDs: {err}");
             return ExitCode::FAILURE;
         }
     };

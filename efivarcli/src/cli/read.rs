@@ -22,7 +22,7 @@ pub fn run(
     match reader.read(&name) {
         Ok((buf, attr)) => {
             if !raw {
-                println!("Attributes: {}", attr);
+                println!("Attributes: {attr}");
             }
             if as_string {
                 if raw {
@@ -34,20 +34,20 @@ pub fn run(
                 let value = buf
                     .iter()
                     .tuples()
-                    .map(|(a, b)| format!("{:02X}{:02X}", a, b))
+                    .map(|(a, b)| format!("{a:02X}{b:02X}"))
                     .fold(String::new(), |acc, ref item| acc + " " + item)
                     .trim()
                     .to_owned();
                 if raw {
-                    println!("{}", value);
+                    println!("{value}");
                 } else {
-                    println!("Value: {}", value);
+                    println!("Value: {value}");
                 }
             };
             ExitCode::SUCCESS
         }
         Err(reason) => {
-            eprintln!("Failed: {}", reason);
+            eprintln!("Failed: {reason}");
             ExitCode::FAILURE
         }
     }

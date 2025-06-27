@@ -18,6 +18,6 @@ impl BootVarName for u16 {
     /// Get the boot entry name associated with that ID.
     /// See [`crate::efi::Variable::boot_var_id`]
     fn boot_var_name(self) -> String {
-        format!("Boot{:04X}", self)
+        format!("Boot{self:04X}")
     }
 }

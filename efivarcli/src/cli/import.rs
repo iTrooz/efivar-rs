@@ -60,11 +60,11 @@ pub fn run(
 
     match manager.write(&var, flags, &data) {
         Ok(()) => {
-            println!("Imported variable {} with success", var);
+            println!("Imported variable {var} with success");
             ExitCode::SUCCESS
         }
         Err(err) => {
-            eprintln!("Failed to write variable {}: {}", var, err);
+            eprintln!("Failed to write variable {var}: {err}");
             ExitCode::FAILURE
         }
     }

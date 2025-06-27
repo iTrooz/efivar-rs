@@ -38,9 +38,9 @@ pub fn run(
                 );
                 return ExitCode::SUCCESS;
             }
-            Err(err) => eprintln!("Failed to write to file: {}", err),
+            Err(err) => eprintln!("Failed to write to file: {err}"),
         },
-        Err(err) => eprintln!("Failed to read variable: {}", err),
+        Err(err) => eprintln!("Failed to read variable: {err}"),
     };
 
     ExitCode::FAILURE

@@ -53,7 +53,7 @@ impl VarEnumerator for SystemManager {
 impl VarReader for SystemManager {
     fn read(&self, var: &Variable) -> crate::Result<(Vec<u8>, VariableFlags)> {
         // Path to the attributes file
-        let attributes_filename = format!("{}/{}/attributes", EFIVARS_ROOT, var);
+        let attributes_filename = format!("{EFIVARS_ROOT}/{var}/attributes");
 
         // Open attributes file
         let f = File::open(attributes_filename).map_err(|error| Error::for_variable(error, var))?;
@@ -67,7 +67,7 @@ impl VarReader for SystemManager {
         }
 
         // Filename to the matching data for this variable
-        let filename = format!("{}/{}/data", EFIVARS_ROOT, var);
+        let filename = format!("{EFIVARS_ROOT}/{var}/data");
 
         let mut f = File::open(filename).map_err(|error| Error::for_variable(error, var))?;
 
@@ -88,7 +88,7 @@ impl VarWriter for SystemManager {
         value: &[u8],
     ) -> crate::Result<()> {
         // Path to the attributes file
-        let attributes_filename = format!("{}/{}/attributes", EFIVARS_ROOT, var);
+        let attributes_filename = format!("{EFIVARS_ROOT}/{var}/attributes");
         // Open attributes file
         let mut f =
             File::open(attributes_filename).map_err(|error| Error::for_variable(error, var))?;
@@ -100,7 +100,7 @@ impl VarWriter for SystemManager {
             .map_err(|error| Error::for_variable(error, var))?;
 
         // Filename to the matching file for this variable
-        let filename = format!("{}/{}/data", EFIVARS_ROOT, var);
+        let filename = format!("{EFIVARS_ROOT}/{var}/data");
 
         let mut f = OpenOptions::new()
             .write(true)

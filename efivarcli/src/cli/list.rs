@@ -13,7 +13,7 @@ fn list_all(enumerator: &dyn VarManager) {
 }
 
 fn list_namespace(enumerator: &dyn VarManager, vendor: VariableVendor) {
-    println!("Variables in namespace {} :", vendor);
+    println!("Variables in namespace {vendor} :");
     for var in enumerator
         .get_all_vars()
         .expect("Failed to list variable names")
