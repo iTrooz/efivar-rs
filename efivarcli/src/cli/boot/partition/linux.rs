@@ -120,19 +120,19 @@ fn get_partition_location(name: &str) -> (u64, u64) {
 }
 
 /// retrieve data needed to generate a EFIHardDrive from the system, from a friendly name of the partition
-pub fn retrieve_efi_partition_data(name: &str) -> EFIHardDrive {
+pub fn retrieve_efi_partition_data(name: &str) -> anyhow::Result<EFIHardDrive> {
     let partition_sig = get_partition_uuid(name).unwrap();
     let partition_number = get_partition_number(name).unwrap();
     let (partition_start, partition_size) = get_partition_location(name);
 
-    EFIHardDrive {
+    Ok(EFIHardDrive {
         partition_number,
         partition_start,
         partition_size,
         partition_sig,
         format: 0x02, // no idea
         sig_type: EFIHardDriveType::Gpt,
-    }
+    })
 }
 
 pub fn get_mount_point(name: &str) -> Option<PathBuf> {

@@ -81,7 +81,7 @@ pub fn run(
             }
 
             // retrieve the partition EFI struct
-            partition::retrieve_efi_partition_data(&abs_partition)
+            partition::retrieve_efi_partition_data(&abs_partition).unwrap()
         } else {
             // default to currently booted partition
             eprintln!("No partition selected. Using active boot partition");
