@@ -2,12 +2,8 @@ name: build
 
 on:
   pull_request:
-    branches-ignore:
-      - renovate/*
   push:
-    branches: ["*"]
-    tags-ignore:
-      - "**"
+    branches: ["main", "ci"]
 
 jobs:
   check:
