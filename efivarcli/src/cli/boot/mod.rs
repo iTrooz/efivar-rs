@@ -21,7 +21,7 @@ mod tests;
 fn disk_help() -> &'static str {
     #[cfg(target_os = "windows")]
     {
-        "Disk device to use. Use disk index, starting at 1 (e.g. 2 for second disk)."
+        "Disk device to use. Use disk index, starting at 0 (e.g. 1 for second disk)."
     }
 
     #[cfg(target_os = "linux")]
