@@ -21,12 +21,10 @@ pub fn query_partition(disk_id: Option<String>, partition_id: String) -> anyhow:
     Ok(Partition {
         disk_id: disk_id
             .parse::<usize>()
-            .context(format!("Invalid disk ID: {disk_id}"))?
-            - 1,
+            .context(format!("Invalid disk ID: {disk_id}"))?,
         partition_id: partition_id
             .parse::<usize>()
-            .context(format!("Invalid partition ID: {partition_id}"))?
-            - 1,
+            .context(format!("Invalid partition ID: {partition_id}"))?,
     })
 }
 
@@ -36,7 +34,8 @@ pub fn retrieve_efi_partition_data(partition_arg: &Partition) -> anyhow::Result<
 
     let partition_win = disk
         .partitions
-        .get(partition_arg.partition_id as usize)
+        .iter()
+        .find(|p| p.partition_number as usize == partition_arg.partition_id)
         .context("Partition not found")?;
     let partition_win_gpt = match partition_win.extra {
         PartitionExtra::Gpt(ref gpt) => gpt,
@@ -48,9 +47,6 @@ pub fn retrieve_efi_partition_data(partition_arg: &Partition) -> anyhow::Result<
             );
         }
     };
-
-    // Just to be sure
-    assert!(partition_arg.partition_id == partition_win.partition_number as usize);
 
     Ok(EFIHardDrive {
         partition_number: partition_win.partition_number,
