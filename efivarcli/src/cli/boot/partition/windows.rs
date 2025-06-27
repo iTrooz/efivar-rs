@@ -1,8 +1,8 @@
 use anyhow::{Context, Ok};
 use efivar::boot::{EFIHardDrive, EFIHardDriveType};
+use std::fmt;
 use std::path::PathBuf;
 use win_partlist::types::PartitionExtra;
-use std::fmt;
 
 pub struct Partition {
     pub disk_id: usize,
@@ -21,10 +21,12 @@ pub fn query_partition(disk_id: Option<String>, partition_id: String) -> anyhow:
     Ok(Partition {
         disk_id: disk_id
             .parse::<usize>()
-            .context(format!("Invalid disk ID: {disk_id}"))?,
+            .context(format!("Invalid disk ID: {disk_id}"))?
+            - 1,
         partition_id: partition_id
             .parse::<usize>()
-            .context(format!("Invalid partition ID: {partition_id}"))?,
+            .context(format!("Invalid partition ID: {partition_id}"))?
+            - 1,
     })
 }
 
