@@ -32,9 +32,8 @@ rustix = { version = "0.38.30", features = ["fs"] }
 [features]
 store = ["base64", "serde", "serde_derive", "toml"]
 
-[target.'cfg(windows)'.dependencies.winapi]
-version = "0.3.9"
-features = ["winbase", "winnt", "processthreadsapi", "securitybaseapi", "handleapi"]
+[target.'cfg(windows)'.dependencies]
+winapi = { version = "0.3.9", features = ["winbase", "winnt", "processthreadsapi", "securitybaseapi", "handleapi"] }
 
 [dev-dependencies]
 version-sync = "0.9.4"
