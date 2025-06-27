@@ -18,6 +18,30 @@ pub mod partition;
 #[cfg(test)]
 mod tests;
 
+fn disk_help() -> &'static str {
+    #[cfg(target_os = "windows")]
+    {
+        "Disk device to use. Use disk index, starting at 1 (e.g. 2 for second disk)."
+    }
+
+    #[cfg(target_os = "linux")]
+    {
+        "Disk device to use (e.g. /dev/sda)"
+    }
+}
+
+fn partition_help() -> &'static str {
+    #[cfg(target_os = "windows")]
+    {
+        "Partition index that holds the file to boot from, starting at 1 (e.g. 2 for second partition)."
+    }
+
+    #[cfg(target_os = "linux")]
+    {
+        "Partition that holds the file to boot from. May be a partition number (1) or a full partition name (/dev/sda1). Defaults to the currently active boot partition"
+    }
+}
+
 #[derive(Parser)]
 pub enum BootCommand {
     /// Get all boot entries found, both in the boot order, and outside it if the name matchs
@@ -28,14 +52,10 @@ pub enum BootCommand {
         verbose: bool,
     },
     Add {
-        /// Disk device to use (e.g. /dev/sda)
-        #[arg(long, requires = "partition")]
+        #[arg(long, requires = "partition", help=disk_help())]
         disk: Option<String>,
 
-        /// Partition that holds the file to boot from.
-        /// May be a partition number (1) or a full partition name on linux (/dev/sda1)
-        /// Defaults to the currently active boot partition
-        #[arg(short, long)]
+        #[arg(short, long, help = partition_help())]
         partition: Option<String>,
 
         /// File to boot from, inside the partition
