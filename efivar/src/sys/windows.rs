@@ -21,9 +21,9 @@ mod security;
 
 impl SystemManager {
     pub fn new() -> Result<SystemManager, crate::VarManagerInitError> {
-        debug!("Updating thread token privileges for EFI variable access");
+        log::debug!("Updating thread token privileges for EFI variable access");
         security::update_privileges().map_err(|err| {
-            debug!("Failed to update thread privileges: {err}");
+            log::debug!("Failed to update thread privileges: {err}");
             crate::VarManagerInitError::EFIVariablesNotAvailable
         })?;
 
