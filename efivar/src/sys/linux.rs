@@ -3,6 +3,8 @@ use std::fs;
 mod efivarfs;
 mod efivars;
 
+use log::debug;
+
 use crate::efi::{Variable, VariableFlags};
 use crate::{VarEnumerator, VarManager, VarReader, VarWriter};
 

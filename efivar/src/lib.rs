@@ -14,19 +14,6 @@
 
 #![doc(html_root_url = "https://docs.rs/efivar/2.0.0")]
 
-#[macro_use]
-extern crate bitflags;
-#[macro_use]
-extern crate lazy_static;
-#[cfg(feature = "store")]
-#[macro_use]
-extern crate serde_derive;
-#[macro_use]
-extern crate log;
-
-#[cfg(windows)]
-extern crate winapi;
-
 /// EFI constants based on the [UEFI specification](http://www.uefi.org/sites/default/files/resources/UEFI_Spec_2_7.pdf)
 pub mod efi;
 #[cfg(feature = "store")]

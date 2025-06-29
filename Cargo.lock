@@ -155,7 +155,6 @@ dependencies = [
  "ntapi",
  "rustix",
  "serde",
- "serde_derive",
  "thiserror",
  "toml",
  "uuid",

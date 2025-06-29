@@ -11,6 +11,7 @@ use crate::push::PushVecU8;
 use crate::{Error, VarEnumerator, VarManager, VarReader, VarWriter};
 
 use byteorder::{LittleEndian, ReadBytesExt};
+use log::debug;
 use rustix::fs::IFlags;
 
 pub const EFIVARFS_ROOT: &str = "/sys/firmware/efi/efivars";

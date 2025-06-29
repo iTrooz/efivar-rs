@@ -4,7 +4,7 @@ use std::{fmt::Display, str::FromStr};
 
 use crate::Error;
 
-bitflags! {
+bitflags::bitflags! {
     /// Possible attributes of EFI variables as a bitfield
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     pub struct VariableFlags : u32 {

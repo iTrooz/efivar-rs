@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 
+use serde::{Deserialize, Serialize};
+
 use super::GuidGroup;
 use crate::efi::VariableVendor;
 

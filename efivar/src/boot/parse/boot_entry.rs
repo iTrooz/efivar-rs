@@ -8,7 +8,7 @@ use super::FilePathList;
 use crate::{efi::Variable, push::PushVecU8, utils::read_nt_utf16_string, Error, VarReader};
 use std::convert::TryFrom;
 
-bitflags! {
+bitflags::bitflags! {
     /// Possible attributes of a boot entry as a bitfield
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     pub struct BootEntryAttributes : u32 {
