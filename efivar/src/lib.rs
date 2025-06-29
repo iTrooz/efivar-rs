@@ -21,6 +21,8 @@ extern crate lazy_static;
 #[cfg(feature = "store")]
 #[macro_use]
 extern crate serde_derive;
+#[macro_use]
+extern crate log;
 
 #[cfg(windows)]
 extern crate winapi;

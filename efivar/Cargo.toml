@@ -25,6 +25,7 @@ toml = { version = "0.7.6", optional = true }
 uuid = { version = "1.4.1", features = ["serde"] }
 lazy_static = "1.4.0"
 thiserror = "1.0.49"
+log = "0.4.27"
 
 [target.'cfg(unix)'.dependencies]
 rustix = { version = "0.38.30", features = ["fs"] }

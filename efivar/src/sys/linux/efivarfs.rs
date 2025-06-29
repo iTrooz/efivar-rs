@@ -81,6 +81,7 @@ impl VarWriter for SystemManager {
         attributes: VariableFlags,
         value: &[u8],
     ) -> crate::Result<()> {
+        log::debug!("Writing EFI variable {} via efivarfs", var);
         // Filename to the matching efivarfs file for this variable
         let filename = format!("{EFIVARFS_ROOT}/{var}");
 
@@ -89,14 +90,19 @@ impl VarWriter for SystemManager {
             // Open file read only to get FD for flags operations.
             let f_res = File::open(&filename);
             let f = match f_res {
-                Ok(f) => f,
+                Ok(f) => {
+                    debug!("Opened variable file {} for flag operations", filename);
+                    f
+                }
                 Err(err) => {
                     // If the file does not exist, we cannot get flags (so skip the flag reading part),
                     // but should still proceed with writing the variable
                     if err.kind() == std::io::ErrorKind::NotFound {
+                        debug!("File {} does not exist, will create new variable", filename);
                         break 'outer None;
                     } else {
                         // Otherwise, return an error.
+                        debug!("Failed to open {} for flag operations: {}", filename, err);
                         return Err(Error::for_variable(err, var));
                     }
                 }
@@ -108,6 +114,7 @@ impl VarWriter for SystemManager {
 
             // If Immutable flag is present, remove it.
             if orig_flags.contains(rustix::fs::IFlags::IMMUTABLE) {
+                debug!("Removing IMMUTABLE flag from {} for writing", filename);
                 // IFlags doesn't implement Clone, so cycle through bits.
                 let mut modif_flags = rustix::fs::IFlags::from_bits(orig_flags.bits()).unwrap();
 
@@ -141,16 +148,23 @@ impl VarWriter for SystemManager {
 
         // Potentially add back the Immutable flag.
         if let Some(orig_flags) = file_flags {
+            debug!("Restoring original flags for variable {}", var);
             rustix::fs::ioctl_setflags(&f, orig_flags)
                 .map_err(|error| Error::for_variable(error.into(), var))?;
         }
 
+        debug!("Successfully wrote variable {}", var);
         Ok(())
     }
 
     fn delete(&mut self, var: &Variable) -> crate::Result<()> {
-        std::fs::remove_file(format!("{EFIVARFS_ROOT}/{var}"))
-            .map_err(|error| Error::for_variable(error, var))
+        debug!("Deleting EFI variable {} via efivarfs", var);
+        let filename = format!("{EFIVARFS_ROOT}/{var}");
+
+        std::fs::remove_file(&filename).map_err(|error| Error::for_variable(error, var))?;
+
+        debug!("Successfully deleted variable {}", var);
+        Ok(())
     }
 }
 
