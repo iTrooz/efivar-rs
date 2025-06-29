@@ -23,13 +23,19 @@ impl SystemManager {
     }
 
     pub fn new() -> Result<SystemManager, crate::VarManagerInitError> {
+        debug!("Initializing Linux EFI variable system manager");
+
         if !Self::is_empty(efivarfs::EFIVARFS_ROOT) {
+            debug!("Using efivarfs interface at {}", efivarfs::EFIVARFS_ROOT);
             Ok(Self::efivars())
         } else if !Self::is_empty(efivars::EFIVARS_ROOT) {
+            debug!("Using efivars interface at {}", efivars::EFIVARS_ROOT);
             Ok(Self::efivarfs())
         } else if cfg!(test) {
+            debug!("Running in test mode, using efivars interface");
             Ok(Self::efivars())
         } else {
+            debug!("EFI variables not available - no accessible interface found");
             Err(crate::VarManagerInitError::EFIVariablesNotAvailable)
         }
     }

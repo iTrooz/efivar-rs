@@ -20,6 +20,10 @@ struct Opt {
 }
 
 fn main() -> std::process::ExitCode {
+    env_logger::Builder::from_default_env()
+        .filter_level(log::LevelFilter::Info)
+        .init();
+
     let opts = Opt::parse();
 
     let manager = &mut *if let Some(filename) = opts.file_store {

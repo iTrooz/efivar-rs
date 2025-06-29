@@ -17,7 +17,9 @@ anyhow = "1.0.98"
 byteorder = "1.4.3"
 clap = { version = "4.4.6", features = ["derive", "env"] }
 efivar = { version = "2.0.0", path = "../efivar", features = ["store"] }
+env_logger = "0.11.8"
 itertools = "0.11.0"
+log = "0.4.27"
 uuid = { version = "1.4.1" }
 
 [dev-dependencies]

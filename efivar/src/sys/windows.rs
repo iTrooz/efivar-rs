@@ -21,12 +21,16 @@ mod security;
 
 impl SystemManager {
     pub fn new() -> Result<SystemManager, crate::VarManagerInitError> {
-        // Update current thread token with the right privileges
-        security::update_privileges()
-            .map_err(|_| crate::VarManagerInitError::EFIVariablesNotAvailable)?;
+        debug!("Updating thread token privileges for EFI variable access");
+        security::update_privileges().map_err(|err| {
+            debug!("Failed to update thread privileges: {err}");
+            crate::VarManagerInitError::EFIVariablesNotAvailable
+        })?;
+
         if !Self::efi_variables_available() {
             return Err(crate::VarManagerInitError::EFIVariablesNotAvailable);
         }
+
         Ok(SystemManager {})
     }
 
@@ -162,6 +166,11 @@ impl VarReader for SystemManager {
         const ERROR_BUFFER_TOO_SMALL: DWORD = 122;
         loop {
             unsafe {
+                log::debug!(
+                    "Trying to read EFI variable {} with buffer size {}",
+                    var,
+                    buf.len()
+                );
                 let written_bytes = GetFirmwareEnvironmentVariableExW(
                     name_wide.as_ptr(),
                     guid_wide.as_ptr(),
@@ -172,12 +181,18 @@ impl VarReader for SystemManager {
 
                 if written_bytes == 0 {
                     if GetLastError() == ERROR_BUFFER_TOO_SMALL {
+                        log::debug!(
+                            "Buffer too small for variable {}, resizing to {} bytes",
+                            var,
+                            buf.len() * 2
+                        );
                         buf.resize(buf.len() * 2, 0u8);
                     } else {
                         return Err(Error::for_variable_os(var));
                     }
                 } else {
                     buf.resize(written_bytes.try_into().expect("GetFirmwareEnvironmentVariableExW() return value should be a value usize"), 0u8);
+                    log::debug!("Successfully read variable {} ({} bytes)", var, buf.len());
                     return Ok((
                         buf,
                         VariableFlags::from_bits(attributes).unwrap_or(VariableFlags::empty()),

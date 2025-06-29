@@ -46,7 +46,7 @@ pub struct Variable {
 }
 
 impl Variable {
-    /// Create a new EFI standard variable name
+    /// Create a new EFI standard variable
     ///
     /// # Parameters
     ///
@@ -58,7 +58,7 @@ impl Variable {
         }
     }
 
-    /// Create a new custom vendor variable name
+    /// Create a new custom vendor variable
     ///
     /// # Parameters
     ///
@@ -81,9 +81,7 @@ impl Variable {
         &self.vendor
     }
 
-    /// Return a short version of the variable name as a String
-    ///
-    /// If the vendor GUID is the EFI one, it will not be added to the name.
+    /// Return a short version of the variable as a String
     pub fn short_name(&self) -> String {
         if self.vendor.is_efi() {
             self.name.clone()
