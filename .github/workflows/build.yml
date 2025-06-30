@@ -60,8 +60,8 @@ jobs:
         run: cargo doc --all-features --no-deps
 
   test:
-    runs-on: ${{ matrix.runs-on }}
     name: Test
+    runs-on: ${{ matrix.runs-on }}
     strategy:
       fail-fast: false
       matrix:
@@ -117,8 +117,8 @@ jobs:
           verbose: true
 
   build:
-    runs-on: ${{ matrix.runs-on }}
     name: Build
+    runs-on: ${{ matrix.runs-on }}
     strategy:
       fail-fast: false
       matrix:
