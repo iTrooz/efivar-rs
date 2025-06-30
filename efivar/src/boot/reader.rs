@@ -2,7 +2,7 @@
 
 use byteorder::{LittleEndian, ReadBytesExt};
 
-use crate::{efi::Variable, Error, VarReader};
+use crate::{boot::BootVarFormat, efi::Variable, Error, VarReader};
 
 use super::boot_entry_iter::BootEntriesIterator;
 
@@ -22,7 +22,8 @@ impl<T: VarReader> BootVarReader for T {
             .read_u16_into::<LittleEndian>(&mut ids)
             .map_err(Error::UnknownIoError)?;
 
-        log::debug!("Queried BootOrder: {ids:?}");
+        let ids_formatted: Vec<String> = ids.iter().map(|id| id.boot_id_format()).collect();
+        log::debug!("Queried BootOrder: [{}]", ids_formatted.join(", "));
         Ok(ids)
     }
 
