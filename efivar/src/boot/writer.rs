@@ -28,7 +28,7 @@ impl<T: VarWriter> BootVarWriter for T {
     }
 
     /// Creates an EFI variable for a boot entry.
-    /// You then need to add it to the boot order using [`Self::set_boot_order`].
+    /// You then need to add it to the boot order using [`BootVarWriter::set_boot_order`].
     fn create_boot_entry(&mut self, id: u16, entry: BootEntry) -> crate::Result<()> {
         let bytes = entry.to_bytes();
 
