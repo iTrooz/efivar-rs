@@ -22,7 +22,7 @@ impl<T: VarReader> BootVarReader for T {
             .read_u16_into::<LittleEndian>(&mut ids)
             .map_err(Error::UnknownIoError)?;
 
-        log::debug!("Queried BootOrder: {:?}", ids);
+        log::debug!("Queried BootOrder: {ids:?}");
         Ok(ids)
     }
 

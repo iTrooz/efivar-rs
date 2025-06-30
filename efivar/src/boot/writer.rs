@@ -23,7 +23,7 @@ impl<T: VarWriter> BootVarWriter for T {
             &bytes,
         )?;
 
-        log::debug!("Set BootOrder to {:?}", ids);
+        log::debug!("Set BootOrder to {ids:?}");
         Ok(())
     }
 

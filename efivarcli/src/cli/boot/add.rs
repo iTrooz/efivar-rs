@@ -142,7 +142,7 @@ pub fn run(
 
     // create the entry
     manager.create_boot_entry(id, entry.clone()).unwrap();
-    
+
     // add it to boot order
     let mut ids = manager.get_boot_order().unwrap();
     ids.insert(0, id);

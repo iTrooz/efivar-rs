@@ -53,18 +53,18 @@ pub fn run(
     let (flags, data) = match read_var_from_file_or_stdin(input_path) {
         Ok(inner) => inner,
         Err(err) => {
-            eprintln!("Failed to read variable {}: {}", input_path.display(), err);
+            log::error!("Failed to read variable {}: {}", input_path.display(), err);
             return ExitCode::FAILURE;
         }
     };
 
     match manager.write(&var, flags, &data) {
         Ok(()) => {
-            println!("Imported variable {var} with success");
+            log::info!("Imported variable {var} with success");
             ExitCode::SUCCESS
         }
         Err(err) => {
-            eprintln!("Failed to write variable {var}: {err}");
+            log::error!("Failed to write variable {var}: {err}");
             ExitCode::FAILURE
         }
     }

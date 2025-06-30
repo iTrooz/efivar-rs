@@ -1,5 +1,4 @@
 use crate::exit_code::ExitCode;
-use core::panic;
 
 use byteorder::{LittleEndian, ReadBytesExt};
 use clap::Parser;
@@ -31,18 +30,19 @@ pub fn run(manager: &mut dyn VarManager, cmd: BootNextCommand) -> ExitCode {
             let res = manager.read(&Variable::new("BootNext"));
             match res {
                 Ok((data, _)) => {
-                    println!(
+                    log::info!(
                         "Next booting on: {:04X}",
                         data.as_slice().read_u16::<LittleEndian>().unwrap()
                     );
                     ExitCode::SUCCESS
                 }
                 Err(Error::VarNotFound { var: _ }) => {
-                    println!("BootNext is not set");
+                    log::warn!("BootNext is not set");
                     ExitCode::FAILURE
                 }
                 Err(err) => {
-                    panic!("{}", err);
+                    log::error!("Failed to read BootNext: {err}");
+                    ExitCode::FAILURE
                 }
             }
         }
@@ -52,11 +52,12 @@ pub fn run(manager: &mut dyn VarManager, cmd: BootNextCommand) -> ExitCode {
             let boot_entry = match BootEntry::read(&*manager, &Variable::new(&id.boot_var_name())) {
                 Ok(boot_entry) => boot_entry,
                 Err(Error::VarNotFound { var: _ }) => {
-                    println!("No boot entry with id {id:04X} found");
+                    log::error!("No boot entry with id {id:04X} found");
                     return ExitCode::FAILURE;
                 }
                 Err(err) => {
-                    panic!("{}", err);
+                    log::error!("Failed to read boot entry: {err}");
+                    return ExitCode::FAILURE;
                 }
             };
 
@@ -64,7 +65,7 @@ pub fn run(manager: &mut dyn VarManager, cmd: BootNextCommand) -> ExitCode {
                 .attributes
                 .contains(BootEntryAttributes::LOAD_OPTION_ACTIVE)
             {
-                eprintln!("Warning: boot entry is not active, and may not boot. Enable it with `efivarcli boot enable {id:04X}`");
+                log::warn!("Boot entry is not active, and may not boot. Enable it with `efivarcli boot enable {id:04X}`");
             }
 
             manager
@@ -75,7 +76,7 @@ pub fn run(manager: &mut dyn VarManager, cmd: BootNextCommand) -> ExitCode {
                 )
                 .unwrap();
 
-            println!(
+            log::info!(
                 "BootNext set to {id:04X} ({}) with success",
                 boot_entry.description
             );
@@ -84,14 +85,17 @@ pub fn run(manager: &mut dyn VarManager, cmd: BootNextCommand) -> ExitCode {
         }
         BootNextCommand::Unset => match manager.delete(&Variable::new("BootNext")) {
             Ok(_) => {
-                println!("BootNext unset with success");
+                log::info!("BootNext unset with success");
                 ExitCode::SUCCESS
             }
             Err(Error::VarNotFound { var: _ }) => {
-                println!("BootNext not set");
+                log::warn!("BootNext not set");
                 ExitCode::FAILURE
             }
-            Err(err) => panic!("{}", err),
+            Err(err) => {
+                log::error!("Failed to unset BootNext: {err}");
+                ExitCode::FAILURE
+            }
         },
     }
 }

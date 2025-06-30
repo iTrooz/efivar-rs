@@ -13,7 +13,7 @@ pub fn enable(manager: &mut dyn VarManager, id: u16) -> ExitCode {
         .attributes
         .contains(BootEntryAttributes::LOAD_OPTION_ACTIVE)
     {
-        eprintln!("Boot entry is already enabled");
+        log::warn!("Boot entry is already enabled");
         return ExitCode::FAILURE;
     }
 
@@ -22,7 +22,7 @@ pub fn enable(manager: &mut dyn VarManager, id: u16) -> ExitCode {
         .insert(BootEntryAttributes::LOAD_OPTION_ACTIVE);
 
     manager.create_boot_entry(id, boot_entry).unwrap();
-    println!("Enabled boot entry with success");
+    log::info!("Enabled boot entry with success");
 
     ExitCode::SUCCESS
 }
@@ -34,7 +34,7 @@ pub fn disable(manager: &mut dyn VarManager, id: u16) -> ExitCode {
         .attributes
         .contains(BootEntryAttributes::LOAD_OPTION_ACTIVE)
     {
-        eprintln!("Boot entry is already disabled");
+        log::warn!("Boot entry is already disabled");
         return ExitCode::FAILURE;
     }
 
@@ -43,7 +43,7 @@ pub fn disable(manager: &mut dyn VarManager, id: u16) -> ExitCode {
         .remove(BootEntryAttributes::LOAD_OPTION_ACTIVE);
 
     manager.create_boot_entry(id, boot_entry).unwrap();
-    println!("Disabled boot entry with success");
+    log::info!("Disabled boot entry with success");
 
     ExitCode::SUCCESS
 }
