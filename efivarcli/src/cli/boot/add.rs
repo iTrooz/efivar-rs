@@ -2,7 +2,7 @@
 
 use crate::{
     cli::boot::{
-        get_entries::print_var,
+        list::print_var,
         partition::{query_partition, Partition},
     },
     exit_code::ExitCode,

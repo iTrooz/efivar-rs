@@ -10,7 +10,7 @@ use self::{next::BootNextCommand, order::OrderCommand};
 pub mod add;
 pub mod delete;
 pub mod enable_disable;
-pub mod get_entries;
+pub mod list;
 pub mod next;
 pub mod order;
 pub mod partition;
@@ -46,6 +46,7 @@ fn partition_help() -> &'static str {
 pub enum BootCommand {
     /// Get all boot entries found, both in the boot order, and outside it if the name matchs
     #[command(alias = "get-entries")]
+    #[command(alias = "get")]
     List {
         /// Show more information, such as optional data
         #[arg(short, long)]
@@ -104,7 +105,7 @@ pub enum BootCommand {
 
 pub fn run(manager: &mut dyn VarManager, cmd: BootCommand) -> ExitCode {
     match cmd {
-        BootCommand::List { verbose } => get_entries::run(manager, verbose),
+        BootCommand::List { verbose } => list::run(manager, verbose),
         BootCommand::Add {
             disk,
             partition,
