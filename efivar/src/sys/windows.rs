@@ -31,6 +31,7 @@ impl SystemManager {
             return Err(crate::VarManagerInitError::EFIVariablesNotAvailable);
         }
 
+        log::trace!("Successfully initialized SystemManager for EFI variables");
         Ok(SystemManager {})
     }
 
@@ -118,6 +119,10 @@ impl VarEnumerator for SystemManager {
 
             // handle error
             if status != STATUS_BUFFER_TOO_SMALL {
+                log::debug!(
+                    "NtEnumerateSystemEnvironmentValuesEx() returned an error when trying to guess buffer size: {}",
+                    status
+                );
                 return Err(crate::Error::UnknownIoError(
                     std::io::Error::from_raw_os_error(status),
                 ));
@@ -142,6 +147,10 @@ impl VarEnumerator for SystemManager {
 
             // handle error
             if status != 0 {
+                log::debug!(
+                    "NtEnumerateSystemEnvironmentValuesEx() returned an error when trying to read EFI variables: {}",
+                    status
+                );
                 return Err(crate::Error::UnknownIoError(
                     std::io::Error::from_raw_os_error(status),
                 ));
@@ -149,12 +158,14 @@ impl VarEnumerator for SystemManager {
         }
 
         let vars = parse_efi_variables(&mut &buf[..])?;
+        log::debug!("Found {} EFI variables", vars.len());
         Ok(Box::new(vars.into_iter()))
     }
 }
 
 impl VarReader for SystemManager {
     fn read(&self, var: &Variable) -> crate::Result<(Vec<u8>, VariableFlags)> {
+        log::trace!("Reading variable: {}", var);
         // Parse name, and split into LPCWSTR
         let (guid_wide, name_wide) = SystemManager::parse_name(var)?;
 
@@ -210,6 +221,11 @@ impl VarWriter for SystemManager {
         attributes: VariableFlags,
         value: &[u8],
     ) -> crate::Result<()> {
+        log::trace!(
+            "Writing variable {} with value of size {}",
+            var,
+            value.len()
+        );
         // Parse name, and split into LPCWSTR
         let (guid_wide, name_wide) = SystemManager::parse_name(var)?;
 
@@ -224,12 +240,24 @@ impl VarWriter for SystemManager {
         };
 
         match result {
-            0 => Err(Error::for_variable_os(var)),
-            _ => Ok(()),
+            0 => {
+                let err = Error::for_variable_os(var);
+                log::debug!("Failed to write variable {}: {}", var, err);
+                Err(err)
+            }
+            _ => {
+                log::debug!(
+                    "Successfully wrote variable {}. Value size: {}",
+                    var,
+                    value.len()
+                );
+                Ok(())
+            }
         }
     }
 
     fn delete(&mut self, var: &Variable) -> crate::Result<()> {
+        log::trace!("Deleting variable: {}", var);
         let (guid_wide, name_wide) = SystemManager::parse_name(var)?;
 
         let result = unsafe {
@@ -243,8 +271,18 @@ impl VarWriter for SystemManager {
         };
 
         match result {
-            0 => Err(Error::for_variable_os(var)),
-            _ => Ok(()),
+            0 => {
+                log::debug!(
+                    "Failed to delete variable {}: {}",
+                    var,
+                    Error::for_variable_os(var)
+                );
+                Err(Error::for_variable_os(var))
+            }
+            _ => {
+                log::debug!("Successfully deleted variable {}", var);
+                Ok(())
+            }
         }
     }
 }
