@@ -15,7 +15,7 @@ impl<T: VarReader> BootVarReader for T {
     fn get_boot_order(&self) -> crate::Result<Vec<u16>> {
         let (data, _) = self.read(&Variable::new("BootOrder"))?;
 
-        assert!(data.len() % 2 == 0);
+        assert!(data.len() % 2 == 0); // ids are u16 values, so it must be an even number of u8
 
         let mut ids = vec![0u16; data.len() / 2];
         data.as_slice()
