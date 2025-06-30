@@ -12,7 +12,7 @@ pub fn run(manager: &mut dyn VarManager, id: u16, position: Option<usize>) -> Ex
 
     manager.set_boot_order(ids.clone()).unwrap(); // TODO remove clone() call
 
-    println!(
+    log::info!(
         "Added new id {id:04X} to boot order. New boot order: {}",
         super::boot_order_str(&ids)
     );

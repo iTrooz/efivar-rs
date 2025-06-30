@@ -46,8 +46,8 @@ pub fn run(
             };
             ExitCode::SUCCESS
         }
-        Err(reason) => {
-            eprintln!("Failed: {reason}");
+        Err(err) => {
+            log::error!("Failed to read variable {name}: {err}");
             ExitCode::FAILURE
         }
     }

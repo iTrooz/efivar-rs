@@ -13,11 +13,11 @@ pub fn run(manager: &mut dyn VarManager, name: &str, namespace: Option<uuid::Uui
 
     match manager.delete(&var_name) {
         Ok(_) => {
-            println!("Deleted variable {var_name} successfully");
+            log::info!("Deleted variable {var_name} successfully");
             ExitCode::SUCCESS
         }
         Err(err) => {
-            eprintln!("Failed to delete variable {var_name}: {err}");
+            log::error!("Failed to delete variable {var_name}: {err}");
             ExitCode::FAILURE
         }
     }

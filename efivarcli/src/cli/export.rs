@@ -31,16 +31,16 @@ pub fn run(
     match reader.read(&var) {
         Ok((buf, flags)) => match export(output_path, flags, &buf) {
             Ok(_) => {
-                println!(
+                log::info!(
                     "Exported variable {} to file {}",
                     var,
                     output_path.canonicalize().unwrap().display()
                 );
                 return ExitCode::SUCCESS;
             }
-            Err(err) => eprintln!("Failed to write to file: {err}"),
+            Err(err) => log::error!("Failed to write to file: {err}"),
         },
-        Err(err) => eprintln!("Failed to read variable: {err}"),
+        Err(err) => log::error!("Failed to read variable: {err}"),
     };
 
     ExitCode::FAILURE

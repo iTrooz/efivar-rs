@@ -8,12 +8,12 @@ pub fn run(manager: &mut dyn VarManager, id: u16, force: bool) -> ExitCode {
     if let Some(index) = ids.iter().position(|loop_id| loop_id == &id) {
         ids.remove(index);
     } else {
-        eprintln!("Id {id:04X} not found in boot order");
+        log::error!("Id {id:04X} not found in boot order");
         return ExitCode::FAILURE;
     }
 
     if manager.read(&Variable::new(&id.boot_var_name())).is_ok() && !force {
-        eprintln!("Warning: A variable with the name {} exists. Deleting its id from the boot order won't delete it.\n\
+        log::warn!("A variable with the name {} exists. Deleting its id from the boot order won't delete it.\n\
             Use `efivarcli boot del {id:04X}` instead.\n\
             Pass argument --force to skip this warning", id.boot_var_name());
         return ExitCode::FAILURE;
@@ -21,7 +21,7 @@ pub fn run(manager: &mut dyn VarManager, id: u16, force: bool) -> ExitCode {
 
     manager.set_boot_order(ids.clone()).unwrap(); // TODO remove clone() call
 
-    println!(
+    log::info!(
         "Removed id {id:04X} from boot order. New boot order: {}",
         super::boot_order_str(&ids)
     );

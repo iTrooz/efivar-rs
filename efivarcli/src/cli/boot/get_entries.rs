@@ -66,7 +66,7 @@ pub fn run(manager: &dyn VarManager, verbose: bool) -> ExitCode {
     let entries = match manager.get_boot_entries() {
         Ok(entries) => entries,
         Err(err) => {
-            eprintln!("Failed to get boot entries: {err}");
+            log::error!("Failed to get boot entries: {err}");
             return ExitCode::FAILURE;
         }
     };
@@ -74,7 +74,7 @@ pub fn run(manager: &dyn VarManager, verbose: bool) -> ExitCode {
     let mut vars: Vec<Variable> = match manager.get_all_vars() {
         Ok(vars) => vars,
         Err(err) => {
-            eprintln!("Failed to list EFI variables: {err:?}");
+            log::error!("Failed to list EFI variables: {err:?}");
             return ExitCode::FAILURE;
         }
     }
@@ -97,7 +97,7 @@ pub fn run(manager: &dyn VarManager, verbose: bool) -> ExitCode {
 
         match entry {
             Ok(entry) => print_var(&entry, verbose, active_id),
-            Err(err) => eprintln!("Failed to get entry from variable {var}: {err}"),
+            Err(err) => log::error!("Failed to get boot entry from variable {var}: {err}"),
         }
     }
 
@@ -114,7 +114,7 @@ pub fn run(manager: &dyn VarManager, verbose: bool) -> ExitCode {
         };
         match BootEntry::read(manager, &var) {
             Ok(entry) => print_var(&BootVariable { entry, id: boot_id }, verbose, active_id),
-            Err(err) => eprintln!("Failed to get entry from variable {var}: {err}"),
+            Err(err) => log::error!("Failed to get boot entry from variable {var}: {err}"),
         };
     }
 

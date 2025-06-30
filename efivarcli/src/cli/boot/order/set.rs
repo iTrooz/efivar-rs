@@ -5,7 +5,7 @@ use efivar::VarManager;
 pub fn run(manager: &mut dyn VarManager, ids: Vec<u16>) -> ExitCode {
     manager.set_boot_order(ids.clone()).unwrap(); // TODO remove clone() call
 
-    println!(
+    log::info!(
         "Overwrote boot order. New boot order: {}",
         super::boot_order_str(&ids)
     );

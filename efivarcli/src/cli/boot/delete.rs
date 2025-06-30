@@ -11,22 +11,42 @@ pub fn run(manager: &mut dyn VarManager, id: u16) -> ExitCode {
     // delete the entry
     match manager.delete(&Variable::new(&id.boot_var_name())) {
         Ok(_) => {
-            println!("Deleted entry with success");
+            log::info!("Deleted boot entry variable with id {id} successfully");
             result = ExitCode::SUCCESS;
         }
-        Err(efivar::Error::VarNotFound { var: _ }) => eprintln!("Boot entry not found"),
-        Err(err) => eprintln!("Failed to delete entry: {err}"),
+        Err(efivar::Error::VarNotFound { var: _ }) => log::error!("Boot entry variable not found"),
+        Err(err) => log::warn!("Failed to delete boot entry variable: {err}"),
     }
 
     // remove it from boot order
     let mut ids = manager.get_boot_order().unwrap();
     let old_size = ids.len();
     ids.retain(|v| *v != id);
-    if old_size == ids.len() {
-        eprintln!("Failed to remove id from boot order");
-    } else {
+
+    let apply = match (old_size, ids.len()) {
+        (old, new) if old == new => {
+            log::warn!("ID {id} was not found in boot order");
+            false
+        }
+        (old, new) if old - new == 1 => {
+            log::info!("Removed id {id} from boot order");
+            true
+        }
+        (old, new) if old - new > 1 => {
+            log::warn!("Removed id {id} multiple times from boot order");
+            true
+        }
+        _ => {
+            log::warn!(
+                "Unexpected change in boot order size: was {old_size}, now {}. Not applying",
+                ids.len()
+            );
+            false
+        }
+    };
+
+    if apply {
         manager.set_boot_order(ids).unwrap();
-        eprintln!("Removed id from boot order");
         result = ExitCode::SUCCESS;
     }
 

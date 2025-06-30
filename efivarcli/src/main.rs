@@ -19,10 +19,20 @@ struct Opt {
     cmd: Command,
 }
 
+fn setup_logging() {
+    let mut builder =
+        &mut env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info"));
+    if std::env::var("RUST_LOG").is_err() && std::env::var("VERBOSE").is_err() {
+        // Simplify log format
+        builder = builder.format_timestamp(None).format_target(false);
+    }
+    builder.init();
+
+    log::debug!("Debug logging enabled");
+}
+
 fn main() -> std::process::ExitCode {
-    env_logger::Builder::from_default_env()
-        .filter_level(log::LevelFilter::Info)
-        .init();
+    setup_logging();
 
     let opts = Opt::parse();
 
