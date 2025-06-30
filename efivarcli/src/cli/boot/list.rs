@@ -71,10 +71,12 @@ pub fn run(manager: &dyn VarManager, verbose: bool) -> ExitCode {
         }
     };
 
-    let mut vars: Vec<Variable> = match manager.get_all_vars() {
+    let mut vars: Vec<(u16, Variable)> = match manager.get_all_vars() {
         Ok(vars) => {
             // Only keep EFI variables
-            vars.filter(|var| var.vendor().is_efi()).collect()
+            vars.filter(|var| var.vendor().is_efi())
+                .filter_map(|var| var.boot_var_id().map(|id| (id, var)))
+                .collect()
         }
         Err(err) => {
             log::warn!("Failed to list EFI variables. You will not be able to see boot variables outside of boot order. Error: {err:?}");
@@ -94,7 +96,7 @@ pub fn run(manager: &dyn VarManager, verbose: bool) -> ExitCode {
 
     for (entry, var) in entries {
         // remove this variable from the list of variables to show
-        vars.retain(|loop_var| loop_var.name() != var.name());
+        vars.retain(|(_, loop_var)| loop_var.name() != var.name());
 
         match entry {
             Ok(entry) => print_var(&entry, verbose, active_id),
@@ -108,11 +110,7 @@ pub fn run(manager: &dyn VarManager, verbose: bool) -> ExitCode {
 
     println!();
     println!("Found boot entries not in boot sequence:");
-    for var in vars {
-        let boot_id = match var.boot_var_id() {
-            Some(id) => id,
-            None => continue,
-        };
+    for (boot_id, var) in vars {
         match BootEntry::read(manager, &var) {
             Ok(entry) => print_var(&BootVariable { entry, id: boot_id }, verbose, active_id),
             Err(err) => log::error!("Failed to get boot entry from variable {var}: {err}"),
