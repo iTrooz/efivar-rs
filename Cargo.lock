@@ -756,8 +756,8 @@ dependencies = [
 
 [[package]]
 name = "win_partlist"
-version = "0.1.0"
-source = "git+https://github.com/iTrooz/win_partlist#b8c761f870291b5316e557506b5682db75a288ce"
+version = "1.0.0"
+source = "git+https://github.com/iTrooz/win_partlist?rev=v1.0.0#3489d692ff1262d84b52ccb932dbf98c3f150b53"
 dependencies = [
  "log",
  "uuid",
