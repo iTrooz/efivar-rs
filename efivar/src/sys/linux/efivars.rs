@@ -76,6 +76,11 @@ impl VarReader for SystemManager {
         f.read_to_end(&mut value)
             .map_err(|error| Error::for_variable(error, var))?;
 
+        log::debug!(
+            "Read variable {var} with attributes {flags:?} (value length: {})",
+            value.len()
+        );
+
         Ok((value, flags))
     }
 }
@@ -111,6 +116,11 @@ impl VarWriter for SystemManager {
         // Write variable contents
         f.write(value)
             .map_err(|error| Error::for_variable(error, var))?;
+
+        log::debug!(
+            "Wrote variable {var} with attributes {attributes:?} (value length: {})",
+            value.len()
+        );
 
         Ok(())
     }
