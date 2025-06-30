@@ -120,8 +120,7 @@ impl VarEnumerator for SystemManager {
             // handle error
             if status != STATUS_BUFFER_TOO_SMALL {
                 log::debug!(
-                    "NtEnumerateSystemEnvironmentValuesEx() returned an error when trying to guess buffer size: {}",
-                    status
+                    "NtEnumerateSystemEnvironmentValuesEx() returned an error when trying to guess buffer size: {status}"
                 );
                 return Err(crate::Error::UnknownIoError(
                     std::io::Error::from_raw_os_error(status),
@@ -148,8 +147,7 @@ impl VarEnumerator for SystemManager {
             // handle error
             if status != 0 {
                 log::debug!(
-                    "NtEnumerateSystemEnvironmentValuesEx() returned an error when trying to read EFI variables: {}",
-                    status
+                    "NtEnumerateSystemEnvironmentValuesEx() returned an error when trying to read EFI variables: {status}"
                 );
                 return Err(crate::Error::UnknownIoError(
                     std::io::Error::from_raw_os_error(status),
@@ -165,7 +163,7 @@ impl VarEnumerator for SystemManager {
 
 impl VarReader for SystemManager {
     fn read(&self, var: &Variable) -> crate::Result<(Vec<u8>, VariableFlags)> {
-        log::trace!("Reading variable: {}", var);
+        log::trace!("Reading variable: {var}");
         // Parse name, and split into LPCWSTR
         let (guid_wide, name_wide) = SystemManager::parse_name(var)?;
 
@@ -242,7 +240,7 @@ impl VarWriter for SystemManager {
         match result {
             0 => {
                 let err = Error::for_variable_os(var);
-                log::debug!("Failed to write variable {}: {}", var, err);
+                log::debug!("Failed to write variable {var}: {err}");
                 Err(err)
             }
             _ => {
@@ -257,7 +255,7 @@ impl VarWriter for SystemManager {
     }
 
     fn delete(&mut self, var: &Variable) -> crate::Result<()> {
-        log::trace!("Deleting variable: {}", var);
+        log::trace!("Deleting variable: {var}");
         let (guid_wide, name_wide) = SystemManager::parse_name(var)?;
 
         let result = unsafe {
@@ -280,7 +278,7 @@ impl VarWriter for SystemManager {
                 Err(Error::for_variable_os(var))
             }
             _ => {
-                log::debug!("Successfully deleted variable {}", var);
+                log::debug!("Successfully deleted variable {var}");
                 Ok(())
             }
         }
