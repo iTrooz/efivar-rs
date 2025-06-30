@@ -72,14 +72,15 @@ pub fn run(manager: &dyn VarManager, verbose: bool) -> ExitCode {
     };
 
     let mut vars: Vec<Variable> = match manager.get_all_vars() {
-        Ok(vars) => vars,
-        Err(err) => {
-            log::error!("Failed to list EFI variables: {err:?}");
-            return ExitCode::FAILURE;
+        Ok(vars) => {
+            // Only keep EFI variables
+            vars.filter(|var| var.vendor().is_efi()).collect()
         }
-    }
-    .filter(|var| var.vendor().is_efi())
-    .collect();
+        Err(err) => {
+            log::warn!("Failed to list EFI variables. You will not be able to see boot variables outside of boot order. Error: {err:?}");
+            vec![]
+        }
+    };
 
     println!("Boot entries in boot sequence (in boot order):");
 
