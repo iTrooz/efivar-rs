@@ -45,7 +45,7 @@ fn add_entry(manager: &mut dyn VarManager, id: u16, enabled: bool) -> BootEntry 
         optional_data: vec![],
     };
 
-    manager.add_boot_entry(id, entry.clone()).unwrap();
+    manager.create_boot_entry(id, entry.clone()).unwrap();
 
     entry
 }
