@@ -1,6 +1,6 @@
 use crate::exit_code::ExitCode;
 
-use efivar::{boot::BootVarName, efi::Variable, VarManager};
+use efivar::{boot::BootVarFormat, efi::Variable, VarManager};
 
 pub fn run(manager: &mut dyn VarManager, id: u16) -> ExitCode {
     // in this function, we assume that boot entry presence and boot order id presence are not correlated,
@@ -9,7 +9,7 @@ pub fn run(manager: &mut dyn VarManager, id: u16) -> ExitCode {
     let mut result = ExitCode::FAILURE;
 
     // delete the entry
-    match manager.delete(&Variable::new(&id.boot_var_name())) {
+    match manager.delete(&Variable::new(&id.boot_var_format())) {
         Ok(_) => {
             log::info!("Deleted boot entry variable with id {id} successfully");
             result = ExitCode::SUCCESS;

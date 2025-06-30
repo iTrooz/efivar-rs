@@ -10,7 +10,7 @@ use crate::{
 
 use byteorder::{LittleEndian, ReadBytesExt};
 use efivar::{
-    boot::{BootEntry, BootEntryAttributes, BootVarName, BootVariable, FilePath, FilePathList},
+    boot::{BootEntry, BootEntryAttributes, BootVarFormat, BootVariable, FilePath, FilePathList},
     efi::Variable,
     VarManager,
 };
@@ -94,7 +94,7 @@ pub fn run(
                 .unwrap();
 
             let boot_entry =
-                BootEntry::read(&*manager, &Variable::new(&active_id.boot_var_name())).unwrap();
+                BootEntry::read(&*manager, &Variable::new(&active_id.boot_var_format())).unwrap();
 
             boot_entry.file_path_list.unwrap().hard_drive
         }
@@ -127,7 +127,10 @@ pub fn run(
         let used_boot_ids = get_used_ids(&*manager);
         if let Some(id) = id {
             if used_boot_ids.contains(&id) {
-                log::error!("Boot entry with id {id:04X} already exists. Delete it first");
+                log::error!(
+                    "Boot entry {} already exists. Delete it first",
+                    id.boot_var_format()
+                );
                 return ExitCode::FAILURE;
             }
             id
@@ -135,7 +138,7 @@ pub fn run(
             let id = (0x0001..0xFFFF)
                 .find(|&i| !used_boot_ids.contains(&i))
                 .unwrap();
-            log::info!("Chose id {id:04X} for boot entry");
+            log::info!("Chose id {} for boot entry", id.boot_id_format());
             id
         }
     };

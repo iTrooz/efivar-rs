@@ -2,7 +2,7 @@ use crate::exit_code::ExitCode;
 
 use byteorder::{LittleEndian, ReadBytesExt};
 use efivar::{
-    boot::{BootEntry, BootEntryAttributes, BootVariable},
+    boot::{BootEntry, BootEntryAttributes, BootVarFormat, BootVariable},
     efi::Variable,
     VarManager,
 };
@@ -11,7 +11,7 @@ use efivar::{
 pub fn print_var(boot_var: &BootVariable, verbose: bool, active_boot_id: u16) {
     println!();
 
-    println!("ID: {:04X}", boot_var.id);
+    println!("ID: {}", boot_var.id.boot_id_format());
     println!("Description: {}", boot_var.entry.description);
     println!(
         "Enabled: {}",

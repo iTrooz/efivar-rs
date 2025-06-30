@@ -1,13 +1,13 @@
 use crate::exit_code::ExitCode;
 
 use efivar::{
-    boot::{BootEntry, BootEntryAttributes, BootVarName},
+    boot::{BootEntry, BootEntryAttributes, BootVarFormat},
     efi::Variable,
     VarManager,
 };
 
 pub fn enable(manager: &mut dyn VarManager, id: u16) -> ExitCode {
-    let mut boot_entry = BootEntry::read(&*manager, &Variable::new(&id.boot_var_name())).unwrap();
+    let mut boot_entry = BootEntry::read(&*manager, &Variable::new(&id.boot_var_format())).unwrap();
 
     if boot_entry
         .attributes
@@ -28,7 +28,7 @@ pub fn enable(manager: &mut dyn VarManager, id: u16) -> ExitCode {
 }
 
 pub fn disable(manager: &mut dyn VarManager, id: u16) -> ExitCode {
-    let mut boot_entry = BootEntry::read(&*manager, &Variable::new(&id.boot_var_name())).unwrap();
+    let mut boot_entry = BootEntry::read(&*manager, &Variable::new(&id.boot_var_format())).unwrap();
 
     if !boot_entry
         .attributes

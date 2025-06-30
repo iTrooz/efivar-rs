@@ -1,7 +1,7 @@
 use crate::exit_code::ExitCode;
 
 use clap::Parser;
-use efivar::VarManager;
+use efivar::{boot::BootVarFormat, VarManager};
 use itertools::Itertools;
 
 use crate::id::BootEntryId;
@@ -60,5 +60,5 @@ pub fn run(manager: &mut dyn VarManager, cmd: OrderCommand) -> ExitCode {
 
 /// Generate a string version of the boot order.
 fn boot_order_str(ids: &[u16]) -> String {
-    ids.iter().map(|id| format!("{id:04X}")).join(" ")
+    ids.iter().map(|id| id.boot_id_format()).join(" ")
 }

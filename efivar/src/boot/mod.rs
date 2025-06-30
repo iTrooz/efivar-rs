@@ -10,14 +10,19 @@ pub use parse::{EFIHardDrive, EFIHardDriveType, FilePath, FilePathList};
 pub use reader::BootVarReader;
 pub use writer::BootVarWriter;
 
-pub trait BootVarName {
-    fn boot_var_name(self) -> String;
+pub trait BootVarFormat {
+    fn boot_id_format(self) -> String;
+    fn boot_var_format(self) -> String;
 }
 
-impl BootVarName for u16 {
+impl BootVarFormat for u16 {
+    fn boot_id_format(self) -> String {
+        format!("{self:04X}")
+    }
+
     /// Get the boot entry name associated with that ID.
     /// See [`crate::efi::Variable::boot_var_id`]
-    fn boot_var_name(self) -> String {
-        format!("Boot{self:04X}")
+    fn boot_var_format(self) -> String {
+        format!("Boot{}", self.boot_id_format())
     }
 }

@@ -1,6 +1,6 @@
 use crate::exit_code::ExitCode;
 
-use efivar::{boot::BootVarName, VarManager};
+use efivar::{boot::BootVarFormat, VarManager};
 
 pub fn run(manager: &dyn VarManager) -> ExitCode {
     let ids = match manager.get_boot_order() {
@@ -14,7 +14,7 @@ pub fn run(manager: &dyn VarManager) -> ExitCode {
     println!("Boot order:");
 
     for id in ids {
-        println!("{}", id.boot_var_name());
+        println!("{}", id.boot_var_format());
     }
 
     ExitCode::SUCCESS

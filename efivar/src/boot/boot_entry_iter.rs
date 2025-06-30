@@ -1,8 +1,8 @@
 //! This module contains the custom iterator used to loop lazily over boot entries
 
-use crate::{efi::Variable, VarReader};
+use crate::{boot::BootVarFormat, efi::Variable, VarReader};
 
-use super::{BootEntry, BootVarName, BootVarReader, BootVariable};
+use super::{BootEntry, BootVarReader, BootVariable};
 
 /// Loop over boot entries. On each iteration, a variable data will be queried from the OS
 pub struct BootEntriesIterator<'a> {
@@ -28,7 +28,7 @@ impl<'a> Iterator for BootEntriesIterator<'a> {
         let id = self.ids.pop();
         let id = id?;
 
-        let var = Variable::new(&id.boot_var_name());
+        let var = Variable::new(&id.boot_var_format());
         let boot_var_res =
             BootEntry::read(self.var_reader, &var).map(|entry| BootVariable { entry, id });
 

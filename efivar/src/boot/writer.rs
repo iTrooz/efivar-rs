@@ -1,7 +1,7 @@
 //! This module contains functions to write boot entries
 
 use crate::{
-    boot::BootVarName,
+    boot::BootVarFormat,
     efi::{Variable, VariableFlags},
     VarWriter,
 };
@@ -33,7 +33,7 @@ impl<T: VarWriter> BootVarWriter for T {
         let bytes = entry.to_bytes();
 
         self.write(
-            &Variable::new(&id.boot_var_name()),
+            &Variable::new(&id.boot_var_format()),
             VariableFlags::default(),
             &bytes,
         )?;
