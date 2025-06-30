@@ -31,7 +31,7 @@ pub fn get_used_ids(manager: &dyn VarManager) -> Vec<u16> {
 /// check if a partition+file is valid (exists), if the partition is mounted
 fn try_check_if_valid(partition: &Partition, file: &str) -> Option<bool> {
     if let Some(mount_point) = partition::get_mount_point(partition) {
-        eprintln!(
+        log::info!(
             "Partition {} is mounted on {}. Verifying file location {file} is valid",
             partition,
             mount_point.display()
@@ -39,11 +39,11 @@ fn try_check_if_valid(partition: &Partition, file: &str) -> Option<bool> {
         let full_path = mount_point.join(file);
         if let Ok(md) = std::fs::metadata(&full_path) {
             if md.is_file() {
-                eprintln!("File location is valid");
+                log::info!("File location is valid");
                 return Some(true);
             }
         }
-        eprintln!("{} is not a valid file", full_path.display());
+        log::error!("{} is not a valid file", full_path.display());
         Some(false)
     } else {
         None
@@ -84,7 +84,7 @@ pub fn run(
             partition::retrieve_efi_partition_data(&abs_partition).unwrap()
         } else {
             // default to currently booted partition
-            eprintln!("No partition selected. Using active boot partition");
+            log::info!("No partition selected. Using active boot partition");
             let active_id = manager
                 .read(&Variable::new("BootCurrent"))
                 .unwrap()
@@ -101,10 +101,16 @@ pub fn run(
     };
 
     // Construct EFI boot file path
+    let fixed_file_path = fix_file_path(file_path.clone());
+    if file_path != fixed_file_path {
+        log::warn!(
+            "File path {file_path} has been fixed to {fixed_file_path} to match EFI requirements"
+        );
+    }
     let file_path_list = FilePathList {
         hard_drive: efi_partition,
         file_path: FilePath {
-            path: fix_file_path(file_path),
+            path: fixed_file_path,
         },
     };
 
@@ -121,7 +127,7 @@ pub fn run(
         let used_boot_ids = get_used_ids(&*manager);
         if let Some(id) = id {
             if used_boot_ids.contains(&id) {
-                eprintln!("Boot entry with id {id:04X} already exists. Delete it first");
+                log::error!("Boot entry with id {id:04X} already exists. Delete it first");
                 return ExitCode::FAILURE;
             }
             id
@@ -129,7 +135,7 @@ pub fn run(
             let id = (0x0001..0xFFFF)
                 .find(|&i| !used_boot_ids.contains(&i))
                 .unwrap();
-            println!("Chose id {id:04X} for boot entry");
+            log::info!("Chose id {id:04X} for boot entry");
             id
         }
     };
@@ -142,7 +148,7 @@ pub fn run(
     ids.insert(0, id);
     manager.set_boot_order(ids).unwrap();
 
-    println!("Added entry with success");
+    log::info!("Added entry with success");
     print_var(&BootVariable { entry, id }, true, 0x0000);
 
     ExitCode::SUCCESS
