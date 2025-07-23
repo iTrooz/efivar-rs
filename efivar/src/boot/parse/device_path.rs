@@ -109,7 +109,7 @@ impl DevicePath {
 
         let data_size = length - 1 - 1 - 2;
 
-        if data_size > buf.len() {
+        if data_size as usize > buf.len() {
             return Err(Error::VarParseError);
         }
         
