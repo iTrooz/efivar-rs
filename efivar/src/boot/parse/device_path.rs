@@ -110,9 +110,9 @@ impl DevicePath {
         let data_size = length - 1 - 1 - 2;
 
         if data_size as usize > buf.len() {
-            return Err(Error::VarParseError);
+                return Err(Error::VarParseError);
         }
-        
+
         let (mut device_path_data, new_buf) = buf.split_at(data_size.into());
         *buf = new_buf;
 
