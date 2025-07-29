@@ -61,11 +61,7 @@ use crate::sys::SystemManager;
 /// ***The returned object will change the values stored in the system's NVRAM. Please be cautious
 /// when using its methods.***
 pub fn system() -> std::result::Result<Box<dyn VarManager>, VarManagerInitError> {
-    pub fn system() -> std::result::Result<Box<dyn VarManager>, error::Error> {
-        SystemManager::new()
-            .map(|sys| Box::<dyn VarManager>::new(sys))
-            .map_err(Into::into)
-    }
+    SystemManager::new().map(|m| Box::new(m) as Box<dyn VarManager>)
 }
 
 /// Returns a `VarManager` which loads and stores variables to a TOML file. The variable file will
