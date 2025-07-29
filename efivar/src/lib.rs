@@ -61,12 +61,7 @@ use crate::sys::SystemManager;
 /// ***The returned object will change the values stored in the system's NVRAM. Please be cautious
 /// when using its methods.***
 pub fn system() -> std::result::Result<Box<dyn VarManager>, VarManagerInitError> {
-    match SystemManager::new() {
-        Ok(manager) => Ok(Box::new(manager)),
-        Err(VarManagerInitError::EFIVariablesNotAvailable) => {
-            panic!("EFI variables are not available on this system.")
-        }
-    }
+    SystemManager::new().map(|m| Box::new(m) as Box<dyn VarManager>)
 }
 
 /// Returns a `VarManager` which loads and stores variables to a TOML file. The variable file will
