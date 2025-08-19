@@ -51,7 +51,7 @@ jobs:
         run: cargo fmt -- --check
 
       - name: Run cargo clippy
-        run: cargo clippy --all-features
+        run: cargo clippy --no-deps --all-features
       
       # Verify broken doc links
       - name: Run cargo doc
