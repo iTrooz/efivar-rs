@@ -7,4 +7,4 @@ to manage EFI variables related to UEFI boot manager operation.
 
 iTrooz
 
-Vincent Tavernier <v.tavernier@pm.me>
+Alixinne <alixinne@pm.me>
