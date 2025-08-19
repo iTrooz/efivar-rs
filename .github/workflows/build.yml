@@ -50,8 +50,6 @@ jobs:
       - name: Run cargo fmt
         run: cargo fmt -- --check
 
-      - name: Run cargo check
-        run: cargo check --all-features
       - name: Run cargo clippy
         run: cargo clippy --all-features
       
