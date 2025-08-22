@@ -21,8 +21,7 @@ The efivarcli tool supports both Windows and Linux:
 ## Development status
 
 ***This project is still under heavy development. Its public interface should
-not be considered stable, and should not in any way be used in a production
-environment.***
+not be considered stable.**
 
 ## Disclaimer
 
