@@ -8,7 +8,7 @@ use super::boot_entry_iter::BootEntriesIterator;
 
 pub trait BootVarReader {
     fn get_boot_order(&self) -> crate::Result<Vec<u16>>;
-    fn get_boot_entries(&self) -> crate::Result<BootEntriesIterator>;
+    fn get_boot_entries<'a>(&'a self) -> crate::Result<BootEntriesIterator<'a>>;
 }
 
 impl<T: VarReader> BootVarReader for T {
@@ -27,7 +27,7 @@ impl<T: VarReader> BootVarReader for T {
         Ok(ids)
     }
 
-    fn get_boot_entries(&self) -> crate::Result<BootEntriesIterator> {
+    fn get_boot_entries<'a>(&'a self) -> crate::Result<BootEntriesIterator<'a>> {
         BootEntriesIterator::new(self)
     }
 }
