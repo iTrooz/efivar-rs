@@ -110,6 +110,7 @@ impl VarWriter for SystemManager {
         value: &[u8],
     ) -> crate::Result<()> {
         log::trace!("efivarfs: Writing EFI variable {var} with attributes {attributes:?} and value length {}", value.len());
+        // Filename to the matching efivarfs file for this variable
         let filename = format!("{EFIVARFS_ROOT}/{var}");
 
         let file_flags = remove_immutable(&filename, var)?;
@@ -149,6 +150,8 @@ impl VarWriter for SystemManager {
     fn delete(&mut self, var: &Variable) -> crate::Result<()> {
         log::trace!("efivarfs: Deleting EFI variable {var}");
         let filename = format!("{EFIVARFS_ROOT}/{var}");
+
+        remove_immutable(&filename, var)?;
 
         std::fs::remove_file(&filename).map_err(|error| Error::for_variable(error, var))?;
 
