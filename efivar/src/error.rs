@@ -5,13 +5,13 @@ use crate::efi::Variable;
 /// Describes an error returned by EFI variable operations
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
-    #[error("failed to parse variable name: {}", name)]
+    #[error("failed to parse variable name '{}'", name)]
     InvalidVarName { name: String },
-    #[error("variable not found: {}", var)]
+    #[error("variable not found '{}'", var)]
     VarNotFound { var: Variable },
-    #[error("permission denied for variable: {}", var)]
+    #[error("permission denied for variable '{}'", var)]
     PermissionDenied { var: Variable },
-    #[error("unknown i/o error for variable: {}", var)]
+    #[error("unknown i/o error for variable '{}': {}", var, error)]
     VarUnknownError { var: Variable, error: io::Error },
     #[error("base64 decoding error: {}", error)]
     #[cfg(feature = "store")]
