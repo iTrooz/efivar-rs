@@ -23,6 +23,28 @@ impl SystemManager {
     }
 }
 
+fn remove_immutable(filename: &str, var: &Variable) -> crate::Result<Option<IFlags>> {
+    let f = match File::open(filename) {
+        Ok(f) => f,
+        Err(err) if err.kind() == std::io::ErrorKind::NotFound => return Ok(None),
+        Err(err) => return Err(Error::for_variable(err, var)),
+    };
+
+    let orig_flags =
+        rustix::fs::ioctl_getflags(&f).map_err(|e| Error::for_variable(e.into(), var))?;
+
+    if orig_flags.contains(IFlags::IMMUTABLE) {
+        log::trace!("Removing IMMUTABLE flag from {filename}");
+        let mut new_flags = IFlags::from_bits(orig_flags.bits()).unwrap();
+        new_flags.remove(IFlags::IMMUTABLE);
+        rustix::fs::ioctl_setflags(&f, new_flags)
+            .map_err(|e| Error::for_variable(e.into(), var))?;
+        Ok(Some(orig_flags))
+    } else {
+        Ok(None)
+    }
+}
+
 impl LinuxSystemManager for SystemManager {
     #[cfg(test)]
     fn supported(&self) -> bool {
@@ -91,48 +113,7 @@ impl VarWriter for SystemManager {
         // Filename to the matching efivarfs file for this variable
         let filename = format!("{EFIVARFS_ROOT}/{var}");
 
-        // handle immutable file attribute. file_flags is some if the flag was removed and need to be set again
-        let file_flags: Option<IFlags> = 'outer: {
-            // Open file read only to get FD for flags operations.
-            let f_res = File::open(&filename);
-            let f = match f_res {
-                Ok(f) => {
-                    log::trace!("Opened variable file {filename} for flag operations");
-                    f
-                }
-                Err(err) => {
-                    // If the file does not exist, we cannot get flags (so skip the flag reading part),
-                    // but should still proceed with writing the variable
-                    if err.kind() == std::io::ErrorKind::NotFound {
-                        log::debug!("File {filename} does not exist, will create new variable");
-                        break 'outer None;
-                    } else {
-                        // Otherwise, return an error.
-                        log::debug!("Failed to open {filename} for flag operations: {err}");
-                        return Err(Error::for_variable(err, var));
-                    }
-                }
-            };
-
-            // Read original flags.
-            let orig_flags = rustix::fs::ioctl_getflags(&f)
-                .map_err(|error| Error::for_variable(error.into(), var))?;
-
-            // If Immutable flag is present, remove it.
-            if orig_flags.contains(rustix::fs::IFlags::IMMUTABLE) {
-                log::trace!("Removing IMMUTABLE flag from {filename} for writing");
-                // IFlags doesn't implement Clone, so cycle through bits.
-                let mut modif_flags = rustix::fs::IFlags::from_bits(orig_flags.bits()).unwrap();
-
-                modif_flags.remove(rustix::fs::IFlags::IMMUTABLE);
-                rustix::fs::ioctl_setflags(&f, modif_flags)
-                    .map_err(|error| Error::for_variable(error.into(), var))?;
-
-                Some(orig_flags)
-            } else {
-                None
-            }
-        };
+        let file_flags = remove_immutable(&filename, var)?;
 
         // Open file for write
         let mut f = File::options()
@@ -169,6 +150,8 @@ impl VarWriter for SystemManager {
     fn delete(&mut self, var: &Variable) -> crate::Result<()> {
         log::trace!("efivarfs: Deleting EFI variable {var}");
         let filename = format!("{EFIVARFS_ROOT}/{var}");
+
+        remove_immutable(&filename, var)?;
 
         std::fs::remove_file(&filename).map_err(|error| Error::for_variable(error, var))?;
 
