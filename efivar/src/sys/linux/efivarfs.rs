@@ -23,6 +23,7 @@ impl SystemManager {
     }
 }
 
+/// remove immutable flag from a variable, and return the original flagset if it was modified
 fn remove_immutable(filename: &str, var: &Variable) -> crate::Result<Option<IFlags>> {
     let f = match File::open(filename) {
         Ok(f) => f,
@@ -113,7 +114,7 @@ impl VarWriter for SystemManager {
         // Filename to the matching efivarfs file for this variable
         let filename = format!("{EFIVARFS_ROOT}/{var}");
 
-        let file_flags = remove_immutable(&filename, var)?;
+        let orig_flags = remove_immutable(&filename, var)?;
 
         // Open file for write
         let mut f = File::options()
@@ -134,7 +135,7 @@ impl VarWriter for SystemManager {
             .map_err(|error| Error::for_variable(error, var))?;
 
         // Potentially add back the Immutable flag.
-        if let Some(orig_flags) = file_flags {
+        if let Some(orig_flags) = orig_flags {
             log::trace!("Restoring original flags for variable {var}");
             rustix::fs::ioctl_setflags(&f, orig_flags)
                 .map_err(|error| Error::for_variable(error.into(), var))?;
